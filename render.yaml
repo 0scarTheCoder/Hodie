@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: hodie-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        fromDatabase:
+          name: hodie-mongodb
+          property: connectionString
+      - key: PORT
+        value: 10000
