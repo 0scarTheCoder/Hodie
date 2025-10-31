@@ -9,8 +9,6 @@ services:
       - key: NODE_ENV
         value: production
       - key: MONGODB_URI
-        fromDatabase:
-          name: hodie-mongodb
-          property: connectionString
+        sync: false
       - key: PORT
-        value: 10000
+        generateValue: true
