@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { User } from 'firebase/auth';
 import { queryLogger } from '../../utils/queryLogger';
-import { claudeService } from '../../services/claudeService';
+// import { claudeService } from '../../services/claudeService'; // Not needed - using backend endpoint
 
 interface Message {
   id: string;
