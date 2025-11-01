@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { User } from 'firebase/auth';
 import { queryLogger } from '../../utils/queryLogger';
-// import { claudeService } from '../../services/claudeService'; // Not needed - using backend endpoint
+import { enhancedChatService } from '../../services/enhancedChatService';
 
 interface Message {
   id: string;
@@ -61,26 +61,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
       // Get user's recent health data for context
       const healthContext = await getUserHealthContext(user.uid);
       
-      // Generate response using backend Claude AI endpoint
-      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: inputValue,
-          userId: user.uid,
-          healthContext,
-          conversationHistory
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      const responseText = data.response;
+      // Generate response using enhanced local chat service
+      const responseText = await enhancedChatService.generateHealthResponse(
+        inputValue,
+        healthContext,
+        conversationHistory
+      );
       
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -267,11 +253,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
               <button
                 key={topic}
                 onClick={() => setInputValue(question)}
-                className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors flex items-center space-x-1"
+                className="px-3 py-2 bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 text-gray-700 rounded-lg text-sm transition-all duration-200 flex items-center space-x-1 border border-gray-200 hover:border-blue-300"
                 disabled={isLoading}
               >
-                <span>{emoji}</span>
-                <span>{topic}</span>
+                <span className="text-base">{emoji}</span>
+                <span className="font-medium">{topic}</span>
               </button>
             ))}
           </div>
