@@ -114,7 +114,7 @@ You can help with:
     const templates = {
       sleep: "I'd like to improve my sleep quality. What are some evidence-based strategies?",
       exercise: "What's a good exercise routine for someone just starting their fitness journey?",
-      nutrition: "Can you help me understand the basics of healthy eating?",
+      nutrition: "What foods should I eat for optimal health?",
       stress: "I've been feeling stressed lately. What are some healthy ways to manage stress?",
       hydration: "How much water should I be drinking daily, and why is it important?"
     };

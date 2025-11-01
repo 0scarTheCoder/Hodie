@@ -18,7 +18,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: 'Hello! I\'m your Hodie Labs health assistant powered by Claude AI. I can help you with health questions, analyze your health data, and provide personalized wellness advice. How can I help you today?',
+      text: 'G\'day! I\'m your Hodie Labs health assistant powered by Claude AI. I can help you with health questions, analyse your health data, and provide personalised wellness advice. How can I help you today?',
       sender: 'assistant',
       timestamp: new Date()
     }
@@ -61,16 +61,30 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
       // Get user's recent health data for context
       const healthContext = await getUserHealthContext(user.uid);
       
-      // Generate response using Claude AI
-      const response = await claudeService.generateHealthResponse(
-        inputValue,
-        healthContext,
-        conversationHistory
-      );
+      // Generate response using backend Claude AI endpoint
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: inputValue,
+          userId: user.uid,
+          healthContext,
+          conversationHistory
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const responseText = data.response;
       
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: response,
+        text: responseText,
         sender: 'assistant',
         timestamp: new Date()
       };
@@ -81,15 +95,15 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
       setConversationHistory(prev => [
         ...prev,
         { role: 'user', content: inputValue },
-        { role: 'assistant', content: response }
+        { role: 'assistant', content: responseText }
       ]);
       
-      queryLogger.logResponse(logId, response);
+      queryLogger.logResponse(logId, responseText);
     } catch (error) {
       console.error('Chat error:', error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: 'I apologize, but I encountered an error processing your request. This might be due to API configuration issues. Please try again or contact support.',
+        text: 'I apologise, but I encountered an error processing your request. This might be due to API configuration issues. Please try again or contact support.',
         sender: 'assistant',
         timestamp: new Date()
       };
