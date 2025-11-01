@@ -25,7 +25,12 @@ function App() {
           `User authenticated: ${user.email}`,
           'general_query',
           user.uid,
-          { action: 'auth_state_changed' }
+          { 
+            action: 'auth_state_changed',
+            deployment_status: 'production',
+            backend_url: process.env.REACT_APP_API_BASE_URL,
+            timestamp: new Date().toISOString()
+          }
         );
       }
     });

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { User } from 'firebase/auth';
 import { mongoService } from '../../services/mongoService';
 import { motion } from 'framer-motion';
@@ -21,15 +21,6 @@ interface HealthMetrics {
   date: string;
 }
 
-interface UserData {
-  uid: string;
-  email: string;
-  healthData?: {
-    streak?: number;
-    healthScore?: number;
-    lastUpdated?: string;
-  };
-}
 
 const EnhancedHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
   const [healthMetrics, setHealthMetrics] = useState<HealthMetrics | null>(null);
@@ -50,7 +41,7 @@ const EnhancedHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
     heartRate: ''
   });
 
-  const loadUserData = async () => {
+  const loadUserData = useCallback(async () => {
     try {
       setLoading(true);
       
@@ -89,11 +80,11 @@ const EnhancedHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     loadUserData();
-  }, [user]);
+  }, [user, loadUserData]);
 
   const calculateHealthScore = (metrics: HealthMetrics): number => {
     let score = 0;
