@@ -18,7 +18,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: 'G\'day! I\'m your Hodie Labs health assistant powered by Claude AI. I can help you with health questions, analyse your health data, and provide personalised wellness advice. How can I help you today?',
+      text: 'G\'day! I\'m your Hodie Labs health assistant. I can help you with:\n\n🍎 **Nutrition & Diet**: Food recommendations, meal planning, dietary guidance\n🏃 **Exercise & Fitness**: Workout routines, activity suggestions, fitness goals\n😴 **Sleep & Recovery**: Sleep hygiene, rest strategies, recovery tips\n🧘 **Mental Wellbeing**: Stress management, mindfulness, mental health support\n💧 **Hydration & Wellness**: Daily health habits and general wellness advice\n\nI use Australian health guidelines and terminology. How can I help you today?',
       sender: 'assistant',
       timestamp: new Date()
     }
@@ -190,9 +190,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
-        <h2 className="text-xl font-semibold text-gray-900">Health Chat Assistant</h2>
-        <p className="text-sm text-gray-600">Ask me anything about health and wellness</p>
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-4">
+        <h2 className="text-xl font-semibold">🇦🇺 Hodie Health Assistant</h2>
+        <p className="text-sm opacity-90">Australian health guidance • Evidence-based advice • Always consult your GP</p>
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
@@ -202,13 +202,31 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
             className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-xs lg:max-w-md px-4 py-3 rounded-xl ${
+              className={`max-w-xs lg:max-w-2xl px-4 py-3 rounded-xl ${
                 message.sender === 'user'
                   ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
                   : 'bg-white shadow-md border border-gray-100 text-gray-900'
               }`}
             >
-              <p className="text-sm">{message.text}</p>
+              <div className="text-sm whitespace-pre-wrap">
+                {message.text.split('\n').map((line, index) => {
+                  // Handle bold formatting
+                  if (line.includes('**')) {
+                    const parts = line.split(/(\*\*.*?\*\*)/);
+                    return (
+                      <div key={index} className="mb-1">
+                        {parts.map((part, partIndex) => {
+                          if (part.startsWith('**') && part.endsWith('**')) {
+                            return <strong key={partIndex}>{part.slice(2, -2)}</strong>;
+                          }
+                          return part;
+                        })}
+                      </div>
+                    );
+                  }
+                  return <div key={index} className={line.trim() === '' ? 'mb-2' : 'mb-1'}>{line}</div>;
+                })}
+              </div>
               <p className={`text-xs mt-1 ${
                 message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
               }`}>
@@ -234,17 +252,26 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
       </div>
 
       <div className="bg-white border-t border-gray-200 p-4">
-        {/* Quick topic buttons */}
+        {/* Enhanced Quick topic buttons */}
         <div className="mb-3">
           <div className="flex flex-wrap gap-2">
-            {['Sleep', 'Exercise', 'Nutrition', 'Stress', 'Hydration'].map(topic => (
+            {[
+              { topic: 'Nutrition', question: 'What foods should I eat for optimal health?', emoji: '🍎' },
+              { topic: 'Exercise', question: 'What exercise routine should I start with?', emoji: '🏃' },
+              { topic: 'Sleep', question: 'How can I improve my sleep quality?', emoji: '😴' },
+              { topic: 'Weight Loss', question: 'What foods should I eat for healthy weight loss?', emoji: '⚖️' },
+              { topic: 'Muscle Building', question: 'What foods should I eat for muscle building?', emoji: '💪' },
+              { topic: 'Stress', question: 'How can I manage stress better?', emoji: '🧘' },
+              { topic: 'Hydration', question: 'How much water should I drink daily?', emoji: '💧' }
+            ].map(({ topic, question, emoji }) => (
               <button
                 key={topic}
-                onClick={() => setInputValue(claudeService.generateHealthQuestion(topic.toLowerCase()))}
-                className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200 transition-colors"
+                onClick={() => setInputValue(question)}
+                className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors flex items-center space-x-1"
                 disabled={isLoading}
               >
-                {topic}
+                <span>{emoji}</span>
+                <span>{topic}</span>
               </button>
             ))}
           </div>
