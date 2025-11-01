@@ -16,7 +16,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   onSignOut
 }) => {
   const navigation = [
+    { name: 'Home', id: 'home', icon: '🏠' },
     { name: 'Health Chat', id: 'chat', icon: '💬' },
+    { name: 'Devices', id: 'devices', icon: '⌚' },
     { name: 'History', id: 'history', icon: '📋' },
     { name: 'Profile', id: 'profile', icon: '👤' },
   ];

@@ -4,6 +4,8 @@ import { auth } from '../../firebase/config';
 import ChatInterface from '../chat/ChatInterface';
 import Sidebar from '../layout/Sidebar';
 import Header from '../layout/Header';
+import EnhancedHealthDashboard from './EnhancedHealthDashboard';
+import DeviceIntegration from '../devices/DeviceIntegration';
 import { queryLogger } from '../../utils/queryLogger';
 
 interface DashboardProps {
@@ -12,7 +14,7 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = ({ user }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('chat');
+  const [activeSection, setActiveSection] = useState('home');
 
   const handleSignOut = async () => {
     try {
@@ -30,8 +32,12 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
 
   const renderContent = () => {
     switch (activeSection) {
+      case 'home':
+        return <EnhancedHealthDashboard user={user} />;
       case 'chat':
         return <ChatInterface user={user} />;
+      case 'devices':
+        return <DeviceIntegration user={user} />;
       case 'history':
         return (
           <div className="p-6">
@@ -60,7 +66,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user }) => {
           </div>
         );
       default:
-        return <ChatInterface user={user} />;
+        return <EnhancedHealthDashboard user={user} />;
     }
   };
 

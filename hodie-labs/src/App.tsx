@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { auth } from './firebase/config';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import LoginPage from './components/auth/LoginPage';
+import ExactHodieLogin from './components/auth/ExactHodieLogin';
 import Dashboard from './components/dashboard/Dashboard';
+import OnboardingFlow from './components/onboarding/OnboardingFlow';
 import { queryLogger } from './utils/queryLogger';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -15,6 +17,10 @@ function App() {
       setLoading(false);
       
       if (user) {
+        // Check if user has completed onboarding
+        const onboardingComplete = localStorage.getItem(`hodie_onboarding_${user.uid}`);
+        setShowOnboarding(!onboardingComplete);
+        
         queryLogger.logQuery(
           `User authenticated: ${user.email}`,
           'general_query',
@@ -37,7 +43,21 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {user ? <Dashboard user={user} /> : <LoginPage />}
+      {user ? (
+        showOnboarding ? (
+          <OnboardingFlow 
+            user={user} 
+            onComplete={() => {
+              localStorage.setItem(`hodie_onboarding_${user.uid}`, 'true');
+              setShowOnboarding(false);
+            }} 
+          />
+        ) : (
+          <Dashboard user={user} />
+        )
+      ) : (
+        <ExactHodieLogin />
+      )}
     </div>
   );
 }
