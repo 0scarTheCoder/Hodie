@@ -3,6 +3,7 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'fire
 import { auth } from '../../firebase/config';
 import { queryLogger } from '../../utils/queryLogger';
 import { motion } from 'framer-motion';
+import { Eye, EyeOff } from 'lucide-react';
 
 const ExactHodieLogin: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -10,6 +11,7 @@ const ExactHodieLogin: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,22 +104,37 @@ const ExactHodieLogin: React.FC = () => {
             {/* Password Input */}
             <div className="relative">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-4 bg-transparent border border-[#3a2e6c] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-[#6b46c1] focus:ring-1 focus:ring-[#6b46c1] transition-colors"
+                className="w-full px-4 py-4 pr-12 bg-transparent border border-[#3a2e6c] rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-[#6b46c1] focus:ring-1 focus:ring-[#6b46c1] transition-colors"
               />
-              {isLogin && (
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
+            </div>
+
+            {/* Forgot Password Link */}
+            {isLogin && (
+              <div className="text-center">
                 <button
                   type="button"
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-sm text-[#8b7ed8] hover:text-white transition-colors"
+                  className="text-sm text-[#8b7ed8] hover:text-white transition-colors"
                 >
                   Forgot password?
                 </button>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* Error Message */}
             {error && (

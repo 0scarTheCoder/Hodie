@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { auth } from './firebase/config';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import ExactHodieLogin from './components/auth/ExactHodieLogin';
-import Dashboard from './components/dashboard/Dashboard';
+import ComprehensiveDashboard from './components/dashboard/ComprehensiveDashboard';
 import OnboardingFlow from './components/onboarding/OnboardingFlow';
 import { queryLogger } from './utils/queryLogger';
 
@@ -58,7 +58,7 @@ function App() {
             }} 
           />
         ) : (
-          <Dashboard user={user} />
+          <ComprehensiveDashboard user={user} />
         )
       ) : (
         <ExactHodieLogin />

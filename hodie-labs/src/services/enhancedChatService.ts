@@ -43,283 +43,248 @@ class EnhancedChatService {
     
     // Personalisation based on health context
     let personalisation = '';
-    if (healthContext?.recentHealthData) {
+    if (healthContext?.recentHealthData?.healthScore) {
       const { healthScore } = healthContext.recentHealthData;
-      if (healthScore) {
-        personalisation = `\n\n📊 **Your Current Health Score**: ${healthScore}/100\n`;
-        if (healthScore >= 80) personalisation += "You're doing brilliantly! Keep up the excellent work.";
-        else if (healthScore >= 60) personalisation += "You're on the right track! A few tweaks could help you reach your goals.";
-        else personalisation += "There's room for improvement, but every small step counts!";
-      }
+      personalisation = `\n\n📊 **Your Health Score**: ${healthScore}/100`;
     }
 
-    // Advanced Food & Nutrition Responses
-    if (lowerMessage.includes('food') || lowerMessage.includes('eat') || lowerMessage.includes('nutrition') || lowerMessage.includes('diet')) {
-      
-      // Weight loss specific
-      if (lowerMessage.includes('weight loss') || lowerMessage.includes('lose weight')) {
-        return `${greeting}! For healthy weight management, here's what I recommend:
+    // Handle greetings and basic conversation
+    if (this.isGreeting(lowerMessage)) {
+      return `${greeting}! I'm your Hodie Health Assistant. I'm here to help with health and wellness questions using Australian health guidelines. 
 
-🥗 **Nutrient-Dense Foods:**
-• Leafy greens (spinach, kale, rocket, lettuce)
-• Lean proteins (white fish, chicken breast, tofu, legumes)
-• Complex carbohydrates (sweet potato, quinoa, brown rice)
+🍎 I can help with nutrition, exercise, sleep, stress management, and general health advice.
+
+What would you like to know about your health today?${personalisation}`;
+    }
+
+    // Handle thank you messages
+    if (this.isThankYou(lowerMessage)) {
+      return `You're very welcome! I'm here whenever you need health guidance. Take care and remember - small consistent changes make the biggest difference to your health! 🌟${personalisation}`;
+    }
+
+    // Handle non-health related questions
+    if (this.isNonHealthQuestion(lowerMessage)) {
+      return this.handleNonHealthQuestion(message, greeting, personalisation);
+    }
+
+    // Check for health topics with more flexible matching
+    const healthTopic = this.identifyHealthTopic(lowerMessage);
+    if (healthTopic) {
+      return this.getHealthAdvice(healthTopic, message, greeting, personalisation);
+    }
+
+    // Default response for unclear questions
+    return this.getDefaultResponse(message, greeting, personalisation);
+  }
+
+  private isGreeting(message: string): boolean {
+    const greetings = ['hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening', 'g\'day', 'howdy'];
+    return greetings.some(greeting => message.includes(greeting));
+  }
+
+  private isThankYou(message: string): boolean {
+    const thanks = ['thank', 'thanks', 'cheers', 'appreciate', 'grateful'];
+    return thanks.some(thank => message.includes(thank));
+  }
+
+  private isNonHealthQuestion(message: string): boolean {
+    const nonHealthKeywords = [
+      'weather', 'time', 'date', 'movie', 'music', 'sport', 'football', 'cricket', 'politics', 
+      'travel', 'holiday', 'work', 'job', 'school', 'university', 'car', 'computer', 'phone',
+      'shopping', 'restaurant', 'recipe', 'cooking', 'baking', 'pet', 'dog', 'cat', 'news'
+    ];
+    return nonHealthKeywords.some(keyword => message.includes(keyword));
+  }
+
+  private handleNonHealthQuestion(message: string, greeting: string, personalisation: string): string {
+    const responses = [
+      `${greeting}! That's an interesting question, but I'm specifically designed to help with health and wellness topics. 
+
+🏥 I can provide advice on nutrition, exercise, sleep, stress management, and general health using Australian guidelines.
+
+Is there anything health-related I can help you with today?`,
+      
+      `${greeting}! While that sounds like a great topic, I focus on health and wellness guidance.
+
+🍎 I'd love to help with questions about diet, fitness, sleep, mental wellbeing, or any other health concerns you might have.
+
+What would you like to know about your health?`,
+      
+      `${greeting}! I'm your health assistant, so I'm best at answering health and wellness questions.
+
+💡 I can help with things like meal planning, exercise routines, sleep improvement, stress management, or general health advice.
+
+How can I support your health journey today?`
+    ];
+    
+    return responses[Math.floor(Math.random() * responses.length)] + personalisation;
+  }
+
+  private identifyHealthTopic(message: string): string | null {
+    const topicMap = {
+      'nutrition': ['food', 'eat', 'diet', 'nutrition', 'meal', 'hungry', 'snack', 'vitamin', 'protein', 'carb', 'fat'],
+      'exercise': ['exercise', 'workout', 'gym', 'fitness', 'training', 'run', 'walk', 'swim', 'sport', 'muscle', 'strength'],
+      'sleep': ['sleep', 'tired', 'rest', 'insomnia', 'dream', 'nap', 'bed', 'wake'],
+      'stress': ['stress', 'anxiety', 'worried', 'overwhelmed', 'mental health', 'depression', 'mood'],
+      'hydration': ['water', 'drink', 'hydrat', 'thirst', 'fluid'],
+      'general': ['health', 'wellness', 'advice', 'tips', 'help', 'doctor', 'medical']
+    };
+
+    for (const [topic, keywords] of Object.entries(topicMap)) {
+      if (keywords.some(keyword => message.includes(keyword))) {
+        return topic;
+      }
+    }
+    return null;
+  }
+
+  private getHealthAdvice(topic: string, originalMessage: string, greeting: string, personalisation: string): string {
+    const message = originalMessage.toLowerCase();
+    
+    switch (topic) {
+      case 'nutrition':
+        return this.getNutritionAdvice(message, greeting, personalisation);
+      case 'exercise':
+        return this.getExerciseAdvice(message, greeting, personalisation);
+      case 'sleep':
+        return this.getSleepAdvice(message, greeting, personalisation);
+      case 'stress':
+        return this.getStressAdvice(message, greeting, personalisation);
+      case 'hydration':
+        return this.getHydrationAdvice(message, greeting, personalisation);
+      default:
+        return this.getGeneralHealthAdvice(message, greeting, personalisation);
+    }
+  }
+
+  private getNutritionAdvice(message: string, greeting: string, personalisation: string): string {
+    if (message.includes('weight loss') || message.includes('lose weight')) {
+      return `${greeting}! For healthy weight management:
+
+🥗 **Focus on these foods:**
+• Plenty of vegetables (aim for variety and colour)
+• Lean proteins (chicken, fish, legumes, tofu)
+• Wholegrains (brown rice, quinoa, oats)
 • Healthy fats in moderation (avocado, nuts, olive oil)
 
-🍽️ **Smart Eating Strategies:**
-• Fill half your plate with vegetables
+💡 **Key strategies:**
 • Eat slowly and mindfully
-• Drink water before meals
-• Regular meal times to maintain metabolism
-• Portion control using smaller plates
+• Stay hydrated
+• Regular meal times
+• Fill half your plate with vegetables
 
-⚖️ **Australian Guidelines:** Aim for sustainable weight loss of 0.5-1kg per week. Always consult your GP before starting any weight loss program, especially if you have underlying health conditions.
-
-💡 **Top Tip:** Focus on adding nutritious foods rather than just removing foods - this creates sustainable habits!${personalisation}`;
-      }
-      
-      // Muscle building specific
-      if (lowerMessage.includes('muscle') || lowerMessage.includes('protein') || lowerMessage.includes('gym') || lowerMessage.includes('building')) {
-        return `${greeting}! For muscle building and recovery, here's your nutrition guide:
-
-💪 **High-Quality Protein Sources** (aim for 1.6-2.2g per kg body weight):
-• **Animal proteins:** Lean beef, chicken, turkey, fish (barramundi, salmon)
-• **Dairy:** Greek yoghurt, cottage cheese, milk, whey protein
-• **Plant proteins:** Lentils, chickpeas, tofu, tempeh, quinoa
-• **Convenient options:** Eggs, nuts, protein powder
-
-⏰ **Timing Strategy:**
-• **Pre-workout:** Light carbs + protein (banana with Greek yoghurt)
-• **Post-workout:** Protein within 30-60 minutes (protein shake or meal)
-• **Throughout day:** Spread protein across all meals and snacks
-
-🥤 **Hydration for Training:** Extra important during training - aim for 2.5-3L daily, more in hot Australian weather.
-
-🍎 **Supporting Foods:** Complex carbs for energy (oats, brown rice), healthy fats for hormone production (nuts, avocado), and plenty of vegetables for micronutrients.${personalisation}`;
-      }
-
-      // General healthy eating
-      return `${greeting}! For optimal health, I'd recommend these nutritious Australian foods:
-
-🥬 **Fresh Vegetables** (aim for 5+ serves daily):
-• **Leafy greens:** Spinach, kale, rocket, lettuce
-• **Colourful varieties:** Carrots, capsicum, beetroot, broccoli, tomatoes
-• **Local seasonal options:** Pumpkin, zucchini, sweet potato, corn
-
-🍎 **Fresh Fruits** (aim for 2+ serves daily):
-• **Australian favourites:** Apples, bananas, oranges, pears
-• **Seasonal berries:** Strawberries, blueberries, raspberries
-• **Tropical options:** Mango, pineapple, kiwi fruit, papaya
-
-🐟 **Quality Proteins:**
-• **Australian seafood:** Barramundi, salmon, prawns, tuna
-• **Lean meats:** Grass-fed beef, free-range chicken, lamb
-• **Plant proteins:** Legumes, nuts, seeds, tofu
-
-🌾 **Wholegrains:** Oats, brown rice, quinoa, wholemeal bread
-
-💧 **Stay Hydrated:** 8-10 glasses of water daily (our Australian tap water is excellent!)
-
-🏥 **Professional Advice:** Consider seeing your GP or an Accredited Practising Dietitian for personalised nutrition advice tailored to your specific needs.${personalisation}`;
+Always consult your GP before starting any weight loss program.${personalisation}`;
     }
 
-    // Enhanced Exercise & Fitness Responses
-    if (lowerMessage.includes('exercise') || lowerMessage.includes('fitness') || lowerMessage.includes('workout') || lowerMessage.includes('gym') || lowerMessage.includes('training')) {
-      
-      // Beginner-specific advice
-      if (lowerMessage.includes('beginner') || lowerMessage.includes('start') || lowerMessage.includes('new')) {
-        return `${greeting}! Perfect time to start your fitness journey! Here's a beginner-friendly approach:
+    if (message.includes('muscle') || message.includes('protein') || message.includes('gain')) {
+      return `${greeting}! For muscle building:
 
-🚶 **Week 1-2: Foundation Building**
-• 15-20 minutes walking daily (great excuse to explore your neighbourhood!)
-• Basic bodyweight exercises: squats, push-ups (wall or knee), planks
-• 2-3 times per week, focusing on form over intensity
+💪 **Protein sources** (1.6-2.2g per kg body weight):
+• Lean meats, fish, eggs
+• Greek yoghurt, cottage cheese
+• Lentils, chickpeas, quinoa
+• Nuts and protein powder
 
-💪 **Week 3-4: Building Momentum**
-• Increase to 30 minutes activity daily
-• Add light weights or resistance bands
-• Include stretching or beginner yoga (YouTube has great free sessions)
+⏰ **Timing:** Include protein with each meal and especially after workouts.
 
-🏃 **Week 5+: Progressive Challenge**
-• Mix cardio and strength training
-• Aim for 150+ minutes moderate activity per week (Australian Physical Activity Guidelines)
-• Find activities you actually enjoy - dancing, swimming, bushwalking!
-
-⚠️ **Important Safety Note:** Start slowly, listen to your body, and consult your GP before beginning any new exercise program, especially if you have health conditions or haven't exercised in a while.
-
-🎯 **Success Tips:** Set realistic goals, track your progress, find a workout buddy for motivation!${personalisation}`;
-      }
-
-      // General fitness advice
-      return `${greeting}! Here's a balanced approach to fitness that works for most Australians:
-
-🏃 **Cardio Options** (150+ minutes/week moderate intensity):
-• **Local activities:** Walking/jogging in parks, beach walks, bushwalking
-• **Community facilities:** Swimming at local pools, cycling on bike paths
-• **Social options:** Tennis, basketball, dancing, team sports
-
-💪 **Strength Training** (2-3 times/week):
-• **At home:** Bodyweight exercises, resistance bands, YouTube workouts
-• **Gym options:** Free weights, machines, group fitness classes
-• **Functional training:** Lifting, carrying, climbing stairs
-
-🧘 **Recovery & Flexibility:**
-• Gentle yoga or stretching (10-15 minutes daily)
-• Rest days between intense sessions
-• Quality sleep (7-9 hours) for muscle recovery
-
-🎯 **Set SMART Goals:** Specific, Measurable, Achievable, Relevant, Time-bound. For example: "Walk 30 minutes, 5 days a week for the next month."
-
-📱 **Track Progress:** Use a fitness app, journal, or simple calendar to stay motivated!${personalisation}`;
+🥤 **Stay hydrated:** Extra water during training days.${personalisation}`;
     }
 
-    // Enhanced Sleep Responses
-    if (lowerMessage.includes('sleep') || lowerMessage.includes('tired') || lowerMessage.includes('insomnia') || lowerMessage.includes('rest')) {
-      return `${greeting}! Quality sleep is crucial for both physical and mental health. Here are evidence-based strategies:
+    return `${greeting}! For optimal nutrition:
 
-🌙 **Sleep Hygiene Essentials:**
-• **Consistent schedule:** Same bedtime and wake time, even on weekends
-• **Cool environment:** Keep bedroom at 18-21°C (ideal for Australian climate)
-• **Dark & quiet:** Block out light, consider earplugs if needed
-• **Comfortable setup:** Quality mattress, supportive pillows
+🥬 **Vegetables:** 5+ serves daily (mix of colours and types)
+🍎 **Fruits:** 2+ serves daily (fresh Australian seasonal options)
+🐟 **Proteins:** Include with each meal (fish, chicken, legumes, nuts)
+🌾 **Wholegrains:** Choose brown rice, quinoa, wholemeal bread
 
-📱 **Evening Wind-Down Routine:**
-• No screens 1-2 hours before bed (blue light disrupts melatonin)
-• Try reading, gentle stretching, meditation, or warm bath
-• Avoid large meals, caffeine after 2pm, and alcohol before bedtime
-• Herbal teas like chamomile can be relaxing
+Consider seeing an Accredited Practising Dietitian for personalised advice.${personalisation}`;
+  }
 
-☀️ **Daytime Habits for Better Sleep:**
-• Get natural sunlight in the morning (helps regulate circadian rhythm)
-• Regular exercise, but not within 3 hours of bedtime
-• Limit daytime naps to 20-30 minutes before 3pm
+  private getExerciseAdvice(message: string, greeting: string, personalisation: string): string {
+    if (message.includes('beginner') || message.includes('start')) {
+      return `${greeting}! Great decision to start exercising!
 
-⏰ **Target:** 7-9 hours nightly for most adults
+🚶 **Week 1-2:** 15-20 minutes walking daily
+💪 **Week 3-4:** Add bodyweight exercises (squats, push-ups)
+🏃 **Week 5+:** Build up to 150+ minutes moderate activity weekly
 
-🏥 **When to See Your GP:** If sleep problems persist for more than 2-3 weeks, or if you experience sleep apnoea symptoms, chronic insomnia, or daytime fatigue affecting your life.${personalisation}`;
+Start slowly and consult your GP before beginning any new exercise program.${personalisation}`;
     }
 
-    // Mental Health & Stress Management
-    if (lowerMessage.includes('stress') || lowerMessage.includes('anxiety') || lowerMessage.includes('mental health') || lowerMessage.includes('worried') || lowerMessage.includes('overwhelmed')) {
-      return `${greeting}! Mental health is just as important as physical health. Here are evidence-based strategies:
+    return `${greeting}! For a balanced fitness approach:
 
-🧘 **Immediate Stress Relief Techniques:**
-• **4-7-8 Breathing:** Inhale for 4, hold for 7, exhale for 8
-• **Progressive muscle relaxation:** Tense and release muscle groups
-• **Mindfulness:** Focus on present moment, not past worries or future fears
-• **Physical activity:** Even a 10-minute walk can reduce stress hormones
+🏃 **Cardio:** 150+ minutes moderate activity weekly (walking, swimming, cycling)
+💪 **Strength:** 2-3 times per week (weights or bodyweight exercises)
+🧘 **Flexibility:** Daily stretching or yoga
 
-🌿 **Daily Lifestyle Support:**
-• **Social connections:** Call a friend, spend time with loved ones
-• **Nature therapy:** Spend time outdoors, beach walks, park visits
-• **Limit stressors:** Reduce news/social media if overwhelming
-• **Work-life balance:** Set boundaries, take regular breaks
+Find activities you enjoy - that's the key to consistency!${personalisation}`;
+  }
 
-💬 **Professional Support in Australia:**
-• **Start with your GP:** For assessment and Mental Health Care Plan
-• **Crisis support:** Lifeline 13 11 14 (24/7), Beyond Blue 1300 22 4636
-• **Online resources:** Beyond Blue, Headspace, MindSpot
-• **Medicare rebates:** Available for psychology sessions with referral
+  private getSleepAdvice(message: string, greeting: string, personalisation: string): string {
+    return `${greeting}! Quality sleep is essential for health:
 
-🎯 **Remember:** Seeking help is a sign of strength, not weakness. Many Australians experience mental health challenges - you're not alone.
+🌙 **Sleep hygiene:**
+• Consistent bedtime and wake time
+• Cool bedroom (18-21°C)
+• Dark, quiet environment
+• No screens 1-2 hours before bed
 
-⚠️ **Emergency:** If you're having thoughts of self-harm, call 000 or go to your nearest emergency department immediately.${personalisation}`;
-    }
+⏰ **Aim for 7-9 hours** nightly.
 
-    // Hydration & Water
-    if (lowerMessage.includes('water') || lowerMessage.includes('hydrat') || lowerMessage.includes('drink')) {
-      return `${greeting}! Proper hydration is essential for optimal health, especially in Australia's climate:
+If sleep problems persist, consult your GP.${personalisation}`;
+  }
 
-💧 **Daily Hydration Targets:**
-• **General guideline:** 8-10 glasses (2-2.5L) daily
-• **Exercise days:** Extra 500-750ml per hour of activity
-• **Hot weather:** Increase by 1-2 glasses (important in Australian summers!)
-• **Pregnancy/breastfeeding:** Consult your GP for specific needs
+  private getStressAdvice(message: string, greeting: string, personalisation: string): string {
+    return `${greeting}! For stress management:
 
-🥤 **Best Hydration Sources:**
-• **Plain water:** Australian tap water is excellent quality and safe
-• **Alternatives:** Herbal teas, sparkling water with lemon
-• **Water-rich foods:** Cucumber, watermelon, oranges, lettuce
+🧘 **Immediate relief:**
+• Deep breathing exercises
+• 10-minute walk
+• Mindfulness or meditation
 
-⚠️ **Limit These:**
-• Sugary drinks (soft drinks, fruit juices with added sugar)
-• Excessive caffeine (can be dehydrating)
-• Alcohol (dehydrating effect)
+💬 **Support available:**
+• Your GP for assessment
+• Lifeline: 13 11 14
+• Beyond Blue: 1300 22 4636
 
-📊 **Hydration Check:** Your urine should be pale yellow. Dark yellow indicates dehydration.
+Remember: Seeking help is a sign of strength.${personalisation}`;
+  }
 
-🌡️ **Australian Climate Tip:** In hot weather or if you're sweating a lot, you may need electrolytes too - consider adding a pinch of salt to water or eating fruits.${personalisation}`;
-    }
+  private getHydrationAdvice(message: string, greeting: string, personalisation: string): string {
+    return `${greeting}! For proper hydration:
 
-    // General Health & Wellness
-    if (lowerMessage.includes('health') || lowerMessage.includes('wellness') || lowerMessage.includes('tips') || lowerMessage.includes('advice')) {
-      return `${greeting}! Here are the key pillars of good health, based on Australian health guidelines:
+💧 **Daily target:** 8-10 glasses (2-2.5L)
+🏃 **Exercise days:** Extra 500-750ml per hour of activity
+🌡️ **Hot weather:** Increase intake (important in Australian climate)
 
-🍎 **Nutrition Foundation:**
-• Balanced diet with plenty of vegetables (5+ serves) and fruits (2+ serves)
-• Lean proteins, wholegrains, healthy fats
-• Stay hydrated with 8-10 glasses of water daily
+Australian tap water is excellent quality!${personalisation}`;
+  }
 
-🏃 **Physical Activity:**
-• 150+ minutes moderate exercise weekly (brisk walking, swimming)
-• Strength training 2-3 times per week
-• Reduce sedentary time - stand and move regularly
+  private getGeneralHealthAdvice(message: string, greeting: string, personalisation: string): string {
+    return `${greeting}! Here are key health fundamentals:
 
-😴 **Quality Sleep:**
-• 7-9 hours nightly with consistent sleep schedule
-• Cool, dark, quiet bedroom environment
-• Wind-down routine without screens
+🍎 **Nutrition:** Balanced diet with plenty of vegetables and fruits
+🏃 **Exercise:** 150+ minutes moderate activity weekly
+😴 **Sleep:** 7-9 hours with good sleep hygiene
+💧 **Hydration:** 8-10 glasses of water daily
+🧘 **Mental health:** Stress management and social connections
 
-🧠 **Mental Wellbeing:**
-• Stress management techniques (meditation, breathing exercises)
-• Social connections and community involvement
-• Work-life balance and regular relaxation
+For specific concerns, consult your GP or call Healthdirect: 1800 022 222${personalisation}`;
+  }
 
-🩺 **Preventive Healthcare:**
-• Regular GP check-ups and health screenings
-• Dental visits every 6 months
-• Stay up-to-date with vaccinations
+  private getDefaultResponse(message: string, greeting: string, personalisation: string): string {
+    return `${greeting}! I'm not quite sure how to help with that specific question, but I'm here to provide health and wellness guidance.
 
-🚭 **Lifestyle Factors:**
-• Don't smoke (or quit if you do - Quitline 13 7848)
-• Limit alcohol to Australian guidelines
-• Protect skin from UV (slip, slop, slap!)
+🏥 **I can help with:**
+• Nutrition and healthy eating
+• Exercise and fitness advice
+• Sleep improvement strategies
+• Stress management techniques
+• General health and wellness tips
 
-📞 **Australian Health Resources:**
-• Healthdirect: 1800 022 222 (24/7 health advice)
-• Your local GP for personalised care
-• Australian Department of Health website
+💡 **Try asking:** "What should I eat for better health?" or "How can I improve my sleep?"
 
-💡 **Remember:** Small, consistent changes lead to lasting improvements. Start with one area and build from there!${personalisation}`;
-    }
-
-    // Conversation context awareness
-    const previousTopics = conversationHistory.slice(-4).map(h => h.content.toLowerCase()).join(' ');
-    let contextualResponse = '';
-    
-    if (previousTopics.includes('food') && !lowerMessage.includes('food')) {
-      contextualResponse = "\n\n💡 **Following up on nutrition:** Remember, consistency is key - small changes make big differences over time!";
-    } else if (previousTopics.includes('exercise') && !lowerMessage.includes('exercise')) {
-      contextualResponse = "\n\n🏃 **Following up on fitness:** Remember to start gradually and listen to your body!";
-    }
-
-    // Default comprehensive response
-    return `${greeting}! Thanks for your health question. While I'd love to provide more specific guidance, I recommend discussing this with your GP or a qualified health professional for personalised advice.
-
-💡 **Quick Health Tips for Australians:**
-• **Eat well:** Rainbow of fruits and vegetables, lean proteins, wholegrains
-• **Move daily:** Aim for 30 minutes activity (walking, swimming, cycling)
-• **Sleep quality:** 7-9 hours with good sleep hygiene
-• **Stay hydrated:** 8-10 glasses water daily (more in hot weather)
-• **Manage stress:** Try mindfulness, social connections, nature time
-• **Regular check-ups:** See your GP for preventive care
-
-🏥 **Australian Health Support:**
-• **General health advice:** Healthdirect 1800 022 222
-• **Mental health:** Lifeline 13 11 14, Beyond Blue 1300 22 4636
-• **Your GP:** For personalised health advice and care plans
-
-🇦🇺 **Remember:** This advice follows Australian health guidelines. Individual needs vary, so professional consultation is always recommended for specific health concerns.${contextualResponse}${personalisation}`;
+Is there a health topic I can help you with?${personalisation}`;
   }
 
   // Health-specific question templates for quick buttons

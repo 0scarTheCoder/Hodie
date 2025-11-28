@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { User } from 'firebase/auth';
 import { queryLogger } from '../../utils/queryLogger';
-import { enhancedChatService } from '../../services/enhancedChatService';
+import { freeChatService } from '../../services/freeChatService';
 
 interface Message {
   id: string;
@@ -18,7 +18,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: 'G\'day! I\'m your Hodie Labs health assistant. I can help you with:\n\n🍎 **Nutrition & Diet**: Food recommendations, meal planning, dietary guidance\n🏃 **Exercise & Fitness**: Workout routines, activity suggestions, fitness goals\n😴 **Sleep & Recovery**: Sleep hygiene, rest strategies, recovery tips\n🧘 **Mental Wellbeing**: Stress management, mindfulness, mental health support\n💧 **Hydration & Wellness**: Daily health habits and general wellness advice\n\nI use Australian health guidelines and terminology. How can I help you today?',
+      text: 'G\'day! I\'m your Hodie Labs AI health assistant, powered by free AI technology. I can help you with:\n\n🍎 **Nutrition & Cooking**: Specific recipes, meal planning, protein calculations\n🏃 **Exercise & Fitness**: Personalised workout routines and fitness goals\n😴 **Sleep & Recovery**: Sleep improvement strategies and recovery tips\n🧘 **Mental Wellbeing**: Stress management and mental health support\n💧 **Wellness**: Daily health habits and lifestyle advice\n\nI use real AI to understand context and have natural conversations about your health journey. I follow Australian health guidelines and remember our chat history. What would you like to know?',
       sender: 'assistant',
       timestamp: new Date()
     }
@@ -61,8 +61,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
       // Get user's recent health data for context
       const healthContext = await getUserHealthContext(user.uid);
       
-      // Generate response using enhanced local chat service
-      const responseText = await enhancedChatService.generateHealthResponse(
+      // Generate response using free AI chat service
+      const responseText = await freeChatService.generateHealthResponse(
         inputValue,
         healthContext,
         conversationHistory
@@ -181,7 +181,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
         <p className="text-sm opacity-90">Australian health guidance • Evidence-based advice • Always consult your GP</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-4">
+      <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
         {messages.map((message) => (
           <div
             key={message.id}
@@ -191,7 +191,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
               className={`max-w-xs lg:max-w-2xl px-4 py-3 rounded-xl ${
                 message.sender === 'user'
                   ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                  : 'bg-white shadow-md border border-gray-100 text-gray-900'
+                  : 'bg-white shadow-lg border border-gray-200 text-gray-900'
               }`}
             >
               <div className="text-sm whitespace-pre-wrap">
@@ -270,7 +270,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Type your health question here..."
-            className="flex-1 resize-none border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="flex-1 resize-none border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             rows={1}
             disabled={isLoading}
           />
