@@ -14,9 +14,29 @@ const Auth0AppContent: React.FC = () => {
 
   useEffect(() => {
     if (isAuthenticated && user) {
-      // Check if user has completed onboarding
-      const onboardingComplete = localStorage.getItem(`hodie_onboarding_${user.sub}`);
-      setShowOnboarding(!onboardingComplete);
+      // Check for comprehensive signup data
+      const comprehensiveSignupData = localStorage.getItem('hodie_comprehensive_signup_data');
+      
+      if (comprehensiveSignupData) {
+        try {
+          const signupData = JSON.parse(comprehensiveSignupData);
+          // TODO: Send this data to backend to store in user profile
+          console.log('Comprehensive signup data found:', signupData);
+          
+          // Clear the signup data since we've processed it
+          localStorage.removeItem('hodie_comprehensive_signup_data');
+          
+          // Mark onboarding as complete since they filled comprehensive form
+          localStorage.setItem(`hodie_onboarding_${user.sub}`, 'true');
+          setShowOnboarding(false);
+        } catch (error) {
+          console.error('Error processing comprehensive signup data:', error);
+        }
+      } else {
+        // Check if user has completed onboarding
+        const onboardingComplete = localStorage.getItem(`hodie_onboarding_${user.sub}`);
+        setShowOnboarding(!onboardingComplete);
+      }
       
       queryLogger.logQuery(
         `Auth0 user authenticated: ${user.email}`,
@@ -28,6 +48,7 @@ const Auth0AppContent: React.FC = () => {
           deployment_status: 'production',
           backend_url: process.env.REACT_APP_API_BASE_URL,
           user_metadata: user.user_metadata,
+          comprehensive_signup: !!comprehensiveSignupData,
           timestamp: new Date().toISOString()
         }
       );

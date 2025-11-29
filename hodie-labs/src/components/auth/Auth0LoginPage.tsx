@@ -4,10 +4,12 @@ import { motion } from 'framer-motion';
 import { Eye, EyeOff, Mail, ArrowLeft, CheckCircle, Loader2 } from 'lucide-react';
 import { auth0Service } from '../../services/auth0Service';
 import { queryLogger } from '../../utils/queryLogger';
+import ComprehensiveSignup from './ComprehensiveSignup';
 
 const Auth0LoginPage: React.FC = () => {
   const { loginWithRedirect, isLoading, error } = useAuth0();
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [showComprehensiveSignup, setShowComprehensiveSignup] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const [resetLoading, setResetLoading] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
@@ -178,11 +180,19 @@ const Auth0LoginPage: React.FC = () => {
             </button>
 
             <button
-              onClick={handleSignup}
+              onClick={() => setShowComprehensiveSignup(true)}
               disabled={isLoading}
-              className="w-full py-4 border-2 border-white/20 text-white font-semibold rounded-2xl hover:bg-white/10 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-4 bg-gradient-to-r from-[#6b46c1] via-[#8b5cf6] to-[#a855f7] text-white font-semibold rounded-2xl hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Create Account
+            </button>
+
+            <button
+              onClick={handleSignup}
+              disabled={isLoading}
+              className="w-full py-2 border border-white/20 text-white/70 text-sm rounded-xl hover:bg-white/5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Quick Signup (Skip Profile)
             </button>
 
             {/* Forgot Password Link */}
@@ -223,6 +233,26 @@ const Auth0LoginPage: React.FC = () => {
           </div>
         </div>
       </motion.div>
+
+      {/* Comprehensive Signup Modal */}
+      {showComprehensiveSignup && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
+        >
+          <div className="relative w-full h-full">
+            <button
+              onClick={() => setShowComprehensiveSignup(false)}
+              className="absolute top-6 right-6 z-10 text-white/70 hover:text-white text-2xl font-light"
+            >
+              ✕
+            </button>
+            <ComprehensiveSignup />
+          </div>
+        </motion.div>
+      )}
 
       {/* Forgot Password Modal */}
       {showForgotPassword && (
