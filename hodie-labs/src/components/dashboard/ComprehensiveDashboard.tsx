@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { User } from 'firebase/auth';
+import { User, signOut } from 'firebase/auth';
+import { auth } from '../../firebase/config';
 import { 
   Heart, 
   Activity, 

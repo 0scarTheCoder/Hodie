@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .container { 
+      max-width: 600px; 
+      margin: 0 auto; 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
+      background: #f8fafc;
+      padding: 20px;
+    }
+    .email-card {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .header { 
+      background: linear-gradient(135deg, #8b5cf6, #ec4899); 
+      padding: 40px 20px; 
+      text-align: center; 
+    }
+    .logo { 
+      color: white; 
+      font-size: 32px; 
+      font-weight: bold; 
+      margin-bottom: 8px; 
+    }
+    .tagline { 
+      color: rgba(255,255,255,0.9); 
+      font-size: 16px; 
+      font-weight: 500;
+    }
+    .content { 
+      padding: 40px 30px; 
+      background: white; 
+    }
+    .button { 
+      display: inline-block; 
+      background: linear-gradient(135deg, #8b5cf6, #ec4899); 
+      color: white !important; 
+      padding: 16px 32px; 
+      text-decoration: none; 
+      border-radius: 12px; 
+      font-weight: 600; 
+      font-size: 16px;
+      margin: 24px 0;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+      transition: all 0.3s ease;
+    }
+    .button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
+    }
+    .security-notice { 
+      background: #fef3c7; 
+      border: 1px solid #f59e0b; 
+      padding: 20px; 
+      border-radius: 12px; 
+      margin: 24px 0; 
+      color: #92400e;
+    }
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: #64748b;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="email-card">
+      <div class="header">
+        <div class="logo">🩺 HodieLabs</div>
+        <div class="tagline">Your AI-Powered Health Intelligence Platform</div>
+      </div>
+      
+      <div class="content">
+        <h2 style="color: #1e293b; margin-bottom: 20px; font-size: 24px;">Reset Your Password</h2>
+        
+        <p style="color: #475569; font-size: 16px; line-height: 1.6;">Hi there,</p>
+        
+        <p style="color: #475569; font-size: 16px; line-height: 1.6;">
+          We received a request to reset your HodieLabs password. Click the button below to create a new password and regain access to your health dashboard:
+        </p>
+        
+        <div style="text-align: center; margin: 32px 0;">
+          <a href="{{ url }}" class="button">Reset My Password</a>
+        </div>
+        
+        <div class="security-notice">
+          <div style="font-weight: 600; margin-bottom: 8px;">🔒 Security Notice:</div>
+          <div style="font-size: 14px; line-height: 1.5;">
+            • This secure link expires in 24 hours<br>
+            • If you didn't request this reset, please ignore this email<br>
+            • Your account and health data remain completely secure
+          </div>
+        </div>
+        
+        <p style="color: #64748b; font-size: 14px; line-height: 1.6; margin-top: 24px;">
+          Need help? Contact our support team at support@hodielabs.com
+        </p>
+        
+        <p style="color: #64748b; font-size: 14px; line-height: 1.6;">
+          Best regards,<br>
+          <strong>The HodieLabs Security Team</strong>
+        </p>
+      </div>
+      
+      <div class="footer">
+        <p>© 2024 HodieLabs. All rights reserved.</p>
+        <p>Secure • Private • Professional</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

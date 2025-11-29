@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../../firebase/config';
 import { queryLogger } from '../../utils/queryLogger';
 
@@ -9,6 +9,11 @@ const LoginPage: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetSuccess, setResetSuccess] = useState(false);
+  const [resetError, setResetError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,6 +45,29 @@ const LoginPage: React.FC = () => {
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setResetLoading(true);
+    setResetError('');
+
+    try {
+      const logId = queryLogger.logQuery(
+        `Password reset request for ${resetEmail}`,
+        'general_query',
+        undefined,
+        { action: 'password_reset_request', email: resetEmail }
+      );
+
+      await sendPasswordResetEmail(auth, resetEmail);
+      setResetSuccess(true);
+      queryLogger.logResponse(logId, 'Password reset email sent successfully');
+    } catch (error: any) {
+      setResetError(error.message);
+    } finally {
+      setResetLoading(false);
     }
   };
 
@@ -102,7 +130,16 @@ const LoginPage: React.FC = () => {
             </button>
           </div>
 
-          <div className="text-center">
+          <div className="text-center space-y-2">
+            {isLogin && (
+              <button
+                type="button"
+                onClick={() => setShowForgotPassword(true)}
+                className="block w-full text-sm text-brand-blue hover:text-brand-light-blue"
+              >
+                Forgot your password?
+              </button>
+            )}
             <button
               type="button"
               onClick={() => setIsLogin(!isLogin)}
@@ -113,6 +150,74 @@ const LoginPage: React.FC = () => {
           </div>
         </form>
       </div>
+
+      {/* Simple Forgot Password Modal */}
+      {showForgotPassword && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center px-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
+            {!resetSuccess ? (
+              <>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">Reset Password</h3>
+                <p className="text-gray-600 text-sm mb-4">
+                  Enter your email address and we'll send you a link to reset your password.
+                </p>
+                
+                <form onSubmit={handleForgotPassword} className="space-y-4">
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  
+                  {resetError && (
+                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                      {resetError}
+                    </div>
+                  )}
+                  
+                  <div className="flex space-x-3">
+                    <button
+                      type="button"
+                      onClick={() => setShowForgotPassword(false)}
+                      className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={resetLoading}
+                      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                    >
+                      {resetLoading ? 'Sending...' : 'Send Reset Link'}
+                    </button>
+                  </div>
+                </form>
+              </>
+            ) : (
+              <div className="text-center">
+                <div className="text-green-600 text-4xl mb-4">✓</div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Check Your Email</h3>
+                <p className="text-gray-600 text-sm mb-4">
+                  We've sent a password reset link to <strong>{resetEmail}</strong>.
+                </p>
+                <button
+                  onClick={() => {
+                    setShowForgotPassword(false);
+                    setResetSuccess(false);
+                    setResetEmail('');
+                  }}
+                  className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  Back to Login
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

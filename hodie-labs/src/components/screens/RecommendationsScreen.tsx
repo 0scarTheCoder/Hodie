@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User } from 'firebase/auth';
 import { 
   Activity, 
@@ -9,8 +9,10 @@ import {
   CheckCircle, 
   Clock,
   Star,
-  TrendingUp
+  TrendingUp,
+  Loader2
 } from 'lucide-react';
+import { kimiK2Service, HealthRecommendation, HealthContext } from '../../services/kimiK2Service';
 
 interface RecommendationsScreenProps {
   user: User;
@@ -19,8 +21,48 @@ interface RecommendationsScreenProps {
 
 const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, healthScore }) => {
   const [selectedFilter, setSelectedFilter] = useState<string>('All');
-  
-  const recommendations = [
+  const [recommendations, setRecommendations] = useState<HealthRecommendation[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [aiEnabled, setAiEnabled] = useState<boolean>(false);
+
+  // Initialize AI and load recommendations
+  useEffect(() => {
+    const initializeAI = async () => {
+      const isEnabled = await kimiK2Service.checkApiStatus();
+      setAiEnabled(isEnabled);
+      loadRecommendations();
+    };
+
+    initializeAI();
+  }, [healthScore]);
+
+  // Load AI-generated recommendations
+  const loadRecommendations = async () => {
+    setLoading(true);
+    
+    const healthContext: HealthContext = {
+      userId: user.uid,
+      recentHealthData: {
+        steps: 8500,
+        sleep: 7.5,
+        mood: 'good',
+        healthScore: healthScore,
+        heartRate: 65,
+        bloodPressure: '120/80'
+      }
+    };
+
+    try {
+      const aiRecommendations = await kimiK2Service.generateHealthRecommendations(healthContext);
+      setRecommendations(aiRecommendations);
+    } catch (error) {
+      console.error('Error loading recommendations:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const staticRecommendations: HealthRecommendation[] = [
     {
       id: '1',
       category: 'Fitness',
@@ -30,8 +72,6 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
       impact: 'May improve glucose control and energy levels',
       timeframe: '2-4 weeks',
       difficulty: 'Easy',
-      icon: Activity,
-      color: 'bg-green-500',
       completed: false
     },
     {
@@ -43,8 +83,6 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
       impact: 'May reduce inflammation by 15-20%',
       timeframe: '3-6 weeks', 
       difficulty: 'Easy',
-      icon: Target,
-      color: 'bg-orange-500',
       completed: false
     },
     {
@@ -56,8 +94,6 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
       impact: 'May improve HRV and reduce CRP levels',
       timeframe: '4-8 weeks',
       difficulty: 'Easy',
-      icon: Shield,
-      color: 'bg-purple-500', 
       completed: false
     },
     {
@@ -69,8 +105,6 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
       impact: 'May improve glucose tolerance and HRV',
       timeframe: '1-2 weeks',
       difficulty: 'Medium',
-      icon: Clock,
-      color: 'bg-blue-500',
       completed: true
     },
     {
@@ -81,9 +115,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
       description: 'Mindfulness meditation can reduce cortisol levels and improve heart rate variability.',
       impact: 'May reduce stress hormones by 25%',
       timeframe: '2-4 weeks',
-      difficulty: 'Medium', 
-      icon: Heart,
-      color: 'bg-pink-500',
+      difficulty: 'Medium',
       completed: false
     },
     {
@@ -95,17 +127,18 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
       impact: 'May increase muscle mass and improve glucose control',
       timeframe: '6-12 weeks',
       difficulty: 'Hard',
-      icon: Zap,
-      color: 'bg-red-500',
       completed: false
     }
   ];
 
   const filterCategories = ['All', 'Fitness', 'Nutrition', 'Supplements', 'Sleep', 'Stress Management'];
   
+  // Use AI recommendations if available, otherwise fallback to static
+  const displayRecommendations = recommendations.length > 0 ? recommendations : staticRecommendations;
+  
   const filteredRecommendations = selectedFilter === 'All' 
-    ? recommendations 
-    : recommendations.filter(rec => rec.category === selectedFilter);
+    ? displayRecommendations 
+    : displayRecommendations.filter(rec => rec.category === selectedFilter);
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -125,6 +158,28 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
     }
   };
 
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'Fitness': return 'bg-green-500';
+      case 'Nutrition': return 'bg-orange-500';
+      case 'Supplements': return 'bg-purple-500';
+      case 'Sleep': return 'bg-blue-500';
+      case 'Stress Management': return 'bg-pink-500';
+      default: return 'bg-gray-500';
+    }
+  };
+
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case 'Fitness': return <Activity className="w-6 h-6 text-white" />;
+      case 'Nutrition': return <Target className="w-6 h-6 text-white" />;
+      case 'Supplements': return <Shield className="w-6 h-6 text-white" />;
+      case 'Sleep': return <Clock className="w-6 h-6 text-white" />;
+      case 'Stress Management': return <Heart className="w-6 h-6 text-white" />;
+      default: return <Star className="w-6 h-6 text-white" />;
+    }
+  };
+
   const completedCount = filteredRecommendations.filter(r => r.completed).length;
   const totalCount = filteredRecommendations.length;
   const completionRate = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
@@ -135,12 +190,27 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2">Your Health Recommendations</h1>
-            <p className="text-white/70">Personalised recommendations based on your health data</p>
+            <h1 className="text-3xl font-bold text-white mb-2 flex items-center">
+              Your Health Recommendations
+              {loading && <Loader2 className="w-6 h-6 animate-spin text-white/60 ml-3" />}
+              {!aiEnabled && <span className="text-sm text-orange-400 ml-3">(Limited AI Mode)</span>}
+            </h1>
+            <p className="text-white/70">
+              {aiEnabled ? 'AI-powered personalized recommendations based on your health data' : 'Basic recommendations - configure Kimi K2 for AI-powered insights'}
+            </p>
           </div>
-          <div className="text-right">
-            <div className="text-2xl font-bold text-white">{completedCount}/{totalCount}</div>
-            <div className="text-sm text-white/70">Completed</div>
+          <div className="text-right space-y-2">
+            <div>
+              <div className="text-2xl font-bold text-white">{completedCount}/{totalCount}</div>
+              <div className="text-sm text-white/70">Completed</div>
+            </div>
+            <button 
+              onClick={loadRecommendations}
+              disabled={loading}
+              className="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 rounded-lg transition-colors"
+            >
+              {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Refresh AI'}
+            </button>
           </div>
         </div>
 
@@ -209,8 +279,8 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
           >
             <div className="flex items-start justify-between">
               <div className="flex items-start space-x-4 flex-1">
-                <div className={`w-12 h-12 ${rec.color} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                  <rec.icon className="w-6 h-6 text-white" />
+                <div className={`w-12 h-12 ${getCategoryColor(rec.category)} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                  {getCategoryIcon(rec.category)}
                 </div>
                 
                 <div className="flex-1">

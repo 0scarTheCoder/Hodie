@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User } from 'firebase/auth';
 import { 
   Dna, 
@@ -11,8 +11,10 @@ import {
   AlertCircle,
   CheckCircle,
   Info,
-  Star
+  Star,
+  Loader2
 } from 'lucide-react';
+import { kimiK2Service, DNAInsight, HealthContext } from '../../services/kimiK2Service';
 
 interface DNAScreenProps {
   user: User;
@@ -20,6 +22,54 @@ interface DNAScreenProps {
 
 const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('overview');
+  const [fitnessInsights, setFitnessInsights] = useState<DNAInsight[]>([]);
+  const [nutritionInsights, setNutritionInsights] = useState<DNAInsight[]>([]);
+  const [healthInsights, setHealthInsights] = useState<DNAInsight[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [aiEnabled, setAiEnabled] = useState<boolean>(false);
+
+  // Check AI status and load insights on mount
+  useEffect(() => {
+    const initializeAI = async () => {
+      const isEnabled = await kimiK2Service.checkApiStatus();
+      setAiEnabled(isEnabled);
+      loadInsights();
+    };
+
+    initializeAI();
+  }, []);
+
+  // Load AI-generated insights
+  const loadInsights = async () => {
+    setLoading(true);
+    
+    const healthContext: HealthContext = {
+      userId: user.uid,
+      recentHealthData: {
+        steps: 8500,
+        sleep: 7.5,
+        mood: 'good',
+        healthScore: 82,
+        heartRate: 65
+      }
+    };
+
+    try {
+      const [fitness, nutrition, health] = await Promise.all([
+        kimiK2Service.generateDNAInsights('fitness', healthContext),
+        kimiK2Service.generateDNAInsights('nutrition', healthContext),
+        kimiK2Service.generateDNAInsights('health', healthContext)
+      ]);
+
+      setFitnessInsights(fitness);
+      setNutritionInsights(nutrition);
+      setHealthInsights(health);
+    } catch (error) {
+      console.error('Error loading DNA insights:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const mainCategories = [
     { id: 'fitness', name: 'Fitness', icon: Activity },
@@ -36,65 +86,6 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
     { id: 'traits', name: 'Personal Traits', icon: Star }
   ];
 
-  const fitnessInsights = [
-    {
-      gene: 'ACTN3',
-      variant: 'RR',
-      trait: 'Fast-twitch muscle fibres',
-      description: 'You have a genetic advantage for power and sprint activities',
-      recommendation: 'Focus on high-intensity, short-duration exercises like sprinting, weightlifting, and HIIT',
-      impact: 'High',
-      color: 'text-green-600'
-    },
-    {
-      gene: 'ACE',
-      variant: 'DD',
-      trait: 'Exercise response',
-      description: 'You respond better to high-intensity exercise than endurance training',
-      recommendation: 'Prioritise strength training and interval workouts over long-distance cardio',
-      impact: 'Medium',
-      color: 'text-yellow-600'
-    },
-    {
-      gene: 'MCT1',
-      variant: 'AA',
-      trait: 'Lactate clearance',
-      description: 'You have efficient lactate clearance during exercise',
-      recommendation: 'You can handle higher training intensities with shorter recovery periods',
-      impact: 'Medium',
-      color: 'text-blue-600'
-    }
-  ];
-
-  const nutritionInsights = [
-    {
-      gene: 'FTO',
-      variant: 'AA',
-      trait: 'Weight management',
-      description: 'You have a lower genetic risk for obesity',
-      recommendation: 'Maintain current healthy eating patterns. Focus on portion control and regular meals',
-      impact: 'High',
-      color: 'text-green-600'
-    },
-    {
-      gene: 'APOE',
-      variant: 'E3/E4',
-      trait: 'Cholesterol metabolism',
-      description: 'You may have increased sensitivity to dietary saturated fat',
-      recommendation: 'Limit saturated fat to <7% of calories. Emphasise Mediterranean-style diet',
-      impact: 'High',
-      color: 'text-red-600'
-    },
-    {
-      gene: 'CYP1A2',
-      variant: 'AC',
-      trait: 'Caffeine metabolism',
-      description: 'You are a moderate caffeine metaboliser',
-      recommendation: 'Limit caffeine to 2-3 cups coffee/day. Avoid caffeine after 2pm',
-      impact: 'Low',
-      color: 'text-yellow-600'
-    }
-  ];
 
   const healthRisks = [
     { condition: 'Heart Disease', risk: 'Lower than average', genetic: 15, lifestyle: 25, color: 'text-green-600' },
@@ -147,22 +138,28 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
         <div className="bg-white/10 rounded-xl p-6">
           <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
             <Activity className="w-5 h-5 mr-2" />
-            Fitness Highlights
+            Fitness Highlights {!aiEnabled && <span className="text-xs text-orange-400 ml-2">(Limited AI Mode)</span>}
           </h3>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-white/80">Power vs Endurance</span>
-              <span className="text-green-400 font-medium">Power athlete</span>
+          {loading ? (
+            <div className="flex items-center justify-center py-4">
+              <Loader2 className="w-6 h-6 animate-spin text-white/60" />
+              <span className="text-white/60 ml-2">Analyzing genetics...</span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-white/80">Exercise recovery</span>
-              <span className="text-blue-400 font-medium">Fast recovery</span>
+          ) : (
+            <div className="space-y-3">
+              {fitnessInsights.slice(0, 3).map((insight, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <span className="text-white/80">{insight.trait}</span>
+                  <span className={`font-medium ${insight.color.replace('text-', 'text-').replace('-600', '-400')}`}>
+                    {insight.impact} impact
+                  </span>
+                </div>
+              ))}
+              {fitnessInsights.length === 0 && (
+                <div className="text-white/60 text-sm">Configure Kimi K2 API for personalized insights</div>
+              )}
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-white/80">Injury risk</span>
-              <span className="text-yellow-400 font-medium">Average</span>
-            </div>
-          </div>
+          )}
         </div>
 
         <div className="bg-white/10 rounded-xl p-6">
@@ -189,39 +186,61 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
 
       {/* Actionable Recommendations */}
       <div className="bg-white/10 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Top DNA-Based Recommendations</h3>
-        <div className="space-y-4">
-          <div className="flex items-start space-x-3">
-            <CheckCircle className="w-5 h-5 text-green-400 mt-0.5" />
-            <div>
-              <div className="text-white font-medium">Focus on strength training and HIIT</div>
-              <div className="text-white/70 text-sm">Your ACTN3 variant suggests you'll respond better to power-based exercises</div>
-            </div>
+        <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+          Top DNA-Based Recommendations 
+          <button 
+            onClick={loadInsights}
+            className="ml-auto px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+            disabled={loading}
+          >
+            {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Refresh AI'}
+          </button>
+        </h3>
+        {loading ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="w-8 h-8 animate-spin text-white/60" />
+            <span className="text-white/60 ml-3">Generating personalized recommendations...</span>
           </div>
-          <div className="flex items-start space-x-3">
-            <AlertCircle className="w-5 h-5 text-orange-400 mt-0.5" />
-            <div>
-              <div className="text-white font-medium">Follow Mediterranean diet pattern</div>
-              <div className="text-white/70 text-sm">Your APOE variant increases sensitivity to saturated fats</div>
-            </div>
+        ) : (
+          <div className="space-y-4">
+            {[...fitnessInsights, ...nutritionInsights, ...healthInsights].slice(0, 3).map((insight, index) => (
+              <div key={index} className="flex items-start space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-400 mt-0.5" />
+                <div>
+                  <div className="text-white font-medium">{insight.trait}</div>
+                  <div className="text-white/70 text-sm">{insight.description}</div>
+                  <div className="text-blue-300 text-sm mt-1 font-medium">{insight.recommendation}</div>
+                </div>
+              </div>
+            ))}
+            {[...fitnessInsights, ...nutritionInsights, ...healthInsights].length === 0 && (
+              <div className="text-center py-4">
+                <div className="text-white/60">Configure your Kimi K2 API key to unlock AI-powered genetic insights</div>
+                <div className="text-white/40 text-sm mt-1">See KIMI_K2_SETUP.md for instructions</div>
+              </div>
+            )}
           </div>
-          <div className="flex items-start space-x-3">
-            <Info className="w-5 h-5 text-blue-400 mt-0.5" />
-            <div>
-              <div className="text-white font-medium">Aim for 8-9 hours of sleep</div>
-              <div className="text-white/70 text-sm">Your PER2 variant suggests you need longer sleep duration for optimal health</div>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
 
   const renderFitness = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-white mb-4">Fitness & Exercise Genetics</h2>
-      {fitnessInsights.map((insight, index) => (
-        <div key={index} className="bg-gray-50 rounded-xl p-6 shadow-lg border border-gray-100">
+      <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
+        Fitness & Exercise Genetics
+        {loading && <Loader2 className="w-6 h-6 animate-spin text-white/60 ml-3" />}
+        {!aiEnabled && <span className="text-sm text-orange-400 ml-3">(Limited AI Mode)</span>}
+      </h2>
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="w-8 h-8 animate-spin text-white/60" />
+          <span className="text-white/60 ml-3">Analyzing your fitness genetics...</span>
+        </div>
+      ) : (
+        <>
+          {fitnessInsights.map((insight, index) => (
+            <div key={index} className="bg-gray-50 rounded-xl p-6 shadow-lg border border-gray-100">
           <div className="flex justify-between items-start mb-4">
             <div>
               <h3 className="text-lg font-semibold text-gray-900">{insight.trait}</h3>
@@ -247,13 +266,32 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
           </div>
         </div>
       ))}
+          {fitnessInsights.length === 0 && (
+            <div className="bg-gray-50 rounded-xl p-8 text-center">
+              <div className="text-gray-600 mb-2">No fitness insights available</div>
+              <div className="text-gray-500 text-sm">Configure Kimi K2 API for AI-generated fitness genetics analysis</div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 
   const renderNutrition = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-white mb-4">Nutrition & Metabolism</h2>
-      {nutritionInsights.map((insight, index) => (
+      <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
+        Nutrition & Metabolism
+        {loading && <Loader2 className="w-6 h-6 animate-spin text-white/60 ml-3" />}
+        {!aiEnabled && <span className="text-sm text-orange-400 ml-3">(Limited AI Mode)</span>}
+      </h2>
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="w-8 h-8 animate-spin text-white/60" />
+          <span className="text-white/60 ml-3">Analyzing your nutrition genetics...</span>
+        </div>
+      ) : (
+        <>
+          {nutritionInsights.map((insight, index) => (
         <div key={index} className="bg-gray-50 rounded-xl p-6 shadow-lg border border-gray-100">
           <div className="flex justify-between items-start mb-4">
             <div>
@@ -280,6 +318,14 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
           </div>
         </div>
       ))}
+          {nutritionInsights.length === 0 && (
+            <div className="bg-gray-50 rounded-xl p-8 text-center">
+              <div className="text-gray-600 mb-2">No nutrition insights available</div>
+              <div className="text-gray-500 text-sm">Configure Kimi K2 API for AI-generated nutrition genetics analysis</div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 

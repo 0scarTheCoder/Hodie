@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { User } from 'firebase/auth';
 import { queryLogger } from '../../utils/queryLogger';
-import { freeChatService } from '../../services/freeChatService';
+import { kimiK2Service, HealthContext, ConversationMessage } from '../../services/kimiK2Service';
 
 interface Message {
   id: string;
@@ -15,18 +15,41 @@ interface ChatInterfaceProps {
 }
 
 const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      text: 'G\'day! I\'m your Hodie Labs AI health assistant, powered by free AI technology. I can help you with:\n\n🍎 **Nutrition & Cooking**: Specific recipes, meal planning, protein calculations\n🏃 **Exercise & Fitness**: Personalised workout routines and fitness goals\n😴 **Sleep & Recovery**: Sleep improvement strategies and recovery tips\n🧘 **Mental Wellbeing**: Stress management and mental health support\n💧 **Wellness**: Daily health habits and lifestyle advice\n\nI use real AI to understand context and have natural conversations about your health journey. I follow Australian health guidelines and remember our chat history. What would you like to know?',
-      sender: 'assistant',
-      timestamp: new Date()
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [conversationHistory, setConversationHistory] = useState<{ role: 'user' | 'assistant'; content: string }[]>([]);
+  const [aiEnabled, setAiEnabled] = useState(false);
+  const [conversationHistory, setConversationHistory] = useState<ConversationMessage[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Initialize AI status and welcome message
+  useEffect(() => {
+    const initializeChat = async () => {
+      const enabled = await kimiK2Service.checkApiStatus();
+      setAiEnabled(enabled);
+      
+      const welcomeMessage: Message = {
+        id: '1',
+        text: `G'day! I'm your Hodie Labs AI health assistant${enabled ? ', powered by Kimi K2 advanced AI' : ' (limited mode)'}. I can help you with:
+
+🍎 **Nutrition & Cooking**: Specific recipes, meal planning, protein calculations
+🏃 **Exercise & Fitness**: Personalised workout routines and fitness goals  
+😴 **Sleep & Recovery**: Sleep improvement strategies and recovery tips
+🧘 **Mental Wellbeing**: Stress management and mental health support
+💧 **Wellness**: Daily health habits and lifestyle advice
+🧬 **DNA Insights**: Genetic-based health recommendations
+📊 **Biomarker Analysis**: Health metrics interpretation
+
+${enabled ? 'I use advanced AI to understand complex health questions and provide evidence-based guidance.' : '⚠️ **Limited AI Mode**: Configure Kimi K2 API for advanced conversational AI capabilities.'} I follow Australian health guidelines and remember our chat history. What would you like to know?`,
+        sender: 'assistant',
+        timestamp: new Date()
+      };
+      
+      setMessages([welcomeMessage]);
+    };
+
+    initializeChat();
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -61,8 +84,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
       // Get user's recent health data for context
       const healthContext = await getUserHealthContext(user.uid);
       
-      // Generate response using free AI chat service
-      const responseText = await freeChatService.generateHealthResponse(
+      // Generate response using Kimi K2 AI service
+      const responseText = await kimiK2Service.generateHealthResponse(
         inputValue,
         healthContext,
         conversationHistory
@@ -177,8 +200,17 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
   return (
     <div className="flex flex-col h-full">
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-4">
-        <h2 className="text-xl font-semibold">🇦🇺 Hodie Health Assistant</h2>
-        <p className="text-sm opacity-90">Australian health guidance • Evidence-based advice • Always consult your GP</p>
+        <h2 className="text-xl font-semibold flex items-center">
+          🇦🇺 Hodie Health Assistant
+          {aiEnabled ? (
+            <span className="ml-3 text-xs bg-green-500 px-2 py-1 rounded-full">Kimi K2 Enabled</span>
+          ) : (
+            <span className="ml-3 text-xs bg-orange-500 px-2 py-1 rounded-full">Limited Mode</span>
+          )}
+        </h2>
+        <p className="text-sm opacity-90">
+          {aiEnabled ? 'Advanced AI health guidance' : 'Basic health guidance'} • Evidence-based advice • Always consult your GP
+        </p>
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
@@ -242,13 +274,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
         <div className="mb-3">
           <div className="flex flex-wrap gap-2">
             {[
-              { topic: 'Nutrition', question: 'What foods should I eat for optimal health?', emoji: '🍎' },
-              { topic: 'Exercise', question: 'What exercise routine should I start with?', emoji: '🏃' },
-              { topic: 'Sleep', question: 'How can I improve my sleep quality?', emoji: '😴' },
-              { topic: 'Weight Loss', question: 'What foods should I eat for healthy weight loss?', emoji: '⚖️' },
-              { topic: 'Muscle Building', question: 'What foods should I eat for muscle building?', emoji: '💪' },
-              { topic: 'Stress', question: 'How can I manage stress better?', emoji: '🧘' },
-              { topic: 'Hydration', question: 'How much water should I drink daily?', emoji: '💧' }
+              { topic: 'DNA Insights', question: 'Explain my genetic fitness and nutrition profile', emoji: '🧬' },
+              { topic: 'Health Analysis', question: 'Analyze my current health metrics and provide recommendations', emoji: '📊' },
+              { topic: 'Nutrition', question: 'What foods should I eat for optimal health based on my data?', emoji: '🍎' },
+              { topic: 'Exercise', question: 'What exercise routine should I start with based on my genetics?', emoji: '🏃' },
+              { topic: 'Sleep', question: 'How can I improve my sleep quality and duration?', emoji: '😴' },
+              { topic: 'Biomarkers', question: 'Help me understand my biomarker results', emoji: '🔬' },
+              { topic: 'Weight Loss', question: 'Create a personalized weight loss strategy for me', emoji: '⚖️' },
+              { topic: 'Stress', question: 'How can I manage stress better based on my profile?', emoji: '🧘' }
             ].map(({ topic, question, emoji }) => (
               <button
                 key={topic}
