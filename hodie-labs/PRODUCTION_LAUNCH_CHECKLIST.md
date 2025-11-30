@@ -30,11 +30,11 @@
 
 ### ⚠️ **RECOMMENDED BEFORE LAUNCH**
 
-#### **AI Chat Enhancement** (15 minutes)
-- [ ] **Add Groq API Key**: Currently in "Limited AI Mode"
-  - Get free key: https://console.groq.com
-  - Add to .env: `REACT_APP_GROQ_API_KEY=gsk_your_key`
-  - Enables advanced conversational AI vs basic pattern matching
+#### **Advanced Health AI Enhancement** (15 minutes)
+- [ ] **Add Kimi K2 API Key**: Currently in "Limited AI Mode"
+  - Get free key: https://api.aimlapi.com
+  - Add to .env: `REACT_APP_KIMI_K2_API_KEY=your_key`
+  - Enables 256k context, DNA analysis, biomarker interpretation vs basic pattern matching
 
 #### **Testing Infrastructure** (30 minutes)
 - [ ] **Fix Test Suite**: Currently broken but app works fine
@@ -91,11 +91,11 @@
 - ✅ Professional appearance
 - ✅ Mobile responsive
 - ✅ Payment system functional
-- ⚠️ AI chat in "Limited Mode" (still functional, just simpler)
+- ⚠️ AI health analytics in "Limited Mode" (basic responses vs advanced DNA/biomarker analysis)
 
 ### **Option 2: Perfect First (1-2 hours more)**
 **Add:**
-- Groq AI key for advanced chat
+- Kimi K2 API key for advanced health AI
 - Fix test suite
 - Enable analytics
 
@@ -114,7 +114,7 @@
 - **Health Dashboard**: 100% complete
 - **Payment System**: 100% complete
 - **Security**: 100% complete
-- **AI Chat**: 80% complete (functional but basic)
+- **AI Health Analytics**: 80% complete (basic responses vs advanced medical AI)
 
 ## 🎉 **Launch Recommendation**
 
@@ -128,7 +128,7 @@
 5. **Scalable infrastructure**
 6. **Revenue-ready with payments**
 
-**The AI chat limitation is minor** - users still get health responses, just not conversational AI. This can be upgraded in 15 minutes post-launch.
+**The AI limitation is minor** - users still get health responses, just not the advanced DNA/biomarker analysis features. This can be upgraded in 15 minutes post-launch.
 
 ### **Next Steps After Employer Approval:**
 1. **Marketing**: Create landing page and onboarding

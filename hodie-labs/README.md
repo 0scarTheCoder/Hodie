@@ -34,7 +34,7 @@ Visit the live application: [https://hodielabs-app.web.app](https://hodielabs-ap
 ### Backend & Services
 - **Auth0** - Professional authentication
 - **Firebase Firestore** - Real-time database
-- **Groq AI** - Advanced conversational AI (Llama3-70B)
+- **Kimi K2 AI** - Advanced health analytics AI (256k context, medical specialization)
 - **Firebase Hosting** - Production deployment
 
 ### Development
@@ -100,23 +100,24 @@ REACT_APP_FIREBASE_STORAGE_BUCKET=your-project.firebasestorage.app
 REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
 REACT_APP_FIREBASE_APP_ID=your-app-id
 
-# Optional: Groq AI (for advanced chat)
-REACT_APP_GROQ_API_KEY=your-groq-api-key
+# Optional: Kimi K2 AI (for advanced health analytics)
+REACT_APP_KIMI_K2_API_KEY=your-kimi-k2-api-key
 ```
 
-### Enable AI Chat (Optional but Recommended)
+### Enable Advanced AI Health Analytics (Optional but Recommended)
 
-1. Get free API key from [console.groq.com](https://console.groq.com)
-2. Add to `.env`: `REACT_APP_GROQ_API_KEY=gsk_your_key`
+1. Get free API key from [api.aimlapi.com](https://api.aimlapi.com)
+2. Add to `.env`: `REACT_APP_KIMI_K2_API_KEY=your_key`
 3. Rebuild and deploy
 
-Without this, the app uses "Limited AI Mode" with pattern-matched responses.
+**Benefits**: 256k context window, health specialization, DNA analysis, biomarker interpretation
+Without this, the app uses "Limited AI Mode" with basic pattern-matched responses.
 
 ## 📚 Documentation
 
 ### Setup Guides
-- [GROQ_SETUP.md](GROQ_SETUP.md) - Enable advanced AI chat
-- [SETUP_REAL_AI.md](SETUP_REAL_AI.md) - Quick AI setup (2 minutes)
+- [KIMI_K2_SETUP.md](KIMI_K2_SETUP.md) - Enable advanced health AI (Recommended)
+- [GROQ_SETUP.md](GROQ_SETUP.md) - Alternative AI chat setup
 - [AUTH0_SETUP_GUIDE.md](AUTH0_SETUP_GUIDE.md) - Authentication configuration
 
 ### Feature Guides
@@ -198,11 +199,12 @@ npm test -- --watchAll=false   # Single run
 - **Apple Health Rings** - Beautiful progress visualization
 - **Real-time Metrics** - Live health data updates
 
-### Chat System
-- **Groq AI Integration** - Advanced conversational AI
+### AI Health System
+- **Kimi K2 Integration** - Advanced health analytics AI (256k context)
+- **DNA Analysis** - Genetic variant interpretation and recommendations
+- **Biomarker Analysis** - Lab result interpretation and trend analysis
 - **Australian Health Guidelines** - Localized health advice
-- **Conversation Memory** - Persistent chat history
-- **Context Awareness** - Personalized responses
+- **Conversation Memory** - Persistent chat history with massive context
 
 ### Settings & Account
 - **Profile Management** - Complete user information
