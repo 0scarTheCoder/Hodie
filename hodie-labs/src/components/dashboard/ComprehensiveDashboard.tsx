@@ -29,6 +29,7 @@ import RecommendationsScreen from '../screens/RecommendationsScreen';
 import DNAScreen from '../screens/DNAScreen';
 import LabsScreen from '../screens/LabsScreen';
 import ReportsScreen from '../screens/ReportsScreen';
+import FAQScreen from '../screens/FAQScreen';
 import { userMetricsService, HealthScoreMetrics, UserLoginData } from '../../services/userMetricsService';
 
 interface DashboardProps {
@@ -65,7 +66,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
   const [loading, setLoading] = useState(true);
   const [showChat, setShowChat] = useState(false);
   const [currentStep, setCurrentStep] = useState<'blood' | 'dna' | 'body' | null>(null);
-  const [currentScreen, setCurrentScreen] = useState<'home' | 'recommendations' | 'dna' | 'labs' | 'reports'>('home');
+  const [currentScreen, setCurrentScreen] = useState<'home' | 'recommendations' | 'dna' | 'labs' | 'reports' | 'faq'>('home');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [chatInput, setChatInput] = useState('');
 
@@ -281,6 +282,8 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
         return <LabsScreen user={user} />;
       case 'reports':
         return <ReportsScreen user={user} />;
+      case 'faq':
+        return <FAQScreen user={user} />;
       case 'home':
       default:
         return renderHomeContent();
@@ -684,7 +687,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
       <BrandHeader 
         user={user}
         currentScreen={currentScreen}
-        onScreenChange={(screen) => setCurrentScreen(screen as 'home' | 'recommendations' | 'dna' | 'labs' | 'reports')}
+        onScreenChange={(screen) => setCurrentScreen(screen as 'home' | 'recommendations' | 'dna' | 'labs' | 'reports' | 'faq')}
         showNavigation={true}
       />
 
@@ -736,6 +739,15 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
               className={`text-left text-white hover:text-blue-300 ${currentScreen === 'reports' ? 'text-blue-300' : ''}`}
             >
               Reports
+            </button>
+            <button 
+              onClick={() => {
+                setCurrentScreen('faq');
+                setMobileMenuOpen(false);
+              }}
+              className={`text-left text-white hover:text-blue-300 ${currentScreen === 'faq' ? 'text-blue-300' : ''}`}
+            >
+              FAQ
             </button>
           </nav>
         </div>

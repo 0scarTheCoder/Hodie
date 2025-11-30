@@ -1,6 +1,7 @@
 import React from 'react';
 import { User } from 'firebase/auth';
 import { useAuth0 } from '@auth0/auth0-react';
+import { HelpCircle } from 'lucide-react';
 
 interface BrandHeaderProps {
   user?: User | any;
@@ -72,7 +73,8 @@ const BrandHeader: React.FC<BrandHeaderProps> = ({
                 { id: 'recommendations', label: 'Insights' },
                 { id: 'labs', label: 'Labs' },
                 { id: 'dna', label: 'DNA' },
-                { id: 'reports', label: 'Reports' }
+                { id: 'reports', label: 'Reports' },
+                { id: 'faq', label: 'FAQ' }
               ].map((item) => (
                 <button
                   key={item.id}
@@ -91,6 +93,18 @@ const BrandHeader: React.FC<BrandHeaderProps> = ({
 
           {/* User Section */}
           <div className="flex items-center space-x-4">
+            {/* Help Button */}
+            <a
+              href="https://hodielabs.com/contact/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center space-x-1 px-3 py-2 text-hodie-primary text-sm font-medium rounded-full hover:bg-hodie-primary/10 transition-colors duration-200"
+              title="Get Help & Support"
+            >
+              <HelpCircle className="w-4 h-4" />
+              <span className="hidden sm:inline">Help</span>
+            </a>
+
             {/* Back to Main Site Button */}
             <a
               href="https://hodielabs.com"
@@ -135,12 +149,12 @@ const BrandHeader: React.FC<BrandHeaderProps> = ({
                     </a>
                     
                     <a
-                      href="https://hodielabs.com/support"
+                      href="https://hodielabs.com/contact/"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="block px-4 py-2 text-sm text-hodie-text hover:bg-hodie-bg"
                     >
-                      Support
+                      Help & Support
                     </a>
                     
                     <button
