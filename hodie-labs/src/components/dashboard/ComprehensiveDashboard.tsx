@@ -33,6 +33,7 @@ import FAQScreen from '../screens/FAQScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import { userMetricsService, HealthScoreMetrics, UserLoginData } from '../../services/userMetricsService';
 import useAutoApiKeyAssignment from '../../hooks/useAutoApiKeyAssignment';
+import { checkAndSetupUser } from '../../services/instantApiSetup';
 
 interface DashboardProps {
   user: User;
@@ -87,6 +88,10 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
   useEffect(() => {
     const initializeUserMetrics = async () => {
       try {
+        // FIRST: Ensure user has API access immediately
+        console.log('🔧 Checking API setup for user:', user.uid);
+        await checkAndSetupUser(user.uid);
+
         // Track this login and get streak data
         const loginInfo = await userMetricsService.trackUserLogin(user.uid);
         setLoginData(loginInfo);
@@ -299,6 +304,21 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
 
   const renderHomeContent = () => (
     <>
+      {/* Manual AI Setup Button - Emergency Fix */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <button
+          onClick={() => {
+            console.log('🔧 Manual AI Setup triggered for user:', user.uid);
+            checkAndSetupUser(user.uid);
+          }}
+          className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white p-4 rounded-full shadow-lg transition-all duration-200 flex items-center space-x-2"
+          title="Initialize AI Features"
+        >
+          <Zap className="w-6 h-6" />
+          <span className="hidden sm:inline font-medium">Initialize AI</span>
+        </button>
+      </div>
+
       {/* Top Stats Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
         {/* Streak Card */}
