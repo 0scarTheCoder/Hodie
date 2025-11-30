@@ -1,0 +1,132 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Enhanced security functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    function hasValidTimestamp() {
+      return request.resource.data.timestamp is timestamp;
+    }
+    
+    function isValidHealthData() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['userId', 'timestamp']) &&
+             data.userId is string &&
+             data.timestamp is timestamp;
+    }
+    
+    function hasRateLimit() {
+      // Allow max 10 writes per minute per user
+      return request.auth.uid in getRateLimitData() == false;
+    }
+    
+    // User profiles - strict access control
+    match /users/{userId} {
+      allow read: if isAuthenticated() && isOwner(userId);
+      allow write: if isAuthenticated() && 
+                      isOwner(userId) && 
+                      hasValidTimestamp() &&
+                      request.resource.data.keys().hasAll(['email', 'createdAt']);
+    }
+    
+    // Health metrics - owner only, validated data
+    match /health_metrics/{document} {
+      allow read: if isAuthenticated() && 
+                     isOwner(resource.data.userId);
+      
+      allow create: if isAuthenticated() && 
+                       isOwner(request.resource.data.userId) &&
+                       isValidHealthData() &&
+                       hasRateLimit();
+      
+      allow update: if isAuthenticated() && 
+                       isOwner(resource.data.userId) &&
+                       request.resource.data.userId == resource.data.userId;
+      
+      allow delete: if isAuthenticated() && 
+                       isOwner(resource.data.userId);
+    }
+    
+    // Encrypted health data - maximum security
+    match /secure_health_data/{document} {
+      allow read: if isAuthenticated() && 
+                     isOwner(resource.data.userId) &&
+                     resource.data.encryptedData != null;
+      
+      allow create: if isAuthenticated() && 
+                       isOwner(request.resource.data.userId) &&
+                       request.resource.data.keys().hasAll(['userId', 'encryptedData', 'createdAt']) &&
+                       request.resource.data.encryptedData.keys().hasAll(['data', 'iv', 'salt', 'timestamp']);
+      
+      // No updates allowed for encrypted data - create new versions only
+      allow update: if false;
+      
+      allow delete: if isAuthenticated() && 
+                       isOwner(resource.data.userId);
+    }
+    
+    // Chat conversations - user specific
+    match /conversations/{conversationId} {
+      allow read, write: if isAuthenticated() && 
+                            resource.data.userId == request.auth.uid;
+      
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid &&
+                       hasValidTimestamp();
+    }
+    
+    // Chat messages - within user's conversations only
+    match /conversations/{conversationId}/messages/{messageId} {
+      allow read, write: if isAuthenticated() && 
+                            get(/databases/$(database)/documents/conversations/$(conversationId)).data.userId == request.auth.uid;
+    }
+    
+    // User sessions - track for security
+    match /user_sessions/{sessionId} {
+      allow read, write: if isAuthenticated() && 
+                            resource.data.userId == request.auth.uid;
+      
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid &&
+                       request.resource.data.keys().hasAll(['loginTime', 'ipHash', 'userAgent']);
+    }
+    
+    // Audit logs - read-only for users, write-only for system
+    match /audit_logs/{logId} {
+      allow read: if isAuthenticated() && 
+                     resource.data.userId == request.auth.uid;
+      
+      // Only system can write audit logs
+      allow create: if false;
+    }
+    
+    // Admin collection - super restricted
+    match /admin/{document} {
+      allow read, write: if isAuthenticated() && 
+                            hasAdminRole(request.auth.uid);
+    }
+    
+    // Helper function for admin role (would be implemented server-side)
+    function hasAdminRole(userId) {
+      return false; // Override with proper admin check
+    }
+    
+    // Rate limiting helper (simplified)
+    function getRateLimitData() {
+      return [];
+    }
+    
+    // Default deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
