@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Auth0Provider, useAuth0 } from '@auth0/auth0-react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { auth0Service } from './services/auth0Service';
 import Auth0LoginPage from './components/auth/Auth0LoginPage';
 import ComprehensiveDashboard from './components/dashboard/ComprehensiveDashboard';
 import OnboardingFlow from './components/onboarding/OnboardingFlow';
+import PasswordResetPage from './components/auth/PasswordResetPage';
 import { queryLogger } from './utils/queryLogger';
 import { Loader2 } from 'lucide-react';
 
@@ -148,9 +150,14 @@ function Auth0App() {
   const auth0Props = auth0Service.getProviderProps();
 
   return (
-    <Auth0Provider {...auth0Props}>
-      <Auth0AppContent />
-    </Auth0Provider>
+    <Router>
+      <Auth0Provider {...auth0Props}>
+        <Routes>
+          <Route path="/reset-password" element={<PasswordResetPage />} />
+          <Route path="/*" element={<Auth0AppContent />} />
+        </Routes>
+      </Auth0Provider>
+    </Router>
   );
 }
 
