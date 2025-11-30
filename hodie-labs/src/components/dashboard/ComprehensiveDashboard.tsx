@@ -253,7 +253,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
     
     return (
       <div className="flex items-center space-x-3">
-        <span className="font-medium text-gray-900">{value}</span>
+        <span className="font-medium text-white">{value}</span>
         <div className="relative w-16 h-6">
           {/* Marker above bar */}
           <div 
@@ -293,9 +293,9 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
   const renderHomeContent = () => (
     <>
       {/* Top Stats Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
         {/* Streak Card */}
-        <div className="bg-gradient-to-r from-orange-300 via-orange-400 to-red-400 rounded-2xl p-6 text-white">
+        <div className="bg-gradient-to-r from-orange-300 via-orange-400 to-red-400 rounded-2xl p-8 text-white shadow-xl">
           <div className="flex items-center justify-between mb-4">
             <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
               <Zap className="w-8 h-8" />
@@ -310,7 +310,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
         </div>
 
         {/* Health Score Card */}
-        <div className="bg-gradient-to-r from-orange-400 to-pink-500 rounded-2xl p-6 text-white">
+        <div className="bg-gradient-to-r from-orange-400 to-pink-500 rounded-2xl p-8 text-white shadow-xl">
           <div className="flex items-center justify-between">
             <div className="flex-1">
               <h2 className="text-2xl font-bold mb-4">Your Health Score</h2>
@@ -422,7 +422,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
       </div>
 
       {/* Top 3 Recommendations */}
-      <div className="mb-8">
+      <div className="mb-12">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">Top 3 Recommendations</h2>
           <button 
@@ -432,9 +432,9 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
             View All
           </button>
         </div>
-        <div className="space-y-3">
+        <div className="space-y-4">
           {recommendations.map((rec) => (
-            <div key={rec.id} className="flex items-center justify-between bg-white/10 rounded-xl p-4 hover:bg-white/15 transition-colors">
+            <div key={rec.id} className="flex items-center justify-between bg-white/10 rounded-xl p-6 hover:bg-white/15 transition-colors shadow-lg">
               <div className="flex items-center space-x-4">
                 <div className={`w-10 h-10 ${rec.color} rounded-lg flex items-center justify-center`}>
                   <rec.icon className="w-5 h-5 text-white" />
@@ -448,84 +448,84 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
       </div>
 
       {/* Health Summary & Biomarkers */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
         {/* Health Summary */}
-        <div className="bg-gray-50 rounded-2xl p-6 shadow-lg flex flex-col h-full border border-gray-100">
+        <div className="bg-white/10 rounded-2xl p-6 shadow-xl flex flex-col h-full border border-white/20 backdrop-blur-sm">
           <div className="flex-1">
-            <h3 className="text-lg font-semibold mb-4 text-gray-900">Your Health Summary</h3>
-            <p className="text-sm text-gray-600 mb-4">Latest Readings</p>
+            <h3 className="text-lg font-semibold mb-4 text-white">Your Health Summary</h3>
+            <p className="text-sm text-white/70 mb-4">Latest Readings</p>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Systolic</span>
+                <span className="text-white/80">Systolic</span>
                 {renderMiniGauge(`${healthMetrics.systolic}`, 'optimal')}
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Diastolic</span>
+                <span className="text-white/80">Diastolic</span>
                 {renderMiniGauge(`${healthMetrics.diastolic}`, 'optimal')}
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Heart Rate</span>
+                <span className="text-white/80">Heart Rate</span>
                 {renderMiniGauge(`${healthMetrics.heartRate}`, 'optimal')}
               </div>
             </div>
-            <div className="mt-6 h-2 bg-gray-200 rounded-full">
+            <div className="mt-6 h-2 bg-white/20 rounded-full">
               <div className="h-2 bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 rounded-full" style={{ width: '60%' }}></div>
             </div>
           </div>
           <button 
             onClick={() => setCurrentScreen('labs')}
-            className="w-full mt-4 bg-gray-900 hover:bg-gray-800 text-white py-2 rounded-lg text-sm transition-colors"
+            className="w-full mt-4 bg-white/20 hover:bg-white/30 text-white py-2 rounded-lg text-sm transition-colors"
           >
             View Full Labs →
           </button>
         </div>
 
         {/* Heart Health */}
-        <div className="bg-gray-50 rounded-2xl p-6 shadow-lg flex flex-col h-full border border-gray-100">
+        <div className="bg-white/10 rounded-2xl p-6 shadow-xl flex flex-col h-full border border-white/20 backdrop-blur-sm">
           <div className="flex-1">
-            <h3 className="text-lg font-semibold mb-2 text-gray-900">Heart Health</h3>
-            <p className="text-sm text-gray-600 mb-4">Measures blood pressure and cholesterols for assessing heart disease risk.</p>
+            <h3 className="text-lg font-semibold mb-2 text-white">Heart Health</h3>
+            <p className="text-sm text-white/70 mb-4">Measures blood pressure and cholesterols for assessing heart disease risk.</p>
             <div className="space-y-3">
               <div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-700">Resting Heart Rate</span>
-                  <span className="text-green-600 font-medium">OPTIMAL</span>
+                  <span className="text-white/80">Resting Heart Rate</span>
+                  <span className="text-green-400 font-medium">OPTIMAL</span>
                 </div>
-                <div className="text-xs text-gray-500">45 bpm • Aug 2025</div>
+                <div className="text-xs text-white/60">45 bpm • Aug 2025</div>
               </div>
               <div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-700">HDL Cholesterol</span>
-                  <span className="text-green-600 font-medium">OPTIMAL</span>
+                  <span className="text-white/80">HDL Cholesterol</span>
+                  <span className="text-green-400 font-medium">OPTIMAL</span>
                 </div>
-                <div className="text-xs text-gray-500">{healthMetrics.cholesterol} mmol/L • Aug 2025</div>
+                <div className="text-xs text-white/60">{healthMetrics.cholesterol} mmol/L • Aug 2025</div>
               </div>
             </div>
           </div>
           <button 
             onClick={() => setCurrentScreen('labs')}
-            className="w-full mt-4 bg-gray-900 hover:bg-gray-800 text-white py-2 rounded-lg text-sm transition-colors"
+            className="w-full mt-4 bg-white/20 hover:bg-white/30 text-white py-2 rounded-lg text-sm transition-colors"
           >
             Learn More →
           </button>
         </div>
 
         {/* Tumour Markers */}
-        <div className="bg-gray-50 rounded-2xl p-6 shadow-lg flex flex-col h-full border border-gray-100">
+        <div className="bg-white/10 rounded-2xl p-6 shadow-xl flex flex-col h-full border border-white/20 backdrop-blur-sm">
           <div className="flex-1">
-            <h3 className="text-lg font-semibold mb-2 text-gray-900">Tumour Markers</h3>
-            <p className="text-sm text-gray-600 mb-4">Biomarkers for early detection of various types of cancers.</p>
+            <h3 className="text-lg font-semibold mb-2 text-white">Tumour Markers</h3>
+            <p className="text-sm text-white/70 mb-4">Biomarkers for early detection of various types of cancers.</p>
             <div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-700">Prostate sp.antigen (PSA)</span>
-                <span className="text-green-600 font-medium">OPTIMAL</span>
+                <span className="text-white/80">Prostate sp.antigen (PSA)</span>
+                <span className="text-green-400 font-medium">OPTIMAL</span>
               </div>
-              <div className="text-xs text-gray-500">{healthMetrics.psaLevel} ug/L • Jun 2024</div>
+              <div className="text-xs text-white/60">{healthMetrics.psaLevel} ug/L • Jun 2024</div>
             </div>
           </div>
           <button 
             onClick={() => setCurrentScreen('labs')}
-            className="w-full mt-4 bg-gray-900 hover:bg-gray-800 text-white py-2 rounded-lg text-sm transition-colors"
+            className="w-full mt-4 bg-white/20 hover:bg-white/30 text-white py-2 rounded-lg text-sm transition-colors"
           >
             Learn More →
           </button>
@@ -533,50 +533,50 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
       </div>
 
       {/* Test Status Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <div className="bg-gray-50 rounded-2xl p-6 shadow-lg flex flex-col h-full border border-gray-100">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+        <div className="bg-white/10 rounded-2xl p-6 shadow-xl flex flex-col h-full border border-white/20 backdrop-blur-sm">
           <div className="flex items-center justify-between mb-4 flex-1">
             <div className="flex items-center space-x-3">
-              <Dna className="w-6 h-6 text-green-600" />
-              <span className="font-semibold text-gray-900">DNA Insights</span>
+              <Dna className="w-6 h-6 text-green-400" />
+              <span className="font-semibold text-white">DNA Insights</span>
             </div>
-            <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">Done</span>
+            <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-medium">Done</span>
           </div>
           <button 
             onClick={() => setCurrentScreen('dna')}
-            className="w-full bg-gray-900 hover:bg-gray-800 text-white py-2 rounded-lg text-sm transition-colors"
+            className="w-full bg-white/20 hover:bg-white/30 text-white py-2 rounded-lg text-sm transition-colors"
           >
             View Results →
           </button>
         </div>
 
-        <div className="bg-gray-50 rounded-2xl p-6 shadow-lg flex flex-col h-full border border-gray-100">
+        <div className="bg-white/10 rounded-2xl p-6 shadow-xl flex flex-col h-full border border-white/20 backdrop-blur-sm">
           <div className="flex items-center justify-between mb-4 flex-1">
             <div className="flex items-center space-x-3">
-              <Stethoscope className="w-6 h-6 text-yellow-600" />
-              <span className="font-semibold text-gray-900">Blood Tests</span>
+              <Stethoscope className="w-6 h-6 text-yellow-400" />
+              <span className="font-semibold text-white">Blood Tests</span>
             </div>
-            <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">Pending</span>
+            <span className="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-xs font-medium">Pending</span>
           </div>
           <button 
             onClick={() => setCurrentStep('blood')}
-            className="w-full bg-gray-900 hover:bg-gray-800 text-white py-2 rounded-lg text-sm transition-colors"
+            className="w-full bg-white/20 hover:bg-white/30 text-white py-2 rounded-lg text-sm transition-colors"
           >
             Upload →
           </button>
         </div>
 
-        <div className="bg-gray-50 rounded-2xl p-6 shadow-lg flex flex-col h-full border border-gray-100">
+        <div className="bg-white/10 rounded-2xl p-6 shadow-xl flex flex-col h-full border border-white/20 backdrop-blur-sm">
           <div className="flex items-center justify-between mb-4 flex-1">
             <div className="flex items-center space-x-3">
-              <Camera className="w-6 h-6 text-blue-600" />
-              <span className="font-semibold text-gray-900">Body Scan</span>
+              <Camera className="w-6 h-6 text-blue-400" />
+              <span className="font-semibold text-white">Body Scan</span>
             </div>
-            <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">Book Now</span>
+            <span className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded-full text-xs font-medium">Book Now</span>
           </div>
           <button 
             onClick={() => setCurrentStep('body')}
-            className="w-full bg-gray-900 hover:bg-gray-800 text-white py-2 rounded-lg text-sm transition-colors"
+            className="w-full bg-white/20 hover:bg-white/30 text-white py-2 rounded-lg text-sm transition-colors"
           >
             Track →
           </button>
@@ -584,7 +584,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
       </div>
 
       {/* Next Steps */}
-      <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-2xl p-4 mb-8">
+      <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-2xl p-6 mb-12">
         <div className="flex items-center space-x-4">
           <AlertTriangle className="w-6 h-6 text-yellow-400" />
           <span className="font-semibold">Next steps:</span>
@@ -682,7 +682,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
   }
 
   return (
-    <div className="min-h-screen bg-hodie-bg font-poppins">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white font-poppins">
       {/* Brand Header */}
       <BrandHeader 
         user={user}
@@ -753,9 +753,9 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
         </div>
       )}
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="px-6 pb-6">
         {renderScreenContent()}
-      </main>
+      </div>
 
       {/* Chat Modal */}
       {showChat && (
