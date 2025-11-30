@@ -32,6 +32,7 @@ import ReportsScreen from '../screens/ReportsScreen';
 import FAQScreen from '../screens/FAQScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import { userMetricsService, HealthScoreMetrics, UserLoginData } from '../../services/userMetricsService';
+import useAutoApiKeyAssignment from '../../hooks/useAutoApiKeyAssignment';
 
 interface DashboardProps {
   user: User;
@@ -70,6 +71,9 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
   const [currentScreen, setCurrentScreen] = useState<'home' | 'recommendations' | 'dna' | 'labs' | 'reports' | 'faq' | 'settings'>('home');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [chatInput, setChatInput] = useState('');
+
+  // Automatically assign API key to user on login
+  const { assignment, hasApiAccess, isLoading: apiLoading, error: apiError } = useAutoApiKeyAssignment(user);
 
   // Static health metrics for demo - these would come from blood tests/body scans
   const healthMetrics = {

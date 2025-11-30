@@ -1,4 +1,5 @@
 // Kimi K2 AI Service for Health Analytics
+import { autoApiKeyService } from './autoApiKeyService';
 interface HealthContext {
   userId: string;
   recentHealthData?: {
@@ -48,14 +49,39 @@ class KimiK2Service {
   private model: string = 'kimi-k2-thinking';
 
   constructor() {
-    // Get API key from environment variable
+    // Get API key from environment variable (fallback)
     this.apiKey = process.env.REACT_APP_KIMI_K2_API_KEY || '';
     
     if (!this.apiKey) {
-      console.warn('⚠️ Kimi K2 API key not configured. Get one from https://platform.moonshot.ai');
-      console.warn('Add REACT_APP_KIMI_K2_API_KEY=your_key to .env file');
+      console.log('🔄 No global API key - using automatic per-user key assignment');
     } else {
-      console.log('✅ Kimi K2 AI enabled - advanced health analytics available');
+      console.log('✅ Global Kimi K2 API key configured');
+    }
+  }
+
+  // Get API key for a specific user (automatic assignment)
+  private async getApiKeyForUser(userId: string): Promise<string | null> {
+    try {
+      // First try to get automatically assigned user key
+      const userApiKey = await autoApiKeyService.getUserApiKey(userId);
+      if (userApiKey) {
+        return userApiKey;
+      }
+
+      // Fallback to user's manually configured key
+      const storedSettings = localStorage.getItem(`aiSettings_${userId}`);
+      if (storedSettings) {
+        const settings = JSON.parse(storedSettings);
+        if (settings.enableAI && settings.kimiK2ApiKey && settings.kimiK2ApiKey.trim().length > 0) {
+          return settings.kimiK2ApiKey;
+        }
+      }
+
+      // Final fallback to global key
+      return this.apiKey || null;
+    } catch (error) {
+      console.error('Error getting API key for user:', error);
+      return this.apiKey || null;
     }
   }
 
@@ -66,7 +92,11 @@ class KimiK2Service {
     conversationHistory: ConversationMessage[] = []
   ): Promise<string> {
     try {
-      if (!this.apiKey) {
+      // Get user-specific API key
+      const apiKey = await this.getApiKeyForUser(context?.userId || '');
+      
+      if (!apiKey) {
+        console.log('🔄 No API key available, using fallback response');
         return this.generateFallbackResponse(userMessage, context);
       }
 
@@ -75,7 +105,7 @@ class KimiK2Service {
       const response = await fetch(`${this.baseUrl}/chat/completions`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -480,14 +510,28 @@ For personalized AI-powered insights, please ensure your Kimi K2 API key is conf
 ⚠️ **Limited AI Mode**: Add your Kimi K2 API key for advanced health analytics`;
   }
 
-  // Check API status
-  async checkApiStatus(): Promise<boolean> {
-    if (!this.apiKey) return false;
-    
+  // Check API status for a specific user
+  async checkApiStatus(userId?: string): Promise<boolean> {
     try {
+      let apiKey;
+      
+      if (userId) {
+        // Check if user has valid API access (auto-assigned or manual)
+        const hasAccess = await autoApiKeyService.hasValidApiAccess(userId);
+        if (hasAccess) return true;
+        
+        // Try to get any available key for the user
+        apiKey = await this.getApiKeyForUser(userId);
+      } else {
+        // Fallback to global key
+        apiKey = this.apiKey;
+      }
+      
+      if (!apiKey) return false;
+      
       const response = await fetch(`${this.baseUrl}/models`, {
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          'Authorization': `Bearer ${apiKey}`,
         },
       });
       return response.ok;

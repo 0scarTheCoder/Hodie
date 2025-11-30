@@ -42,16 +42,15 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
   // Initialize AI and load recommendations
   useEffect(() => {
     const initializeAI = async () => {
-      // Check both global API key and user-specific API key
-      const globalApiEnabled = await kimiK2Service.checkApiStatus();
-      const userApiConfigured = checkUserApiKey();
+      // Check API status for this specific user (includes auto-assigned keys)
+      const userApiEnabled = await kimiK2Service.checkApiStatus(user.uid);
       
-      setAiEnabled(globalApiEnabled || userApiConfigured);
+      setAiEnabled(userApiEnabled);
       loadRecommendations();
     };
 
     initializeAI();
-  }, [healthScore]);
+  }, [user.uid, healthScore]);
 
   // Load AI-generated recommendations
   const loadRecommendations = async () => {
