@@ -25,11 +25,28 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
   const [loading, setLoading] = useState<boolean>(false);
   const [aiEnabled, setAiEnabled] = useState<boolean>(false);
 
+  // Check if user has configured their own API key
+  const checkUserApiKey = (): boolean => {
+    try {
+      const storedSettings = localStorage.getItem(`aiSettings_${user.uid}`);
+      if (storedSettings) {
+        const settings = JSON.parse(storedSettings);
+        return settings.enableAI && settings.kimiK2ApiKey && settings.kimiK2ApiKey.trim().length > 0;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  };
+
   // Initialize AI and load recommendations
   useEffect(() => {
     const initializeAI = async () => {
-      const isEnabled = await kimiK2Service.checkApiStatus();
-      setAiEnabled(isEnabled);
+      // Check both global API key and user-specific API key
+      const globalApiEnabled = await kimiK2Service.checkApiStatus();
+      const userApiConfigured = checkUserApiKey();
+      
+      setAiEnabled(globalApiEnabled || userApiConfigured);
       loadRecommendations();
     };
 
@@ -196,7 +213,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
               {!aiEnabled && <span className="text-sm text-orange-400 ml-3">(Limited AI Mode)</span>}
             </h1>
             <p className="text-white/70">
-              {aiEnabled ? 'AI-powered personalized recommendations based on your health data' : 'Basic recommendations - configure Kimi K2 for AI-powered insights'}
+              {aiEnabled ? 'AI-powered personalized recommendations based on your health data' : 'General recommendations shown - configure your API key in Settings for personalized AI insights'}
             </p>
           </div>
           <div className="text-right space-y-2">
@@ -216,32 +233,32 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
 
         {/* Progress Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div className="bg-white/10 rounded-xl p-4">
+          <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl p-4 text-white shadow-lg">
             <div className="flex items-center space-x-3">
-              <TrendingUp className="w-8 h-8 text-green-400" />
+              <TrendingUp className="w-8 h-8 text-white" />
               <div>
-                <div className="text-2xl font-bold text-white">{completionRate}%</div>
-                <div className="text-sm text-white/70">Completion Rate</div>
+                <div className="text-2xl font-bold text-white drop-shadow-sm">{completionRate}%</div>
+                <div className="text-sm text-white/90">Completion Rate</div>
               </div>
             </div>
           </div>
           
-          <div className="bg-white/10 rounded-xl p-4">
+          <div className="bg-gradient-to-br from-orange-500 to-red-600 rounded-xl p-4 text-white shadow-lg">
             <div className="flex items-center space-x-3">
-              <Star className="w-8 h-8 text-yellow-400" />
+              <Star className="w-8 h-8 text-white" />
               <div>
-                <div className="text-2xl font-bold text-white">{healthScore}</div>
-                <div className="text-sm text-white/70">Health Score</div>
+                <div className="text-2xl font-bold text-white drop-shadow-sm">{healthScore}</div>
+                <div className="text-sm text-white/90">Health Score</div>
               </div>
             </div>
           </div>
 
-          <div className="bg-white/10 rounded-xl p-4">
+          <div className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-xl p-4 text-white shadow-lg">
             <div className="flex items-center space-x-3">
-              <Target className="w-8 h-8 text-blue-400" />
+              <Target className="w-8 h-8 text-white" />
               <div>
-                <div className="text-2xl font-bold text-white">{recommendations.filter(r => r.priority === 'High').length}</div>
-                <div className="text-sm text-white/70">High Priority</div>
+                <div className="text-2xl font-bold text-white drop-shadow-sm">{recommendations.filter(r => r.priority === 'High').length}</div>
+                <div className="text-sm text-white/90">High Priority</div>
               </div>
             </div>
           </div>
@@ -270,10 +287,14 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
 
       {/* Recommendations List */}
       <div className="space-y-4">
-        {filteredRecommendations.map((rec) => (
+        {filteredRecommendations.map((rec, index) => (
           <div 
             key={rec.id} 
-            className={`bg-white/10 rounded-xl p-6 transition-all hover:bg-white/15 ${
+            className={`bg-gradient-to-r ${
+              index % 3 === 0 ? 'from-blue-600/20 via-purple-600/20 to-indigo-700/20' :
+              index % 3 === 1 ? 'from-teal-500/20 via-cyan-600/20 to-blue-600/20' :
+              'from-purple-500/20 via-pink-600/20 to-rose-600/20'
+            } rounded-xl p-6 border border-white/10 backdrop-blur-sm transition-all hover:shadow-lg hover:border-white/20 ${
               rec.completed ? 'opacity-75' : ''
             }`}
           >
@@ -330,17 +351,17 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
       </div>
 
       {/* Action Panel */}
-      <div className="mt-8 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-xl p-6">
+      <div className="mt-8 bg-gradient-to-r from-orange-500/20 via-red-500/20 to-pink-600/20 rounded-xl p-6 border border-white/10 backdrop-blur-sm shadow-lg">
         <h3 className="text-lg font-semibold text-white mb-2">Ready to Improve Your Health Score?</h3>
         <p className="text-white/80 mb-4">
           Complete high-priority recommendations to see the biggest impact on your health score. 
           Each completed recommendation can improve your score by 2-5 points.
         </p>
         <div className="flex space-x-4">
-          <button className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium">
+          <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg font-medium shadow-md transition-all">
             Start High Priority Tasks
           </button>
-          <button className="px-6 py-3 border border-white/30 hover:bg-white/10 text-white rounded-lg">
+          <button className="px-6 py-3 border border-white/30 hover:bg-white/10 text-white rounded-lg transition-all">
             Schedule Reminders
           </button>
         </div>
