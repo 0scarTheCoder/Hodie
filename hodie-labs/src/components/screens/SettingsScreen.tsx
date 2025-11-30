@@ -21,7 +21,10 @@ import {
   Receipt,
   Star,
   Bot,
-  EyeOff
+  EyeOff,
+  Loader2,
+  CheckCircle2,
+  XCircle
 } from 'lucide-react';
 
 interface SettingsScreenProps {
@@ -129,6 +132,12 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
   });
 
   const [showApiKey, setShowApiKey] = useState(false);
+  const [isTestingApi, setIsTestingApi] = useState(false);
+  const [apiTestResult, setApiTestResult] = useState<{
+    success: boolean;
+    message: string;
+    details?: string;
+  } | null>(null);
 
   const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>({
     subscription: {
@@ -180,6 +189,80 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
     if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
       // Handle account deletion
       alert('Account deletion would be processed here');
+    }
+  };
+
+  const testApiConnection = async () => {
+    if (!aiSettings.kimiK2ApiKey.trim()) {
+      setApiTestResult({
+        success: false,
+        message: 'API Key Required',
+        details: 'Please enter your Kimi K2 API key to test the connection.'
+      });
+      return;
+    }
+
+    setIsTestingApi(true);
+    setApiTestResult(null);
+
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Request timeout')), 10000)
+    );
+
+    const endpoint = aiSettings.aiProvider === 'moonshot' 
+      ? 'https://api.moonshot.ai/v1/chat/completions'
+      : 'https://api.aimlapi.com/v1/chat/completions';
+
+    const testPromise = fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${aiSettings.kimiK2ApiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: aiSettings.aiProvider === 'moonshot' ? 'moonshot-v1-8k' : 'kimi-k2-thinking',
+        messages: [
+          { role: 'user', content: 'Test connection. Reply with just "OK" if working.' }
+        ],
+        max_tokens: 5,
+        temperature: 0
+      })
+    });
+
+    try {
+      const response = await Promise.race([testPromise, timeoutPromise]) as Response;
+      
+      if (response.ok) {
+        const data = await response.json();
+        setApiTestResult({
+          success: true,
+          message: 'API Connection Successful',
+          details: `Connected to ${aiSettings.aiProvider} provider. API key is valid and working.`
+        });
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        setApiTestResult({
+          success: false,
+          message: 'API Connection Failed',
+          details: `Error ${response.status}: ${errorData.error?.message || response.statusText}`
+        });
+      }
+    } catch (error: any) {
+      if (error.message === 'Request timeout') {
+        setApiTestResult({
+          success: false,
+          message: 'Connection Timeout',
+          details: 'The API request timed out after 10 seconds. Please check your internet connection and try again.'
+        });
+      } else {
+        setApiTestResult({
+          success: false,
+          message: 'Connection Error',
+          details: `Failed to connect to API: ${error.message}`
+        });
+      }
+    } finally {
+      setIsTestingApi(false);
     }
   };
 
@@ -763,15 +846,41 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
                       <span>Save Settings</span>
                     </button>
                     <button
-                      onClick={() => {
-                        // Test API key logic here
-                        alert('Testing API connection...');
-                      }}
-                      className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
+                      onClick={testApiConnection}
+                      disabled={isTestingApi}
+                      className="px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors flex items-center space-x-2"
                     >
-                      Test API
+                      {isTestingApi ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <CheckCircle2 className="w-4 h-4" />
+                      )}
+                      <span>{isTestingApi ? 'Testing...' : 'Test API'}</span>
                     </button>
                   </div>
+
+                  {/* API Test Result */}
+                  {apiTestResult && (
+                    <div className={`p-4 rounded-lg border ${
+                      apiTestResult.success 
+                        ? 'bg-green-500/10 border-green-400/30 text-green-300' 
+                        : 'bg-red-500/10 border-red-400/30 text-red-300'
+                    }`}>
+                      <div className="flex items-start space-x-3">
+                        {apiTestResult.success ? (
+                          <CheckCircle2 className="w-5 h-5 text-green-400 mt-0.5" />
+                        ) : (
+                          <XCircle className="w-5 h-5 text-red-400 mt-0.5" />
+                        )}
+                        <div>
+                          <h4 className="font-medium text-sm">{apiTestResult.message}</h4>
+                          {apiTestResult.details && (
+                            <p className="text-xs opacity-80 mt-1">{apiTestResult.details}</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
