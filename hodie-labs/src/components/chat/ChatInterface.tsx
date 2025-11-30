@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { User } from 'firebase/auth';
 import { queryLogger } from '../../utils/queryLogger';
 import { kimiK2Service, HealthContext, ConversationMessage } from '../../services/kimiK2Service';
+import { chatStorageService, ChatConversation, ChatMessage } from '../../services/chatStorageService';
 
 interface Message {
   id: string;
@@ -20,18 +21,46 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [aiEnabled, setAiEnabled] = useState(false);
   const [conversationHistory, setConversationHistory] = useState<ConversationMessage[]>([]);
+  const [currentConversation, setCurrentConversation] = useState<ChatConversation | null>(null);
+  const [loadingHistory, setLoadingHistory] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Initialize AI status and welcome message
+  // Initialize AI status and load chat history
   useEffect(() => {
     const initializeChat = async () => {
       const enabled = await kimiK2Service.checkApiStatus();
       setAiEnabled(enabled);
       
-      const welcomeMessage: Message = {
-        id: '1',
-        text: `G'day! I'm your Hodie Labs AI health assistant${enabled ? ', powered by Kimi K2 advanced AI' : ' (limited mode)'}. I can help you with:
+      try {
+        // Load recent conversations for context
+        const recentConversations = await chatStorageService.getUserConversations(user.uid, 5);
+        
+        // Check if there's an active conversation
+        const activeConversation = recentConversations.find(conv => conv.isActive);
+        
+        if (activeConversation) {
+          // Resume active conversation
+          setCurrentConversation(activeConversation);
+          const chatMessages = activeConversation.messages.map(msg => ({
+            ...msg,
+            timestamp: new Date(msg.timestamp)
+          }));
+          setMessages(chatMessages);
+          
+          // Set conversation history for AI context
+          setConversationHistory(chatMessages.map(msg => ({
+            role: msg.sender === 'user' ? 'user' : 'assistant',
+            content: msg.text
+          })));
+        } else {
+          // Start new conversation
+          const welcomeMessage: Message = {
+            id: '1',
+            text: `G'day! I'm your Hodie Labs AI health assistant${enabled ? ', powered by Kimi K2 advanced AI' : ' (limited mode)'}. 
 
+🏥 **I have access to your health profile** and previous conversations for personalized advice.
+
+I can help you with:
 🍎 **Nutrition & Cooking**: Specific recipes, meal planning, protein calculations
 🏃 **Exercise & Fitness**: Personalised workout routines and fitness goals  
 😴 **Sleep & Recovery**: Sleep improvement strategies and recovery tips
@@ -40,16 +69,49 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
 🧬 **DNA Insights**: Genetic-based health recommendations
 📊 **Biomarker Analysis**: Health metrics interpretation
 
-${enabled ? 'I use advanced AI to understand complex health questions and provide evidence-based guidance.' : '⚠️ **Limited AI Mode**: Configure Kimi K2 API for advanced conversational AI capabilities.'} I follow Australian health guidelines and remember our chat history. What would you like to know?`,
-        sender: 'assistant',
-        timestamp: new Date()
-      };
+${enabled ? 'I use advanced AI with memory of our past discussions to provide contextual health guidance.' : '⚠️ **Limited AI Mode**: Configure Kimi K2 API for advanced conversational AI capabilities.'} What would you like to know?`,
+            sender: 'assistant',
+            timestamp: new Date()
+          };
+          
+          // Create new conversation
+          const newConversation: ChatConversation = {
+            userId: user.uid,
+            title: 'New Health Consultation',
+            messages: [welcomeMessage],
+            medicalContext: {
+              conditions: [],
+              medications: [],
+              symptoms: [],
+              recommendations: []
+            },
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            tags: ['general'],
+            isActive: true
+          };
+          
+          const conversationId = await chatStorageService.saveConversation(newConversation);
+          setCurrentConversation({ ...newConversation, id: conversationId });
+          setMessages([welcomeMessage]);
+        }
+      } catch (error) {
+        console.error('Error loading chat history:', error);
+        // Fallback to basic welcome message
+        const welcomeMessage: Message = {
+          id: '1',
+          text: `G'day! I'm your Hodie Labs AI health assistant. What would you like to know?`,
+          sender: 'assistant',
+          timestamp: new Date()
+        };
+        setMessages([welcomeMessage]);
+      }
       
-      setMessages([welcomeMessage]);
+      setLoadingHistory(false);
     };
 
     initializeChat();
-  }, []);
+  }, [user.uid]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -190,10 +252,12 @@ ${enabled ? 'I use advanced AI to understand complex health questions and provid
     return Math.round(score);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      if (inputValue.trim()) {
+        handleSendMessage();
+      }
     }
   };
 
@@ -301,7 +365,7 @@ ${enabled ? 'I use advanced AI to understand complex health questions and provid
           <textarea
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyDown}
             placeholder="Type your health question here..."
             className="flex-1 resize-none border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             rows={1}

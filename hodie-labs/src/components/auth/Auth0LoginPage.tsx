@@ -106,7 +106,10 @@ const Auth0LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#2a1e5c] via-[#1a0f3a] to-[#0f0622] flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-hodie-bg font-poppins flex flex-col items-center justify-center px-4"
+         style={{
+           background: 'linear-gradient(135deg, #F4F7FF 0%, #E8EFFF 50%, #F4F7FF 100%)'
+         }}>
       
       {/* Logo at the top */}
       <motion.div
@@ -184,7 +187,7 @@ const Auth0LoginPage: React.FC = () => {
               disabled={isLoading}
               className="w-full py-4 bg-gradient-to-r from-[#6b46c1] via-[#8b5cf6] to-[#a855f7] text-white font-semibold rounded-2xl hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Create Account
+              Create Account (Comprehensive)
             </button>
 
             <button

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User, signOut } from 'firebase/auth';
 import { auth } from '../../firebase/config';
+import BrandHeader from '../layout/BrandHeader';
 import { 
   Heart, 
   Activity, 
@@ -66,6 +67,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
   const [currentStep, setCurrentStep] = useState<'blood' | 'dna' | 'body' | null>(null);
   const [currentScreen, setCurrentScreen] = useState<'home' | 'recommendations' | 'dna' | 'labs' | 'reports'>('home');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [chatInput, setChatInput] = useState('');
 
   // Static health metrics for demo - these would come from blood tests/body scans
   const healthMetrics = {
@@ -103,6 +105,15 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
 
     initializeUserMetrics();
   }, [user.uid]);
+
+  const handleChatKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (chatInput.trim()) {
+        setShowChat(true);
+      }
+    }
+  };
 
   const triggerConfetti = () => {
     // Create confetti elements
@@ -637,12 +648,16 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
           <div className="flex space-x-2">
             <input 
               type="text" 
+              value={chatInput}
+              onChange={(e) => setChatInput(e.target.value)}
+              onKeyDown={handleChatKeyDown}
               placeholder="Ask HodieGPT anything..."
-              className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm placeholder-white/50"
+              className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm placeholder-white/50 focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400"
             />
             <button 
-              onClick={() => setShowChat(true)}
-              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm"
+              onClick={() => chatInput.trim() && setShowChat(true)}
+              disabled={!chatInput.trim()}
+              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Send
             </button>
@@ -664,62 +679,14 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white">
-      {/* Header */}
-      <header className="flex justify-between items-center p-6">
-        <div className="flex items-center space-x-8">
-          <h1 className="text-2xl font-bold">HodieLabs</h1>
-          <nav className="hidden md:flex space-x-6">
-            <button 
-              onClick={() => setCurrentScreen('home')}
-              className={`text-white hover:text-blue-300 ${currentScreen === 'home' ? 'text-blue-300' : ''}`}
-            >
-              Home
-            </button>
-            <button 
-              onClick={() => setCurrentScreen('recommendations')}
-              className={`text-white hover:text-blue-300 ${currentScreen === 'recommendations' ? 'text-blue-300' : ''}`}
-            >
-              Recommendations
-            </button>
-            <button 
-              onClick={() => setCurrentScreen('dna')}
-              className={`text-white hover:text-blue-300 ${currentScreen === 'dna' ? 'text-blue-300' : ''}`}
-            >
-              DNA
-            </button>
-            <button 
-              onClick={() => setCurrentScreen('labs')}
-              className={`text-white hover:text-blue-300 ${currentScreen === 'labs' ? 'text-blue-300' : ''}`}
-            >
-              Labs
-            </button>
-            <button 
-              onClick={() => setCurrentScreen('reports')}
-              className={`text-white hover:text-blue-300 ${currentScreen === 'reports' ? 'text-blue-300' : ''}`}
-            >
-              Reports
-            </button>
-          </nav>
-        </div>
-        <div className="flex items-center space-x-4">
-          {/* Mobile menu button */}
-          <button 
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg bg-white/10 hover:bg-white/20"
-          >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
-          
-          <button className="p-2 rounded-lg bg-white/10 hover:bg-white/20">
-            <MessageCircle className="w-5 h-5" />
-          </button>
-          <button className="p-2 rounded-lg bg-white/10 hover:bg-white/20">
-            <TrendingUp className="w-5 h-5" />
-          </button>
-          <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-purple-500"></div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-hodie-bg font-poppins">
+      {/* Brand Header */}
+      <BrandHeader 
+        user={user}
+        currentScreen={currentScreen}
+        onScreenChange={(screen) => setCurrentScreen(screen as 'home' | 'recommendations' | 'dna' | 'labs' | 'reports')}
+        showNavigation={true}
+      />
 
       {/* Mobile Navigation Menu */}
       {mobileMenuOpen && (
@@ -774,9 +741,9 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
         </div>
       )}
 
-      <div className="px-6 pb-6">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {renderScreenContent()}
-      </div>
+      </main>
 
       {/* Chat Modal */}
       {showChat && (
