@@ -16,7 +16,10 @@ import {
   Lock,
   Globe,
   Clock,
-  Activity
+  Activity,
+  CreditCard,
+  Receipt,
+  Star
 } from 'lucide-react';
 
 interface SettingsScreenProps {
@@ -53,8 +56,30 @@ interface NotificationSettings {
   emergencyAlerts: boolean;
 }
 
+interface PaymentDetails {
+  subscription: {
+    plan: 'basic' | 'premium' | 'enterprise';
+    status: 'active' | 'cancelled' | 'expired';
+    nextBilling: string;
+    amount: number;
+  };
+  paymentMethod: {
+    type: 'card' | 'paypal' | 'bank';
+    last4: string;
+    expiry: string;
+    brand: string;
+  };
+  billingAddress: {
+    name: string;
+    address: string;
+    city: string;
+    country: string;
+    postal: string;
+  };
+}
+
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
-  const [activeTab, setActiveTab] = useState<'profile' | 'privacy' | 'notifications' | 'account'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'privacy' | 'notifications' | 'payment' | 'account'>('profile');
   const [isEditing, setIsEditing] = useState(false);
   
   const [userProfile, setUserProfile] = useState<UserProfile>({
@@ -85,6 +110,28 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
     testResults: true,
     weeklyReports: true,
     emergencyAlerts: true
+  });
+
+  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>({
+    subscription: {
+      plan: 'premium',
+      status: 'active',
+      nextBilling: '2025-01-15',
+      amount: 29.99
+    },
+    paymentMethod: {
+      type: 'card',
+      last4: '4242',
+      expiry: '12/26',
+      brand: 'Visa'
+    },
+    billingAddress: {
+      name: 'John Doe',
+      address: '123 Health Street',
+      city: 'Sydney',
+      country: 'Australia',
+      postal: '2000'
+    }
   });
 
   const handleSave = () => {
@@ -118,10 +165,22 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
     }
   };
 
+  const handleUpgrade = (plan: string) => {
+    alert(`Upgrading to ${plan} plan...`);
+    // Handle plan upgrade logic
+  };
+
+  const handleCancelSubscription = () => {
+    if (window.confirm('Are you sure you want to cancel your subscription? You will lose access to premium features.')) {
+      alert('Subscription cancellation would be processed here');
+    }
+  };
+
   const tabs = [
     { id: 'profile', label: 'Profile', icon: UserIcon },
     { id: 'privacy', label: 'Privacy', icon: Shield },
     { id: 'notifications', label: 'Notifications', icon: Bell },
+    { id: 'payment', label: 'Payment', icon: CreditCard },
     { id: 'account', label: 'Account', icon: Lock }
   ];
 
@@ -339,6 +398,186 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
                     </label>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* Payment Tab */}
+          {activeTab === 'payment' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold">Payment & Billing</h2>
+              
+              {/* Current Subscription */}
+              <div className="space-y-4">
+                <div className="p-6 bg-white/5 rounded-lg border border-white/10">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <Star className="w-6 h-6 text-yellow-400" />
+                      <div>
+                        <h3 className="font-semibold text-lg capitalize">{paymentDetails.subscription.plan} Plan</h3>
+                        <p className="text-sm text-white/70">
+                          Status: <span className={`capitalize ${paymentDetails.subscription.status === 'active' ? 'text-green-400' : 'text-red-400'}`}>
+                            {paymentDetails.subscription.status}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold">${paymentDetails.subscription.amount}</div>
+                      <div className="text-sm text-white/60">per month</div>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div className="text-center p-3 bg-white/5 rounded">
+                      <div className="text-sm text-white/70">Next Billing</div>
+                      <div className="font-medium">{new Date(paymentDetails.subscription.nextBilling).toLocaleDateString()}</div>
+                    </div>
+                    <div className="text-center p-3 bg-white/5 rounded">
+                      <div className="text-sm text-white/70">Billing Cycle</div>
+                      <div className="font-medium">Monthly</div>
+                    </div>
+                    <div className="text-center p-3 bg-white/5 rounded">
+                      <div className="text-sm text-white/70">Auto Renew</div>
+                      <div className="font-medium text-green-400">Enabled</div>
+                    </div>
+                  </div>
+
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => handleUpgrade('enterprise')}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                    >
+                      Upgrade Plan
+                    </button>
+                    <button
+                      onClick={handleCancelSubscription}
+                      className="px-4 py-2 border border-white/20 text-white rounded-lg hover:bg-white/10 transition-colors"
+                    >
+                      Cancel Subscription
+                    </button>
+                  </div>
+                </div>
+
+                {/* Payment Method */}
+                <div className="p-4 bg-white/5 rounded-lg border border-white/10">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <CreditCard className="w-5 h-5 text-blue-400" />
+                    <h3 className="font-medium">Payment Method</h3>
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-4 bg-white/5 rounded border border-white/5">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-8 bg-blue-600 rounded flex items-center justify-center text-xs font-bold">
+                        {paymentDetails.paymentMethod.brand.toUpperCase()}
+                      </div>
+                      <div>
+                        <div className="font-medium">•••• •••• •••• {paymentDetails.paymentMethod.last4}</div>
+                        <div className="text-sm text-white/60">Expires {paymentDetails.paymentMethod.expiry}</div>
+                      </div>
+                    </div>
+                    <button className="px-3 py-1 bg-white/10 hover:bg-white/20 text-sm rounded transition-colors">
+                      Update
+                    </button>
+                  </div>
+                </div>
+
+                {/* Billing Address */}
+                <div className="p-4 bg-white/5 rounded-lg border border-white/10">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-medium">Billing Address</h3>
+                    <button className="px-3 py-1 bg-white/10 hover:bg-white/20 text-sm rounded transition-colors">
+                      Edit
+                    </button>
+                  </div>
+                  
+                  <div className="space-y-2 text-sm">
+                    <div>{paymentDetails.billingAddress.name}</div>
+                    <div>{paymentDetails.billingAddress.address}</div>
+                    <div>{paymentDetails.billingAddress.city}, {paymentDetails.billingAddress.postal}</div>
+                    <div>{paymentDetails.billingAddress.country}</div>
+                  </div>
+                </div>
+
+                {/* Billing History */}
+                <div className="p-4 bg-white/5 rounded-lg border border-white/10">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <Receipt className="w-5 h-5 text-green-400" />
+                    <h3 className="font-medium">Recent Invoices</h3>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {[
+                      { date: '2024-12-15', amount: 29.99, status: 'paid' },
+                      { date: '2024-11-15', amount: 29.99, status: 'paid' },
+                      { date: '2024-10-15', amount: 29.99, status: 'paid' }
+                    ].map((invoice, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded">
+                        <div className="flex items-center space-x-4">
+                          <div>
+                            <div className="font-medium">${invoice.amount}</div>
+                            <div className="text-sm text-white/60">{new Date(invoice.date).toLocaleDateString()}</div>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <span className={`px-2 py-1 rounded-full text-xs ${
+                            invoice.status === 'paid' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+                          }`}>
+                            {invoice.status.toUpperCase()}
+                          </span>
+                          <button className="text-blue-400 text-sm hover:underline">
+                            Download
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Available Plans */}
+                <div className="p-4 bg-white/5 rounded-lg border border-white/10">
+                  <h3 className="font-medium mb-4">Available Plans</h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {[
+                      { name: 'basic', price: 9.99, features: ['Basic health tracking', '5 health reports', 'Email support'] },
+                      { name: 'premium', price: 29.99, features: ['Advanced analytics', 'Unlimited reports', 'AI insights', 'Priority support'] },
+                      { name: 'enterprise', price: 99.99, features: ['Everything in Premium', 'Custom integrations', 'Dedicated support', 'API access'] }
+                    ].map((plan) => (
+                      <div key={plan.name} className={`p-4 rounded-lg border ${
+                        paymentDetails.subscription.plan === plan.name 
+                          ? 'border-blue-400 bg-blue-500/10' 
+                          : 'border-white/20 bg-white/5'
+                      }`}>
+                        <div className="text-center mb-3">
+                          <h4 className="font-semibold capitalize">{plan.name}</h4>
+                          <div className="text-2xl font-bold">${plan.price}</div>
+                          <div className="text-sm text-white/60">per month</div>
+                        </div>
+                        
+                        <ul className="space-y-2 text-sm mb-4">
+                          {plan.features.map((feature, index) => (
+                            <li key={index} className="flex items-center space-x-2">
+                              <span className="w-1 h-1 bg-white/60 rounded-full"></span>
+                              <span>{feature}</span>
+                            </li>
+                          ))}
+                        </ul>
+                        
+                        {paymentDetails.subscription.plan === plan.name ? (
+                          <div className="text-center text-blue-400 font-medium">Current Plan</div>
+                        ) : (
+                          <button
+                            onClick={() => handleUpgrade(plan.name)}
+                            className="w-full py-2 bg-white/10 hover:bg-white/20 rounded transition-colors"
+                          >
+                            {plan.price > paymentDetails.subscription.amount ? 'Upgrade' : 'Downgrade'}
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           )}
