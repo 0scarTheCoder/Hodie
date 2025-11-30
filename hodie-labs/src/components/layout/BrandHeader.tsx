@@ -1,7 +1,7 @@
 import React from 'react';
 import { User } from 'firebase/auth';
 import { useAuth0 } from '@auth0/auth0-react';
-import { HelpCircle } from 'lucide-react';
+import { HelpCircle, Settings } from 'lucide-react';
 
 interface BrandHeaderProps {
   user?: User | any;
@@ -121,13 +121,22 @@ const BrandHeader: React.FC<BrandHeaderProps> = ({
                       <div className="text-xs">{user.email}</div>
                     </div>
                     
+                    <button
+                      onClick={() => onScreenChange && onScreenChange('settings')}
+                      className="flex items-center space-x-2 w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100/50"
+                    >
+                      <Settings className="w-4 h-4" />
+                      <span>Settings</span>
+                    </button>
+                    
                     <a
                       href="https://hodielabs.com/contact/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100/50"
+                      className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100/50"
                     >
-                      Help & Support
+                      <HelpCircle className="w-4 h-4" />
+                      <span>Help & Support</span>
                     </a>
                     
                     <button
