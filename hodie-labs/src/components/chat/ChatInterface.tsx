@@ -277,7 +277,7 @@ ${enabled ? 'I use advanced AI with memory of our past discussions to provide co
         </p>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
+      <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50 max-h-96 overscroll-behavior-y-contain scroll-smooth">
         {messages.map((message) => (
           <div
             key={message.id}
