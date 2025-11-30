@@ -20,7 +20,8 @@ import {
   CreditCard,
   Receipt,
   Star,
-  Bot
+  Bot,
+  EyeOff
 } from 'lucide-react';
 
 interface SettingsScreenProps {
@@ -126,6 +127,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
     aiProvider: 'moonshot',
     maxTokensPerDay: 1000
   });
+
+  const [showApiKey, setShowApiKey] = useState(false);
 
   const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>({
     subscription: {
@@ -671,14 +674,24 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
                     </label>
                     <div className="relative">
                       <input
-                        type={aiSettings.kimiK2ApiKey ? 'password' : 'text'}
+                        type={showApiKey ? 'text' : 'password'}
                         value={aiSettings.kimiK2ApiKey}
                         onChange={(e) => setAiSettings(prev => ({ ...prev, kimiK2ApiKey: e.target.value }))}
-                        className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
+                        className="w-full px-4 py-3 pr-12 bg-white/5 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
                         placeholder="sk-your-kimi-k2-api-key-here"
                       />
                       {aiSettings.kimiK2ApiKey && (
-                        <Eye className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/40" />
+                        <button
+                          type="button"
+                          onClick={() => setShowApiKey(!showApiKey)}
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white/80 transition-colors"
+                        >
+                          {showApiKey ? (
+                            <EyeOff className="w-5 h-5" />
+                          ) : (
+                            <Eye className="w-5 h-5" />
+                          )}
+                        </button>
                       )}
                     </div>
                     <p className="text-xs text-white/50 mt-1">
