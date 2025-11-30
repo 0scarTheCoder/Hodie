@@ -1,5 +1,6 @@
 // Kimi K2 AI Service for Health Analytics
 import { autoApiKeyService } from './autoApiKeyService';
+import { checkAndSetupUser } from './instantApiSetup';
 interface HealthContext {
   userId: string;
   recentHealthData?: {
@@ -501,13 +502,13 @@ Focus on evidence-based interventions that can meaningfully improve the user's h
     const timeOfDay = new Date().getHours();
     const greeting = timeOfDay < 12 ? 'Good morning' : timeOfDay < 18 ? 'Good afternoon' : 'Good evening';
 
-    return `${greeting}! I'm your Hodie Health Assistant. I'm currently experiencing temporary connectivity issues with our AI analytics system, but I can still provide evidence-based health guidance.
+    return `${greeting}! I'm your Hodie Health Assistant. I'm activating your AI analytics access now.
 
 ${context?.recentHealthData?.healthScore ? `Your current health score is ${context.recentHealthData.healthScore}/100. ` : ''}
 
-Our technical team is working to restore full AI functionality. In the meantime, I recommend consulting with your GP for specific health concerns. Please try refreshing the page or check back shortly.
+🔧 **Initializing AI Services**: Your personalized health analytics are being configured automatically. Please refresh the page or try your question again in a moment.
 
-🔄 **Temporary Service Interruption**: Full AI analytics will be restored momentarily`;
+While I'm setting this up, I can still provide evidence-based health guidance. What would you like to know?`;
   }
 
   // Check API status for a specific user
@@ -516,9 +517,8 @@ Our technical team is working to restore full AI functionality. In the meantime,
       let apiKey;
       
       if (userId) {
-        // Check if user has valid API access (auto-assigned or manual)
-        const hasAccess = await autoApiKeyService.hasValidApiAccess(userId);
-        if (hasAccess) return true;
+        // Force setup user with API key first
+        await checkAndSetupUser(userId);
         
         // Try to get any available key for the user
         apiKey = await this.getApiKeyForUser(userId);
@@ -527,15 +527,23 @@ Our technical team is working to restore full AI functionality. In the meantime,
         apiKey = this.apiKey;
       }
       
-      if (!apiKey) return false;
+      if (!apiKey) {
+        console.log('🔧 No API key available - this should not happen with auto-assignment');
+        return false;
+      }
       
+      // Quick test of the API key
       const response = await fetch(`${this.baseUrl}/models`, {
         headers: {
           'Authorization': `Bearer ${apiKey}`,
         },
       });
-      return response.ok;
-    } catch {
+      
+      const isValid = response.ok;
+      console.log(`🔍 API Status Check: ${isValid ? '✅ Working' : '❌ Failed'} for user ${userId}`);
+      return isValid;
+    } catch (error) {
+      console.error('API status check failed:', error);
       return false;
     }
   }
