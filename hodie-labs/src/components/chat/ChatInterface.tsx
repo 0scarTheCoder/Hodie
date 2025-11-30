@@ -69,7 +69,7 @@ I can help you with:
 🧬 **DNA Insights**: Genetic-based health recommendations
 📊 **Biomarker Analysis**: Health metrics interpretation
 
-${enabled ? 'I use advanced AI with memory of our past discussions to provide contextual health guidance.' : '⚠️ **Limited AI Mode**: Configure Kimi K2 API for advanced conversational AI capabilities.'} What would you like to know?`,
+${enabled ? 'I use advanced AI with memory of our past discussions to provide contextual health guidance.' : '🔄 **Connecting to AI Services**: Advanced conversational capabilities loading...'} What would you like to know?`,
             sender: 'assistant',
             timestamp: new Date()
           };

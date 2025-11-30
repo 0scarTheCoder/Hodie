@@ -501,13 +501,13 @@ Focus on evidence-based interventions that can meaningfully improve the user's h
     const timeOfDay = new Date().getHours();
     const greeting = timeOfDay < 12 ? 'Good morning' : timeOfDay < 18 ? 'Good afternoon' : 'Good evening';
 
-    return `${greeting}! I'm your Hodie Health Assistant. While our advanced AI analytics are temporarily unavailable, I can still provide evidence-based health guidance.
+    return `${greeting}! I'm your Hodie Health Assistant. I'm currently experiencing temporary connectivity issues with our AI analytics system, but I can still provide evidence-based health guidance.
 
 ${context?.recentHealthData?.healthScore ? `Your current health score is ${context.recentHealthData.healthScore}/100. ` : ''}
 
-For personalized AI-powered insights, please ensure your Kimi K2 API key is configured. In the meantime, I recommend consulting with your GP for specific health concerns.
+Our technical team is working to restore full AI functionality. In the meantime, I recommend consulting with your GP for specific health concerns. Please try refreshing the page or check back shortly.
 
-⚠️ **Limited AI Mode**: Add your Kimi K2 API key for advanced health analytics`;
+🔄 **Temporary Service Interruption**: Full AI analytics will be restored momentarily`;
   }
 
   // Check API status for a specific user

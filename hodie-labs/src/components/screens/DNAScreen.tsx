@@ -138,7 +138,7 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
         <div className="bg-white/10 rounded-xl p-6">
           <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
             <Activity className="w-5 h-5 mr-2" />
-            Fitness Highlights {!aiEnabled && <span className="text-xs text-orange-400 ml-2">(Limited AI Mode)</span>}
+            Fitness Highlights {!aiEnabled && <span className="text-xs text-blue-400 ml-2">(AI Loading...)</span>}
           </h3>
           {loading ? (
             <div className="flex items-center justify-center py-4">
@@ -230,7 +230,7 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
       <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
         Fitness & Exercise Genetics
         {loading && <Loader2 className="w-6 h-6 animate-spin text-white/60 ml-3" />}
-        {!aiEnabled && <span className="text-sm text-orange-400 ml-3">(Limited AI Mode)</span>}
+        {!aiEnabled && <span className="text-sm text-blue-400 ml-3">(AI Activating...)</span>}
       </h2>
       {loading ? (
         <div className="flex items-center justify-center py-12">
@@ -282,7 +282,7 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
       <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
         Nutrition & Metabolism
         {loading && <Loader2 className="w-6 h-6 animate-spin text-white/60 ml-3" />}
-        {!aiEnabled && <span className="text-sm text-orange-400 ml-3">(Limited AI Mode)</span>}
+        {!aiEnabled && <span className="text-sm text-blue-400 ml-3">(AI Activating...)</span>}
       </h2>
       {loading ? (
         <div className="flex items-center justify-center py-12">

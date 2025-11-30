@@ -209,7 +209,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
             <h1 className="text-3xl font-bold text-white mb-2 flex items-center">
               Your Health Recommendations
               {loading && <Loader2 className="w-6 h-6 animate-spin text-white/60 ml-3" />}
-              {!aiEnabled && <span className="text-sm text-orange-400 ml-3">(Limited AI Mode)</span>}
+              {!aiEnabled && <span className="text-sm text-blue-400 ml-3">(AI Connecting...)</span>}
             </h1>
             <p className="text-white/70">
               {aiEnabled ? 'AI-powered personalized recommendations based on your health data' : 'General recommendations shown - configure your API key in Settings for personalized AI insights'}
