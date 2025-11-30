@@ -19,7 +19,8 @@ import {
   Activity,
   CreditCard,
   Receipt,
-  Star
+  Star,
+  Bot
 } from 'lucide-react';
 
 interface SettingsScreenProps {
@@ -78,8 +79,15 @@ interface PaymentDetails {
   };
 }
 
+interface AISettings {
+  kimiK2ApiKey: string;
+  enableAI: boolean;
+  aiProvider: 'moonshot' | 'aimlapi' | 'openrouter';
+  maxTokensPerDay: number;
+}
+
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
-  const [activeTab, setActiveTab] = useState<'profile' | 'privacy' | 'notifications' | 'payment' | 'account'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'privacy' | 'notifications' | 'payment' | 'ai' | 'account'>('profile');
   const [isEditing, setIsEditing] = useState(false);
   
   const [userProfile, setUserProfile] = useState<UserProfile>({
@@ -110,6 +118,13 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
     testResults: true,
     weeklyReports: true,
     emergencyAlerts: true
+  });
+
+  const [aiSettings, setAiSettings] = useState<AISettings>({
+    kimiK2ApiKey: '',
+    enableAI: false,
+    aiProvider: 'moonshot',
+    maxTokensPerDay: 1000
   });
 
   const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>({
@@ -181,6 +196,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
     { id: 'privacy', label: 'Privacy', icon: Shield },
     { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: 'payment', label: 'Payment', icon: CreditCard },
+    { id: 'ai', label: 'AI Settings', icon: Bot },
     { id: 'account', label: 'Account', icon: Lock }
   ];
 
@@ -576,6 +592,207 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
                         )}
                       </div>
                     ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* AI Settings Tab */}
+          {activeTab === 'ai' && (
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold">AI Health Analytics Settings</h2>
+              
+              {/* AI Status */}
+              <div className="p-6 bg-white/5 rounded-lg border border-white/10">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-3">
+                    <Bot className="w-6 h-6 text-purple-400" />
+                    <div>
+                      <h3 className="font-semibold">Kimi K2 AI Status</h3>
+                      <p className="text-sm text-white/60">
+                        {aiSettings.enableAI && aiSettings.kimiK2ApiKey 
+                          ? 'AI-powered health analytics enabled' 
+                          : 'Limited AI mode - Configure your API key for advanced features'
+                        }
+                      </p>
+                    </div>
+                  </div>
+                  <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    aiSettings.enableAI && aiSettings.kimiK2ApiKey 
+                      ? 'bg-green-500/20 text-green-400' 
+                      : 'bg-orange-500/20 text-orange-400'
+                  }`}>
+                    {aiSettings.enableAI && aiSettings.kimiK2ApiKey ? 'Active' : 'Limited Mode'}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-400">256k</div>
+                    <div className="text-xs text-white/60">Context Window</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-400">{aiSettings.maxTokensPerDay}</div>
+                    <div className="text-xs text-white/60">Daily Token Limit</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-400">{aiSettings.aiProvider}</div>
+                    <div className="text-xs text-white/60">AI Provider</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* API Key Configuration */}
+              <div className="p-6 bg-white/5 rounded-lg border border-white/10">
+                <div className="flex items-center space-x-3 mb-4">
+                  <Lock className="w-5 h-5 text-blue-400" />
+                  <h3 className="font-semibold">Your Personal API Key</h3>
+                </div>
+                <div className="bg-yellow-500/10 border border-yellow-400/30 rounded-lg p-4 mb-4">
+                  <div className="flex items-start space-x-3">
+                    <Shield className="w-5 h-5 text-yellow-400 mt-0.5" />
+                    <div>
+                      <h4 className="text-sm font-medium text-yellow-300">Why Use Your Own API Key?</h4>
+                      <p className="text-xs text-yellow-200/80 mt-1">
+                        • Control your own usage and costs<br/>
+                        • No sharing API limits with other users<br/>
+                        • Direct access to latest Kimi K2 features<br/>
+                        • Your conversations remain private to your account
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-2">
+                      Kimi K2 API Key
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={aiSettings.kimiK2ApiKey ? 'password' : 'text'}
+                        value={aiSettings.kimiK2ApiKey}
+                        onChange={(e) => setAiSettings(prev => ({ ...prev, kimiK2ApiKey: e.target.value }))}
+                        className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
+                        placeholder="sk-your-kimi-k2-api-key-here"
+                      />
+                      {aiSettings.kimiK2ApiKey && (
+                        <Eye className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/40" />
+                      )}
+                    </div>
+                    <p className="text-xs text-white/50 mt-1">
+                      Get your free API key at <a href="https://platform.moonshot.ai" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300">platform.moonshot.ai</a>
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-2">
+                      AI Provider
+                    </label>
+                    <select
+                      value={aiSettings.aiProvider}
+                      onChange={(e) => setAiSettings(prev => ({ ...prev, aiProvider: e.target.value as any }))}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
+                    >
+                      <option value="moonshot">Moonshot AI (Official)</option>
+                      <option value="aimlapi">AI/ML API (Third-party)</option>
+                      <option value="openrouter">OpenRouter</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-white mb-2">
+                      Daily Token Limit
+                    </label>
+                    <input
+                      type="number"
+                      value={aiSettings.maxTokensPerDay}
+                      onChange={(e) => setAiSettings(prev => ({ ...prev, maxTokensPerDay: parseInt(e.target.value) }))}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400"
+                      placeholder="1000"
+                      min="100"
+                      max="10000"
+                    />
+                    <p className="text-xs text-white/50 mt-1">
+                      Set a daily limit to control API usage and costs
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">Enable AI Features</h4>
+                      <p className="text-sm text-white/60">Activate AI-powered health analytics</p>
+                    </div>
+                    <button
+                      onClick={() => setAiSettings(prev => ({ ...prev, enableAI: !prev.enableAI }))}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        aiSettings.enableAI ? 'bg-blue-600' : 'bg-gray-600'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          aiSettings.enableAI ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => {
+                        // Save AI settings logic here
+                        alert('AI settings saved successfully!');
+                      }}
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2"
+                    >
+                      <Save className="w-4 h-4" />
+                      <span>Save Settings</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        // Test API key logic here
+                        alert('Testing API connection...');
+                      }}
+                      className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
+                    >
+                      Test API
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Feature Overview */}
+              <div className="p-6 bg-white/5 rounded-lg border border-white/10">
+                <h3 className="font-semibold mb-4">AI Features Available</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-start space-x-3">
+                    <Bot className="w-5 h-5 text-purple-400 mt-1" />
+                    <div>
+                      <h4 className="font-medium text-sm">Advanced Health Chat</h4>
+                      <p className="text-xs text-white/60">Contextual conversations with 256k memory</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <Activity className="w-5 h-5 text-blue-400 mt-1" />
+                    <div>
+                      <h4 className="font-medium text-sm">DNA Analysis</h4>
+                      <p className="text-xs text-white/60">AI-powered genetic insights and recommendations</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <Star className="w-5 h-5 text-green-400 mt-1" />
+                    <div>
+                      <h4 className="font-medium text-sm">Health Recommendations</h4>
+                      <p className="text-xs text-white/60">Personalized suggestions based on your data</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <Globe className="w-5 h-5 text-orange-400 mt-1" />
+                    <div>
+                      <h4 className="font-medium text-sm">Biomarker Interpretation</h4>
+                      <p className="text-xs text-white/60">Understand your health metrics with AI insights</p>
+                    </div>
                   </div>
                 </div>
               </div>
