@@ -298,46 +298,46 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
       {/* Top Stats Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
         {/* Streak Card */}
-        <div className="bg-gradient-to-r from-orange-300 via-orange-400 to-red-400 rounded-2xl p-8 text-white shadow-xl">
+        <div className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-600 rounded-2xl p-8 text-white shadow-xl">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-              <Zap className="w-8 h-8" />
+            <div className="w-16 h-16 bg-white/30 rounded-full flex items-center justify-center">
+              <Zap className="w-8 h-8 text-white" />
             </div>
           </div>
-          <h2 className="text-3xl font-bold mb-2">{loginData?.loginStreak || 1} Day Streak</h2>
-          <p className="text-white/90 mb-4">Keep up the great work! You're building a healthier habit every day</p>
+          <h2 className="text-3xl font-bold mb-2 text-white drop-shadow-sm">{loginData?.loginStreak || 1} Day Streak</h2>
+          <p className="text-white mb-4 drop-shadow-sm">Keep up the great work! You're building a healthier habit every day</p>
           <div className="flex space-x-4 text-sm">
-            <span className="bg-white/20 px-3 py-1 rounded-full">7 day Goal</span>
-            <span className="bg-white/20 px-3 py-1 rounded-full">30 day Goal</span>
+            <span className="bg-white/30 px-3 py-1 rounded-full text-white font-medium">7 day Goal</span>
+            <span className="bg-white/30 px-3 py-1 rounded-full text-white font-medium">30 day Goal</span>
           </div>
         </div>
 
         {/* Health Score Card */}
-        <div className="bg-gradient-to-r from-orange-400 to-pink-500 rounded-2xl p-8 text-white shadow-xl">
+        <div className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700 rounded-2xl p-8 text-white shadow-xl">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <h2 className="text-2xl font-bold mb-4">Your Health Score</h2>
-              <div className="space-y-2 text-sm text-white/90">
+              <h2 className="text-2xl font-bold mb-4 text-white drop-shadow-sm">Your Health Score</h2>
+              <div className="space-y-2 text-sm text-white">
                 <div className="flex items-center space-x-2">
-                  <span className={`${(healthScore?.changeIn60Days || 0) >= 0 ? 'text-green-300' : 'text-red-300'}`}>•</span>
+                  <span className={`${(healthScore?.changeIn60Days || 0) >= 0 ? 'text-green-200' : 'text-red-200'}`}>•</span>
                   <span><strong>Change:</strong> {(healthScore?.changeIn60Days || 0) >= 0 ? '+' : ''}{healthScore?.changeIn60Days || 0} in last 60 days</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-blue-300">•</span>
+                  <span className="text-blue-200">•</span>
                   <span><strong>Biological Age:</strong> {healthScore?.biologicalAge || 42} (Chronological: {healthScore?.chronologicalAge || 42})</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-yellow-300">•</span>
+                  <span className="text-yellow-200">•</span>
                   <span><strong>Key wins:</strong> {healthScore?.keyWins?.join(', ') || 'Inflammation -12%'}</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-red-300">•</span>
+                  <span className="text-orange-200">•</span>
                   <span><strong>Focus area:</strong> {healthScore?.focusArea || 'Reduce inflammation (CRP) from 2.8 to <1.0 mg/L'}</span>
                 </div>
               </div>
               <button 
                 onClick={() => setCurrentScreen('recommendations')}
-                className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-medium mt-4"
+                className="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg text-sm font-medium mt-4 text-white backdrop-blur-sm"
               >
                 See all recommendations →
               </button>
