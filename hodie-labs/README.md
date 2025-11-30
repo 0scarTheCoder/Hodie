@@ -1,46 +1,243 @@
-# Getting Started with Create React App
+# HodieLabs Health Dashboard
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A comprehensive health dashboard application built with React, Firebase, and Auth0. Features AI-powered health insights, comprehensive user metrics tracking, and Apple Health-style visualizations.
 
-## Available Scripts
+## 🚀 Live Demo
 
-In the project directory, you can run:
+Visit the live application: [https://hodielabs-app.web.app](https://hodielabs-app.web.app)
 
-### `npm start`
+## ✨ Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### Core Functionality
+- **Professional Authentication** - Auth0 integration with secure login/signup
+- **Health Metrics Tracking** - Comprehensive health score calculation
+- **AI Health Assistant** - Groq-powered conversational AI with Australian health guidelines
+- **Apple Health UI** - Beautiful ring-style progress indicators
+- **Dashboard Analytics** - Real-time health data visualization
+- **Settings Management** - Complete user profile and payment management
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### Advanced Features
+- **Payment Integration** - Subscription management with billing history
+- **Chat Memory** - Persistent conversation storage with Firebase
+- **Responsive Design** - Mobile-first, works on all devices
+- **Real-time Updates** - Live health metrics and streak tracking
+- **Security Best Practices** - Professional auth, secure data handling
 
-### `npm test`
+## 🛠 Technology Stack
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Frontend
+- **React 18** with TypeScript
+- **Tailwind CSS** for styling
+- **Lucide React** for icons
+- **Firebase** for database and hosting
 
-### `npm run build`
+### Backend & Services
+- **Auth0** - Professional authentication
+- **Firebase Firestore** - Real-time database
+- **Groq AI** - Advanced conversational AI (Llama3-70B)
+- **Firebase Hosting** - Production deployment
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Development
+- **Create React App** with TypeScript template
+- **ESLint** for code quality
+- **Jest** for testing
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 🚀 Quick Start
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Prerequisites
+- Node.js 16+
+- npm or yarn
+- Firebase CLI
+- Git
 
-### `npm run eject`
+### Installation
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd hodie-labs
+   ```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your actual credentials
+   ```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+4. **Configure Firebase**
+   ```bash
+   npm install -g firebase-tools
+   firebase login
+   firebase use hodie-labs-webapp
+   ```
 
-## Learn More
+5. **Start development server**
+   ```bash
+   npm start
+   ```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## ⚙️ Configuration
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Required Environment Variables
+
+Create a `.env` file with:
+
+```bash
+# Auth0 Configuration
+REACT_APP_AUTH0_DOMAIN=your-auth0-domain
+REACT_APP_AUTH0_CLIENT_ID=your-auth0-client-id
+
+# Firebase Configuration
+REACT_APP_FIREBASE_API_KEY=your-firebase-api-key
+REACT_APP_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+REACT_APP_FIREBASE_PROJECT_ID=your-project-id
+REACT_APP_FIREBASE_STORAGE_BUCKET=your-project.firebasestorage.app
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+REACT_APP_FIREBASE_APP_ID=your-app-id
+
+# Optional: Groq AI (for advanced chat)
+REACT_APP_GROQ_API_KEY=your-groq-api-key
+```
+
+### Enable AI Chat (Optional but Recommended)
+
+1. Get free API key from [console.groq.com](https://console.groq.com)
+2. Add to `.env`: `REACT_APP_GROQ_API_KEY=gsk_your_key`
+3. Rebuild and deploy
+
+Without this, the app uses "Limited AI Mode" with pattern-matched responses.
+
+## 📚 Documentation
+
+### Setup Guides
+- [GROQ_SETUP.md](GROQ_SETUP.md) - Enable advanced AI chat
+- [SETUP_REAL_AI.md](SETUP_REAL_AI.md) - Quick AI setup (2 minutes)
+- [AUTH0_SETUP_GUIDE.md](AUTH0_SETUP_GUIDE.md) - Authentication configuration
+
+### Feature Guides
+- [EMAIL_CUSTOMIZATION_GUIDE.md](EMAIL_CUSTOMIZATION_GUIDE.md) - Customize Auth0 emails
+- [FORGOT_PASSWORD_FEATURE.md](FORGOT_PASSWORD_FEATURE.md) - Password reset functionality
+
+## 🏗 Project Structure
+
+```
+src/
+├── components/
+│   ├── auth/                 # Authentication components
+│   ├── chat/                 # AI chat interface
+│   ├── dashboard/            # Main dashboard views
+│   ├── layout/               # Header, navigation
+│   ├── screens/              # Feature screens (DNA, Labs, etc.)
+│   ├── workflows/            # Multi-step processes
+│   └── ui/                   # Reusable UI components
+├── services/
+│   ├── auth0Service.ts       # Auth0 integration
+│   ├── groqChatService.ts    # AI chat service
+│   ├── userMetricsService.ts # Health metrics
+│   └── chatStorageService.ts # Chat persistence
+├── firebase/
+│   └── config.ts             # Firebase configuration
+└── utils/                    # Utility functions
+```
+
+## 🚀 Deployment
+
+### Firebase Hosting (Production)
+
+1. **Build the application**
+   ```bash
+   npm run build
+   ```
+
+2. **Deploy to Firebase**
+   ```bash
+   firebase deploy --only hosting
+   ```
+
+3. **View live site**
+   ```bash
+   firebase open hosting:site
+   ```
+
+### Development Server
+```bash
+npm start     # http://localhost:3000
+```
+
+## 🧪 Testing
+
+### Run Tests
+```bash
+npm test                    # Interactive test runner
+npm test -- --watchAll=false   # Single run
+```
+
+### Database Testing
+- **Live Testing**: Use deployed app
+- **Firebase Console**: View real-time data
+- **Chat System**: Test AI responses and storage
+
+## 🔒 Security Features
+
+- **Auth0 Professional Authentication**
+- **Firebase Security Rules**
+- **Environment Variable Protection**
+- **HTTPS Encryption** (Firebase Hosting)
+- **Input Validation** and sanitization
+
+## 📊 Features Overview
+
+### Dashboard Components
+- **Health Score Calculation** - AI-powered health assessment
+- **Login Streak Tracking** - Gamified engagement
+- **Apple Health Rings** - Beautiful progress visualization
+- **Real-time Metrics** - Live health data updates
+
+### Chat System
+- **Groq AI Integration** - Advanced conversational AI
+- **Australian Health Guidelines** - Localized health advice
+- **Conversation Memory** - Persistent chat history
+- **Context Awareness** - Personalized responses
+
+### Settings & Account
+- **Profile Management** - Complete user information
+- **Payment Integration** - Subscription handling
+- **Privacy Controls** - Data sharing preferences
+- **Account Export** - GDPR compliance
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is proprietary. All rights reserved.
+
+## 🆘 Support
+
+- **Documentation**: Check the setup guides in this repository
+- **Issues**: Create an issue for bugs or feature requests
+- **Contact**: Visit [hodielabs.com/contact](https://hodielabs.com/contact)
+
+## 🌟 Key Highlights
+
+- **🚀 Production Ready**: Live at hodielabs-app.web.app
+- **🤖 AI Powered**: Advanced conversational health assistant
+- **🏥 Health Focused**: Australian health guidelines integration
+- **📱 Mobile First**: Responsive design for all devices
+- **🔒 Secure**: Professional authentication and data protection
+- **⚡ Fast**: Optimized build with Firebase CDN
+- **🎨 Beautiful**: Apple Health-inspired design system
+
+---
+
+Built with ❤️ by the HodieLabs team

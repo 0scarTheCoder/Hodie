@@ -46,13 +46,13 @@ const BrandHeader: React.FC<BrandHeaderProps> = ({
                   target.style.display = 'none';
                   const textFallback = document.createElement('div');
                   textFallback.textContent = 'HodieLabs';
-                  textFallback.className = 'text-xl font-semibold text-white font-poppins';
+                  textFallback.className = 'text-xl font-bold text-white font-poppins drop-shadow-lg';
                   target.parentNode?.appendChild(textFallback);
                 }}
               />
-              <div className="hidden sm:block">
-                <div className="text-lg font-semibold text-white">HodieLabs</div>
-                <div className="text-xs text-white/70 -mt-1">Health Dashboard</div>
+              <div className="flex flex-col">
+                <div className="text-xl font-bold text-white drop-shadow-lg">HodieLabs</div>
+                <div className="text-xs text-white/90 -mt-1 drop-shadow-sm hidden sm:block">Health Dashboard</div>
               </div>
             </button>
           </div>
