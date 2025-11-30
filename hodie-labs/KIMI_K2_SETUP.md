@@ -14,21 +14,24 @@ Kimi K2 is a cutting-edge AI model that replaces static health data with intelli
 
 ### 1. Get Your Kimi K2 API Key
 
-#### Option A: AI/ML API (Recommended)
-1. Visit [api.aimlapi.com](https://api.aimlapi.com)
-2. Sign up for a free account
-3. Navigate to your dashboard and generate an API key
-4. Copy the API key for configuration
+#### Option A: Official Moonshot Platform (Recommended)
+1. Visit [platform.moonshot.ai](https://platform.moonshot.ai)
+2. Sign up or log in to your account
+3. Navigate to the API Keys section in the console
+4. Click "Create New Key" and choose your desired permissions
+5. Generate and copy your API key (shown only once!)
+6. Use model: `kimi-k2-thinking` for advanced health analysis
 
-#### Option B: OpenRouter
+#### Option B: AI/ML API (Third-party provider)
+1. Visit [api.aimlapi.com](https://api.aimlapi.com)
+2. Sign up for a free account (1000 requests/day)
+3. Navigate to your dashboard and generate an API key
+4. Use model: `moonshotai/kimi-k2` or `moonshotai/kimi-k2:free`
+
+#### Option C: OpenRouter
 1. Visit [openrouter.ai](https://openrouter.ai)
 2. Create an account and get your API key
 3. Use model: `moonshotai/kimi-k2` or `moonshotai/kimi-k2:free`
-
-#### Option C: Together AI
-1. Visit [together.ai](https://together.ai)
-2. Sign up and generate an API key
-3. Use model: `moonshotai/Kimi-K2-Instruct`
 
 ### 2. Configure Your Environment
 

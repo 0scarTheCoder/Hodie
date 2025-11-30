@@ -44,15 +44,15 @@ interface HealthRecommendation {
 
 class KimiK2Service {
   private apiKey: string;
-  private baseUrl: string = 'https://api.aimlapi.com/v1';
-  private model: string = 'moonshot/kimi-k2-0905-preview';
+  private baseUrl: string = 'https://api.moonshot.ai/v1';
+  private model: string = 'kimi-k2-thinking';
 
   constructor() {
     // Get API key from environment variable
     this.apiKey = process.env.REACT_APP_KIMI_K2_API_KEY || '';
     
     if (!this.apiKey) {
-      console.warn('⚠️ Kimi K2 API key not configured. Get one free at https://api.aimlapi.com');
+      console.warn('⚠️ Kimi K2 API key not configured. Get one from https://platform.moonshot.ai');
       console.warn('Add REACT_APP_KIMI_K2_API_KEY=your_key to .env file');
     } else {
       console.log('✅ Kimi K2 AI enabled - advanced health analytics available');

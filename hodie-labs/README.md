@@ -106,7 +106,7 @@ REACT_APP_KIMI_K2_API_KEY=your-kimi-k2-api-key
 
 ### Enable Advanced AI Health Analytics (Optional but Recommended)
 
-1. Get free API key from [api.aimlapi.com](https://api.aimlapi.com)
+1. Get API key from [platform.moonshot.ai](https://platform.moonshot.ai) (Official) or [api.aimlapi.com](https://api.aimlapi.com) (Third-party)
 2. Add to `.env`: `REACT_APP_KIMI_K2_API_KEY=your_key`
 3. Rebuild and deploy
 
