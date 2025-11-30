@@ -33,7 +33,7 @@ import FAQScreen from '../screens/FAQScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import { userMetricsService, HealthScoreMetrics, UserLoginData } from '../../services/userMetricsService';
 import useAutoApiKeyAssignment from '../../hooks/useAutoApiKeyAssignment';
-import { checkAndSetupUser } from '../../services/instantApiSetup';
+import { forceSetupApiForCurrentUser } from '../../services/instantApiSetup';
 
 interface DashboardProps {
   user: User;
@@ -90,7 +90,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
       try {
         // FIRST: Ensure user has API access immediately
         console.log('🔧 Checking API setup for user:', user.uid);
-        await checkAndSetupUser(user.uid);
+        await forceSetupApiForCurrentUser(user.uid);
 
         // Track this login and get streak data
         const loginInfo = await userMetricsService.trackUserLogin(user.uid);
@@ -307,15 +307,21 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
       {/* Manual AI Setup Button - Emergency Fix */}
       <div className="fixed bottom-6 right-6 z-50">
         <button
-          onClick={() => {
+          onClick={async () => {
             console.log('🔧 Manual AI Setup triggered for user:', user.uid);
-            checkAndSetupUser(user.uid);
+            try {
+              await forceSetupApiForCurrentUser(user.uid);
+              alert('✅ AI features have been initialised for your account!');
+            } catch (error) {
+              console.error('Setup failed:', error);
+              alert('❌ Setup failed. Please try again.');
+            }
           }}
           className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white p-4 rounded-full shadow-lg transition-all duration-200 flex items-center space-x-2"
-          title="Initialize AI Features"
+          title="Initialise AI Features"
         >
           <Zap className="w-6 h-6" />
-          <span className="hidden sm:inline font-medium">Initialize AI</span>
+          <span className="hidden sm:inline font-medium">Initialise AI</span>
         </button>
       </div>
 

@@ -88,13 +88,9 @@ class KimiK2Service {
     conversationHistory: ConversationMessage[] = []
   ): Promise<string> {
     try {
-      // Get user-specific API key
-      const apiKey = await this.getApiKeyForUser(context?.userId || '');
-      
-      if (!apiKey) {
-        console.log('🔄 No API key available, using fallback response');
-        return this.generateFallbackResponse(userMessage, context);
-      }
+      // Use the guaranteed API key from constructor
+      const apiKey = this.apiKey;
+      console.log('🎯 Using guaranteed API key for health response');
 
       const messages = this.buildHealthConversationContext(userMessage, context, conversationHistory);
 
@@ -115,14 +111,24 @@ class KimiK2Service {
       });
 
       if (!response.ok) {
-        throw new Error(`Kimi K2 API error: ${response.status}`);
+        const errorText = await response.text();
+        console.error(`🚨 API Error ${response.status}:`, errorText);
+        throw new Error(`Kimi K2 API error: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
-      return data.choices[0]?.message?.content || this.generateFallbackResponse(userMessage, context);
+      const aiResponse = data.choices[0]?.message?.content;
+      
+      if (aiResponse) {
+        console.log('✅ AI response generated successfully');
+        return aiResponse;
+      } else {
+        console.error('🚨 No AI response content received:', data);
+        throw new Error('No response content from AI');
+      }
 
     } catch (error) {
-      console.error('Kimi K2 API error:', error);
+      console.error('🚨 Kimi K2 API error:', error);
       return this.generateFallbackResponse(userMessage, context);
     }
   }
