@@ -91,7 +91,7 @@ const HodieLoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#1b1740] to-[#0d0925] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-b from-[#1b1740] to-[#0d0925] flex items-centre justify-centre p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -99,7 +99,7 @@ const HodieLoginPage: React.FC = () => {
         className="w-full max-w-md"
       >
         <Card className="bg-[#221c57]/90 border-none text-white shadow-xl rounded-3xl p-6">
-          <CardHeader className="text-center">
+          <CardHeader className="text-centre">
             <img
               src="/hodielabs_logo.svg"
               alt="Hodie Labs"
@@ -145,7 +145,7 @@ const HodieLoginPage: React.FC = () => {
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-3 rounded-lg flex items-center space-x-2"
+                  className="bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-3 rounded-lg flex items-centre space-x-2"
                 >
                   <AlertCircle size={16} />
                   <span className="text-sm">{error}</span>
@@ -160,7 +160,7 @@ const HodieLoginPage: React.FC = () => {
                 {loading ? "Processing..." : (isLogin ? "Sign In" : "Create Account")}
               </Button>
 
-              <div className="flex justify-between items-center text-sm text-gray-300 mt-3">
+              <div className="flex justify-between items-centre text-sm text-gray-300 mt-3">
                 <button
                   type="button"
                   onClick={() => setIsLogin(!isLogin)}
@@ -189,7 +189,7 @@ const HodieLoginPage: React.FC = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center px-4 z-50"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-centre justify-centre px-4 z-50"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -203,7 +203,7 @@ const HodieLoginPage: React.FC = () => {
                 {!resetSuccess ? (
                   <>
                     {/* Header */}
-                    <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-centre justify-between mb-6">
                       <button
                         onClick={handleBackToLogin}
                         className="text-orange-400 hover:text-white transition-colors"
@@ -215,7 +215,7 @@ const HodieLoginPage: React.FC = () => {
                     </div>
 
                     {/* Instructions */}
-                    <div className="text-center mb-6">
+                    <div className="text-centre mb-6">
                       <Mail className="w-12 h-12 text-orange-400 mx-auto mb-3" />
                       <p className="text-gray-300 text-sm">
                         Enter your email address and we'll send you a link to reset your password.
@@ -241,7 +241,7 @@ const HodieLoginPage: React.FC = () => {
                         <motion.div
                           initial={{ opacity: 0, scale: 0.95 }}
                           animate={{ opacity: 1, scale: 1 }}
-                          className="bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-3 rounded-lg flex items-center space-x-2"
+                          className="bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-3 rounded-lg flex items-centre space-x-2"
                         >
                           <AlertCircle size={16} />
                           <span className="text-sm">{resetError}</span>
@@ -260,13 +260,18 @@ const HodieLoginPage: React.FC = () => {
                   </>
                 ) : (
                   /* Success State */
-                  <div className="text-center">
+                  <div className="text-centre">
                     <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
                     <h3 className="text-xl font-semibold text-white mb-3">Check Your Email</h3>
-                    <p className="text-gray-300 text-sm mb-6">
+                    <p className="text-gray-300 text-sm mb-4">
                       We've sent a password reset link to <span className="text-orange-400 font-medium">{resetEmail}</span>.
                       Please check your email and follow the instructions to reset your password.
                     </p>
+                    <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl px-4 py-3 mb-6">
+                      <p className="text-yellow-200 text-xs">
+                        💡 <strong>Tip:</strong> If you don't see the email in your inbox, please check your junk or spam folder.
+                      </p>
+                    </div>
                     <div className="space-y-3">
                       <Button
                         onClick={handleBackToLogin}

@@ -1,8 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { User } from 'firebase/auth';
+import { Upload, Paperclip } from 'lucide-react';
 import { queryLogger } from '../../utils/queryLogger';
 import { kimiK2Service, HealthContext, ConversationMessage } from '../../services/kimiK2Service';
 import { chatStorageService, ChatConversation, ChatMessage } from '../../services/chatStorageService';
+import FileUploadZone, { UploadedFile } from './FileUploadZone';
+import { healthDataParsingService } from '../../services/healthDataParsingService';
 
 interface Message {
   id: string;
@@ -23,11 +26,13 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
   const [conversationHistory, setConversationHistory] = useState<ConversationMessage[]>([]);
   const [currentConversation, setCurrentConversation] = useState<ChatConversation | null>(null);
   const [loadingHistory, setLoadingHistory] = useState(true);
+  const [showFileUpload, setShowFileUpload] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Initialize AI status and load chat history
   useEffect(() => {
-    const initializeChat = async () => {
+    const initialiseChat = async () => {
       const enabled = await kimiK2Service.checkApiStatus();
       setAiEnabled(enabled);
       
@@ -58,7 +63,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
             id: '1',
             text: `G'day! I'm your Hodie Labs AI health assistant${enabled ? ', powered by Kimi K2 advanced AI' : ' (limited mode)'}. 
 
-🏥 **I have access to your health profile** and previous conversations for personalized advice.
+🏥 **I have access to your health profile** and previous conversations for personalised advice.
 
 I can help you with:
 🍎 **Nutrition & Cooking**: Specific recipes, meal planning, protein calculations
@@ -110,7 +115,7 @@ ${enabled ? 'I use advanced AI with memory of our past discussions to provide co
       setLoadingHistory(false);
     };
 
-    initializeChat();
+    initialiseChat();
   }, [user.uid]);
 
   const scrollToBottom = () => {
@@ -261,10 +266,189 @@ ${enabled ? 'I use advanced AI with memory of our past discussions to provide co
     }
   };
 
+  const handleFilesUploaded = async (files: UploadedFile[]) => {
+    setUploadedFiles(prev => [...prev, ...files]);
+
+    // Show processing message
+    const processingMessage: Message = {
+      id: Date.now().toString(),
+      text: `🔄 **Processing ${files.length} file(s)**...\n\nAnalyzing with AI to determine optimal data storage and health insights.`,
+      sender: 'assistant',
+      timestamp: new Date()
+    };
+    setMessages(prev => [...prev, processingMessage]);
+
+    // Process each uploaded file
+    for (const file of files) {
+      try {
+        // Step 1: Parse the file
+        const parsedData = await healthDataParsingService.parseHealthFile(file.file, file.category);
+
+        // Step 2: Use AI to interpret the file and determine database mappings
+        const aiInterpretation = await kimiK2Service.interpretHealthFile(
+          parsedData.data,
+          file.name,
+          file.category,
+          user.uid
+        );
+
+        // Step 3: Save to database based on AI recommendations
+        await saveToDatabaseWithAI(aiInterpretation.databaseMappings, user.uid);
+
+        // Step 4: Create comprehensive message with AI insights
+        const interpretationText = formatFileInterpretation(
+          file.name,
+          parsedData,
+          aiInterpretation
+        );
+
+        const fileMessage: Message = {
+          id: Date.now().toString(),
+          text: interpretationText,
+          sender: 'assistant',
+          timestamp: new Date()
+        };
+
+        setMessages(prev => [...prev, fileMessage]);
+
+        // Log the file upload with AI interpretation
+        queryLogger.logQuery(
+          `AI File interpretation: ${file.name}`,
+          'file_upload',
+          user.uid,
+          {
+            component: 'chat_interface',
+            fileType: file.category,
+            fileName: file.name,
+            confidence: parsedData.metadata.confidence,
+            dbMappings: aiInterpretation.databaseMappings.length,
+            hasRecommendations: aiInterpretation.recommendations.length > 0,
+            aiProcessed: true
+          }
+        );
+
+      } catch (error) {
+        console.error('Error processing uploaded file:', error);
+
+        const errorMessage: Message = {
+          id: Date.now().toString(),
+          text: `❌ **Error processing ${file.name}**: ${error instanceof Error ? error.message : 'Unknown error'}. Please check the file format and try again.`,
+          sender: 'assistant',
+          timestamp: new Date()
+        };
+
+        setMessages(prev => [...prev, errorMessage]);
+      }
+    }
+
+    setShowFileUpload(false);
+  };
+
+  // Format AI file interpretation for user display
+  const formatFileInterpretation = (
+    fileName: string,
+    parsedData: any,
+    aiInterpretation: any
+  ): string => {
+    let message = `📁 **File Analyzed**: ${fileName}\n\n`;
+
+    // AI Interpretation
+    message += `🤖 **AI Analysis**:\n${aiInterpretation.interpretation}\n\n`;
+
+    // Database Mappings
+    if (aiInterpretation.databaseMappings.length > 0) {
+      message += `💾 **Data Storage**:\n`;
+      aiInterpretation.databaseMappings.forEach((mapping: any) => {
+        message += `• Saved to **${mapping.collection}** collection (${mapping.confidence}% confidence)\n`;
+      });
+      message += `\n`;
+    }
+
+    // Recommendations
+    if (aiInterpretation.recommendations.length > 0) {
+      message += `💡 **Health Insights**:\n`;
+      aiInterpretation.recommendations.slice(0, 3).forEach((rec: string) => {
+        message += `• ${rec}\n`;
+      });
+      message += `\n`;
+    }
+
+    // Clarifying Questions
+    if (aiInterpretation.clarifyingQuestions.length > 0) {
+      message += `❓ **Questions for you**:\n`;
+      aiInterpretation.clarifyingQuestions.slice(0, 2).forEach((question: string) => {
+        message += `• ${question}\n`;
+      });
+      message += `\n`;
+    }
+
+    message += `✅ **Status**: Data successfully stored and ready for analysis!\n\n`;
+    message += `You can now ask me questions about this data, such as:\n`;
+    message += `• "What do my lab results show?"\n`;
+    message += `• "Explain any concerning values"\n`;
+    message += `• "Give me personalized recommendations based on this data"`;
+
+    return message;
+  };
+
+  // Save data to database based on AI-recommended mappings
+  const saveToDatabaseWithAI = async (mappings: any[], userId: string) => {
+    try {
+      for (const mapping of mappings) {
+        // Prepare the data for storage
+        const dataToSave = {
+          userId,
+          ...mapping.fields,
+          aiProcessed: true,
+          confidence: mapping.confidence,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+
+        // Save to appropriate collection based on AI recommendation
+        const apiUrl = `${process.env.REACT_APP_API_BASE_URL}/${getApiEndpoint(mapping.collection)}`;
+
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(dataToSave)
+        });
+
+        if (!response.ok) {
+          console.warn(`Failed to save to ${mapping.collection}:`, await response.text());
+        } else {
+          console.log(`✅ Successfully saved data to ${mapping.collection}`);
+        }
+      }
+    } catch (error) {
+      console.error('Error saving to database:', error);
+      // Don't throw - allow the user to still see the interpretation even if saving fails
+    }
+  };
+
+  // Map collection name to API endpoint
+  const getApiEndpoint = (collection: string): string => {
+    const endpointMap: { [key: string]: string } = {
+      'healthMetrics': 'health-metrics',
+      'labResults': 'lab-results',
+      'geneticData': 'genetic-data',
+      'wearableData': 'wearable-data',
+      'medicalReports': 'medical-reports'
+    };
+    return endpointMap[collection] || 'health-metrics';
+  };
+
+  const handleFileRemove = (fileId: string) => {
+    setUploadedFiles(prev => prev.filter(f => f.id !== fileId));
+  };
+
   return (
     <div className="flex flex-col h-full">
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-4">
-        <h2 className="text-xl font-semibold flex items-center">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-4 flex-shrink-0">
+        <h2 className="text-xl font-semibold flex items-centre">
           🇦🇺 Hodie Health Assistant
           {aiEnabled ? (
             <span className="ml-3 text-xs bg-green-500 px-2 py-1 rounded-full">Kimi K2 Enabled</span>
@@ -277,7 +461,9 @@ ${enabled ? 'I use advanced AI with memory of our past discussions to provide co
         </p>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50 max-h-96 overscroll-behavior-y-contain scroll-smooth">
+      {/* Messages Container - Scrollable */}
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-gray-50 overscroll-behavior-y-contain scroll-smooth"
+           style={{ minHeight: 0 }}>
         {messages.map((message) => (
           <div
             key={message.id}
@@ -333,10 +519,11 @@ ${enabled ? 'I use advanced AI with memory of our past discussions to provide co
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="bg-white border-t border-gray-200 p-4">
+      {/* Input Area - Sticky at bottom */}
+      <div className="flex-shrink-0 bg-white border-t border-gray-200 p-4">
         {/* Enhanced Quick topic buttons */}
         <div className="mb-3">
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
             {[
               { topic: 'DNA Insights', question: 'Explain my genetic fitness and nutrition profile', emoji: '🧬' },
               { topic: 'Health Analysis', question: 'Analyze my current health metrics and provide recommendations', emoji: '📊' },
@@ -344,13 +531,71 @@ ${enabled ? 'I use advanced AI with memory of our past discussions to provide co
               { topic: 'Exercise', question: 'What exercise routine should I start with based on my genetics?', emoji: '🏃' },
               { topic: 'Sleep', question: 'How can I improve my sleep quality and duration?', emoji: '😴' },
               { topic: 'Biomarkers', question: 'Help me understand my biomarker results', emoji: '🔬' },
-              { topic: 'Weight Loss', question: 'Create a personalized weight loss strategy for me', emoji: '⚖️' },
+              { topic: 'Weight Loss', question: 'Create a personalised weight loss strategy for me', emoji: '⚖️' },
               { topic: 'Stress', question: 'How can I manage stress better based on my profile?', emoji: '🧘' }
             ].map(({ topic, question, emoji }) => (
               <button
                 key={topic}
-                onClick={() => setInputValue(question)}
-                className="px-3 py-2 bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 text-gray-700 rounded-lg text-sm transition-all duration-200 flex items-center space-x-1 border border-gray-200 hover:border-blue-300"
+                onClick={async () => {
+                  setInputValue(question);
+                  // Automatically send the message for better mobile UX
+                  const userMessage = {
+                    id: Date.now().toString(),
+                    text: question,
+                    sender: 'user' as const,
+                    timestamp: new Date()
+                  };
+
+                  setMessages(prev => [...prev, userMessage]);
+                  setInputValue('');
+                  setIsLoading(true);
+
+                  const logId = queryLogger.logQuery(
+                    question,
+                    'health_query',
+                    user.uid,
+                    { component: 'chat_interface_quick_button' }
+                  );
+
+                  try {
+                    const healthContext = await getUserHealthContext(user.uid);
+                    const responseText = await kimiK2Service.generateHealthResponse(
+                      question,
+                      healthContext,
+                      conversationHistory
+                    );
+                    
+                    const assistantMessage = {
+                      id: (Date.now() + 1).toString(),
+                      text: responseText,
+                      sender: 'assistant' as const,
+                      timestamp: new Date()
+                    };
+
+                    setMessages(prev => [...prev, assistantMessage]);
+                    
+                    setConversationHistory(prev => [
+                      ...prev,
+                      { role: 'user', content: question },
+                      { role: 'assistant', content: responseText }
+                    ]);
+                    
+                    queryLogger.logResponse(logId, responseText);
+                  } catch (error) {
+                    console.error('Quick button chat error:', error);
+                    const errorMessage = {
+                      id: (Date.now() + 1).toString(),
+                      text: 'I apologise, but I encountered an error processing your request. Please try again.',
+                      sender: 'assistant' as const,
+                      timestamp: new Date()
+                    };
+                    setMessages(prev => [...prev, errorMessage]);
+                    queryLogger.logResponse(logId, `Error: ${error}`);
+                  } finally {
+                    setIsLoading(false);
+                  }
+                }}
+                className="px-2 py-3 md:px-3 md:py-2 bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 text-gray-700 rounded-lg text-xs md:text-sm transition-all duration-200 flex flex-col md:flex-row items-centre space-y-1 md:space-y-0 md:space-x-1 border border-gray-200 hover:border-blue-300 touch-manipulation min-h-[60px] md:min-h-[auto]"
                 disabled={isLoading}
               >
                 <span className="text-base">{emoji}</span>
@@ -359,14 +604,59 @@ ${enabled ? 'I use advanced AI with memory of our past discussions to provide co
             ))}
           </div>
         </div>
+
+        {/* File Upload Zone */}
+        {showFileUpload && (
+          <div className="mb-4 p-4 bg-gray-50 rounded-lg border">
+            <FileUploadZone
+              onFilesUploaded={handleFilesUploaded}
+              onFileRemove={handleFileRemove}
+              isVisible={showFileUpload}
+            />
+          </div>
+        )}
+
+        {/* Currently Uploaded Files Summary */}
+        {uploadedFiles.length > 0 && (
+          <div className="mb-3">
+            <div className="flex flex-wrap gap-2">
+              {uploadedFiles.map((file) => (
+                <div key={file.id} className="flex items-centre space-x-2 bg-blue-50 px-3 py-1 rounded-full text-sm border border-blue-200">
+                  <span>{file.category === 'lab_results' ? '🧪' : file.category === 'genetic_data' ? '🧬' : '📄'}</span>
+                  <span className="text-blue-700 font-medium truncate max-w-24">{file.name}</span>
+                  <button
+                    onClick={() => handleFileRemove(file.id)}
+                    className="text-blue-600 hover:text-blue-800 ml-1"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         
         {/* Message input */}
         <div className="flex space-x-3">
+          <div className="flex space-x-2">
+            <button
+              onClick={() => setShowFileUpload(!showFileUpload)}
+              className={`px-3 py-2 rounded-lg transition-all duration-200 ${
+                showFileUpload 
+                  ? 'bg-blue-100 text-blue-600 border border-blue-300' 
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+              title="Upload health data files"
+            >
+              <Paperclip className="w-4 h-4" />
+            </button>
+          </div>
+          
           <textarea
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type your health question here..."
+            placeholder={uploadedFiles.length > 0 ? "Ask about your uploaded health data..." : "Type your health question here..."}
             className="flex-1 resize-none border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             rows={1}
             disabled={isLoading}
