@@ -445,10 +445,10 @@ ${enabled ? 'I use advanced AI with memory of our past discussions to provide co
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-screen max-h-screen overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-4 flex-shrink-0">
-        <h2 className="text-xl font-semibold flex items-centre">
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 md:px-6 py-3 md:py-4 flex-shrink-0">
+        <h2 className="text-lg md:text-xl font-semibold flex items-centre">
           🇦🇺 Hodie Health Assistant
           {aiEnabled ? (
             <span className="ml-3 text-xs bg-green-500 px-2 py-1 rounded-full">Kimi K2 Enabled</span>
@@ -456,14 +456,14 @@ ${enabled ? 'I use advanced AI with memory of our past discussions to provide co
             <span className="ml-3 text-xs bg-orange-500 px-2 py-1 rounded-full">Limited Mode</span>
           )}
         </h2>
-        <p className="text-sm opacity-90">
+        <p className="text-xs md:text-sm opacity-90">
           {aiEnabled ? 'Advanced AI health guidance' : 'Basic health guidance'} • Evidence-based advice • Always consult your GP
         </p>
       </div>
 
       {/* Messages Container - Scrollable */}
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-gray-50 overscroll-behavior-y-contain scroll-smooth"
-           style={{ minHeight: 0 }}>
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-gray-50 overscroll-contain"
+           style={{ minHeight: 0, WebkitOverflowScrolling: 'touch' }}>
         {messages.map((message) => (
           <div
             key={message.id}
@@ -520,10 +520,11 @@ ${enabled ? 'I use advanced AI with memory of our past discussions to provide co
       </div>
 
       {/* Input Area - Sticky at bottom */}
-      <div className="flex-shrink-0 bg-white border-t border-gray-200 p-4">
-        {/* Enhanced Quick topic buttons */}
-        <div className="mb-3">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+      <div className="flex-shrink-0 bg-white border-t border-gray-200 p-3 md:p-4 max-h-[50vh] overflow-y-auto">
+        {/* Enhanced Quick topic buttons - Collapsible on mobile */}
+        {!inputValue && (
+          <div className="mb-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
             {[
               { topic: 'DNA Insights', question: 'Explain my genetic fitness and nutrition profile', emoji: '🧬' },
               { topic: 'Health Analysis', question: 'Analyze my current health metrics and provide recommendations', emoji: '📊' },
@@ -604,6 +605,7 @@ ${enabled ? 'I use advanced AI with memory of our past discussions to provide co
             ))}
           </div>
         </div>
+        )}
 
         {/* File Upload Zone */}
         {showFileUpload && (
@@ -636,35 +638,34 @@ ${enabled ? 'I use advanced AI with memory of our past discussions to provide co
           </div>
         )}
         
-        {/* Message input */}
-        <div className="flex space-x-3">
-          <div className="flex space-x-2">
-            <button
-              onClick={() => setShowFileUpload(!showFileUpload)}
-              className={`px-3 py-2 rounded-lg transition-all duration-200 ${
-                showFileUpload 
-                  ? 'bg-blue-100 text-blue-600 border border-blue-300' 
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-              title="Upload health data files"
-            >
-              <Paperclip className="w-4 h-4" />
-            </button>
-          </div>
-          
+        {/* Message input - Mobile optimized */}
+        <div className="flex items-end space-x-2">
+          <button
+            onClick={() => setShowFileUpload(!showFileUpload)}
+            className={`flex-shrink-0 p-2 md:px-3 md:py-2 rounded-lg transition-all duration-200 ${
+              showFileUpload
+                ? 'bg-blue-100 text-blue-600 border border-blue-300'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+            title="Upload health data files"
+          >
+            <Paperclip className="w-5 h-5 md:w-4 md:h-4" />
+          </button>
+
           <textarea
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={uploadedFiles.length > 0 ? "Ask about your uploaded health data..." : "Type your health question here..."}
-            className="flex-1 resize-none border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder={uploadedFiles.length > 0 ? "Ask about your data..." : "Type your health question..."}
+            className="flex-1 resize-none border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
             rows={1}
             disabled={isLoading}
+            style={{ maxHeight: '120px' }}
           />
           <button
             onClick={handleSendMessage}
             disabled={isLoading || !inputValue.trim()}
-            className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-shrink-0 px-4 md:px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm md:text-base"
           >
             {isLoading ? '...' : 'Send'}
           </button>
