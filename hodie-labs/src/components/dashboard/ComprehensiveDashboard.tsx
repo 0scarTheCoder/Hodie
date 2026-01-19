@@ -31,8 +31,10 @@ import LabsScreen from '../screens/LabsScreen';
 import ReportsScreen from '../screens/ReportsScreen';
 import FAQScreen from '../screens/FAQScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import ChatbotTester from '../testing/ChatbotTester';
+import DemoScreen from '../screens/DemoScreen';
+import HealthDataUploadTester from '../testing/HealthDataUploadTester';
 import { userMetricsService, HealthScoreMetrics, UserLoginData } from '../../services/userMetricsService';
-import useAutoApiKeyAssignment from '../../hooks/useAutoApiKeyAssignment';
 import { forceSetupApiForCurrentUser } from '../../services/instantApiSetup';
 
 interface DashboardProps {
@@ -69,12 +71,13 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
   const [loading, setLoading] = useState(true);
   const [showChat, setShowChat] = useState(false);
   const [currentStep, setCurrentStep] = useState<'blood' | 'dna' | 'body' | null>(null);
-  const [currentScreen, setCurrentScreen] = useState<'home' | 'recommendations' | 'dna' | 'labs' | 'reports' | 'faq' | 'settings'>('home');
+  const [currentScreen, setCurrentScreen] = useState<'home' | 'recommendations' | 'dna' | 'labs' | 'reports' | 'faq' | 'settings' | 'testing' | 'demo'>('home');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [chatInput, setChatInput] = useState('');
+  const [showApiKeySetup, setShowApiKeySetup] = useState(false);
 
-  // Automatically assign API key to user on login
-  const { assignment, hasApiAccess, isLoading: apiLoading, error: apiError } = useAutoApiKeyAssignment(user);
+  // API access is now guaranteed for all users with hardcoded key
+  const hasApiAccess = true;
 
   // Static health metrics for demo - these would come from blood tests/body scans
   const healthMetrics = {
@@ -86,11 +89,9 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
   };
 
   useEffect(() => {
-    const initializeUserMetrics = async () => {
+    const initialiseUserMetrics = async () => {
       try {
-        // FIRST: Ensure user has API access immediately
-        console.log('🔧 Checking API setup for user:', user.uid);
-        await forceSetupApiForCurrentUser(user.uid);
+        console.log('📊 Initializing user metrics for:', user.uid);
 
         // Track this login and get streak data
         const loginInfo = await userMetricsService.trackUserLogin(user.uid);
@@ -100,8 +101,8 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
         const scoreMetrics = await userMetricsService.getUserHealthScore(user.uid, 42);
         setHealthScore(scoreMetrics);
 
-        // Show confetti if user has a streak
-        if (loginInfo?.loginStreak && loginInfo.loginStreak > 1) {
+        // Show confetti for any login streak (including day 1)
+        if (loginInfo?.loginStreak && loginInfo.loginStreak >= 1) {
           setTimeout(() => {
             triggerConfetti();
           }, 1000); // Delay to let page load
@@ -114,7 +115,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
       }
     };
 
-    initializeUserMetrics();
+    initialiseUserMetrics();
   }, [user.uid]);
 
   const handleChatKeyDown = (e: React.KeyboardEvent) => {
@@ -124,6 +125,11 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
         setShowChat(true);
       }
     }
+  };
+
+  const handleQuickSuggestionClick = (suggestion: string) => {
+    setChatInput(suggestion);
+    setShowChat(true);
   };
 
   const triggerConfetti = () => {
@@ -139,7 +145,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
         left: ${Math.random() * 100}vw;
         top: -10px;
         z-index: 10000;
-        animation: confetti-fall ${2 + Math.random() * 3}s linear forwards;
+        animation: confetti-fall ${2 + Math.random() * 3}s linear forwardss;
         border-radius: 50%;
       `;
       
@@ -262,7 +268,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
     const config = getGaugeConfig(status);
     
     return (
-      <div className="flex items-center space-x-3">
+      <div className="flex items-centre space-x-3">
         <span className="font-medium text-white">{value}</span>
         <div className="relative w-16 h-6">
           {/* Marker above bar */}
@@ -296,6 +302,10 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
         return <FAQScreen user={user} />;
       case 'settings':
         return <SettingsScreen user={user} />;
+      case 'demo':
+        return <DemoScreen user={user} />;
+      case 'testing':
+        return <HealthDataUploadTester />;
       case 'home':
       default:
         return renderHomeContent();
@@ -306,31 +316,18 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
     <>
       {/* Manual AI Setup Button - Emergency Fix */}
       <div className="fixed bottom-6 right-6 z-50">
-        <button
-          onClick={async () => {
-            console.log('🔧 Manual AI Setup triggered for user:', user.uid);
-            try {
-              await forceSetupApiForCurrentUser(user.uid);
-              alert('✅ AI features have been initialised for your account!');
-            } catch (error) {
-              console.error('Setup failed:', error);
-              alert('❌ Setup failed. Please try again.');
-            }
-          }}
-          className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white p-4 rounded-full shadow-lg transition-all duration-200 flex items-center space-x-2"
-          title="Initialise AI Features"
-        >
-          <Zap className="w-6 h-6" />
-          <span className="hidden sm:inline font-medium">Initialise AI</span>
-        </button>
+        <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-4 rounded-full shadow-lg flex items-centre space-x-2" title="AI Features Active">
+          <CheckCircle className="w-6 h-6" />
+          <span className="hidden sm:inline font-medium">AI Active</span>
+        </div>
       </div>
 
       {/* Top Stats Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
         {/* Streak Card */}
         <div className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-600 rounded-2xl p-8 text-white shadow-xl">
-          <div className="flex items-center justify-between mb-4">
-            <div className="w-16 h-16 bg-white/30 rounded-full flex items-center justify-center">
+          <div className="flex items-centre justify-between mb-4">
+            <div className="w-16 h-16 bg-white/30 rounded-full flex items-centre justify-centre">
               <Zap className="w-8 h-8 text-white" />
             </div>
           </div>
@@ -344,23 +341,23 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
 
         {/* Health Score Card */}
         <div className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700 rounded-2xl p-8 text-white shadow-xl">
-          <div className="flex items-center justify-between">
+          <div className="flex items-centre justify-between">
             <div className="flex-1">
               <h2 className="text-2xl font-bold mb-4 text-white drop-shadow-sm">Your Health Score</h2>
               <div className="space-y-2 text-sm text-white">
-                <div className="flex items-center space-x-2">
+                <div className="flex items-centre space-x-2">
                   <span className={`${(healthScore?.changeIn60Days || 0) >= 0 ? 'text-green-200' : 'text-red-200'}`}>•</span>
                   <span><strong>Change:</strong> {(healthScore?.changeIn60Days || 0) >= 0 ? '+' : ''}{healthScore?.changeIn60Days || 0} in last 60 days</span>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-centre space-x-2">
                   <span className="text-blue-200">•</span>
                   <span><strong>Biological Age:</strong> {healthScore?.biologicalAge || 42} (Chronological: {healthScore?.chronologicalAge || 42})</span>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-centre space-x-2">
                   <span className="text-yellow-200">•</span>
                   <span><strong>Key wins:</strong> {healthScore?.keyWins?.join(', ') || 'Inflammation -12%'}</span>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-centre space-x-2">
                   <span className="text-orange-200">•</span>
                   <span><strong>Focus area:</strong> {healthScore?.focusArea || 'Reduce inflammation (CRP) from 2.8 to <1.0 mg/L'}</span>
                 </div>
@@ -442,8 +439,8 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
                 </svg>
                 
                 {/* Center Content */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
+                <div className="absolute inset-0 flex items-centre justify-centre">
+                  <div className="text-centre">
                     <div className="text-2xl font-bold">{healthScore?.currentScore || 46}</div>
                     <div className="text-xs">Overall Score</div>
                   </div>
@@ -456,7 +453,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
 
       {/* Top 3 Recommendations */}
       <div className="mb-12">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-centre mb-4">
           <h2 className="text-2xl font-bold">Top 3 Recommendations</h2>
           <button 
             onClick={() => setCurrentScreen('recommendations')}
@@ -467,9 +464,9 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
         </div>
         <div className="space-y-4">
           {recommendations.map((rec) => (
-            <div key={rec.id} className="flex items-center justify-between bg-white/10 rounded-xl p-6 hover:bg-white/15 transition-colors shadow-lg">
-              <div className="flex items-center space-x-4">
-                <div className={`w-10 h-10 ${rec.color} rounded-lg flex items-center justify-center`}>
+            <div key={rec.id} className="flex items-centre justify-between bg-white/10 rounded-xl p-6 hover:bg-white/15 transition-colors shadow-lg">
+              <div className="flex items-centre space-x-4">
+                <div className={`w-10 h-10 ${rec.color} rounded-lg flex items-centre justify-centre`}>
                   <rec.icon className="w-5 h-5 text-white" />
                 </div>
                 <span className="font-medium">{rec.title}</span>
@@ -488,15 +485,15 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
             <h3 className="text-lg font-semibold mb-4 text-white">Your Health Summary</h3>
             <p className="text-sm text-white/70 mb-4">Latest Readings</p>
             <div className="space-y-4">
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-centre">
                 <span className="text-white/80">Systolic</span>
                 {renderMiniGauge(`${healthMetrics.systolic}`, 'optimal')}
               </div>
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-centre">
                 <span className="text-white/80">Diastolic</span>
                 {renderMiniGauge(`${healthMetrics.diastolic}`, 'optimal')}
               </div>
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-centre">
                 <span className="text-white/80">Heart Rate</span>
                 {renderMiniGauge(`${healthMetrics.heartRate}`, 'optimal')}
               </div>
@@ -568,8 +565,8 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
       {/* Test Status Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
         <div className="bg-white/10 rounded-2xl p-6 shadow-xl flex flex-col h-full border border-white/20 backdrop-blur-sm">
-          <div className="flex items-center justify-between mb-4 flex-1">
-            <div className="flex items-center space-x-3">
+          <div className="flex items-centre justify-between mb-4 flex-1">
+            <div className="flex items-centre space-x-3">
               <Dna className="w-6 h-6 text-green-400" />
               <span className="font-semibold text-white">DNA Insights</span>
             </div>
@@ -584,8 +581,8 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
         </div>
 
         <div className="bg-white/10 rounded-2xl p-6 shadow-xl flex flex-col h-full border border-white/20 backdrop-blur-sm">
-          <div className="flex items-center justify-between mb-4 flex-1">
-            <div className="flex items-center space-x-3">
+          <div className="flex items-centre justify-between mb-4 flex-1">
+            <div className="flex items-centre space-x-3">
               <Stethoscope className="w-6 h-6 text-yellow-400" />
               <span className="font-semibold text-white">Blood Tests</span>
             </div>
@@ -600,8 +597,8 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
         </div>
 
         <div className="bg-white/10 rounded-2xl p-6 shadow-xl flex flex-col h-full border border-white/20 backdrop-blur-sm">
-          <div className="flex items-center justify-between mb-4 flex-1">
-            <div className="flex items-center space-x-3">
+          <div className="flex items-centre justify-between mb-4 flex-1">
+            <div className="flex items-centre space-x-3">
               <Camera className="w-6 h-6 text-blue-400" />
               <span className="font-semibold text-white">Body Scan</span>
             </div>
@@ -618,7 +615,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
 
       {/* Next Steps */}
       <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-2xl p-6 mb-12">
-        <div className="flex items-center space-x-4">
+        <div className="flex items-centre space-x-4">
           <AlertTriangle className="w-6 h-6 text-yellow-400" />
           <span className="font-semibold">Next steps:</span>
           <button 
@@ -640,8 +637,8 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Risk Analysis */}
         <div className="bg-white/10 rounded-2xl p-6">
-          <div className="flex items-center space-x-3 mb-6">
-            <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
+          <div className="flex items-centre space-x-3 mb-6">
+            <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-centre justify-centre">
               <Shield className="w-5 h-5" />
             </div>
             <div>
@@ -651,7 +648,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
           </div>
           <div className="space-y-3">
             {riskCategories.map((category, index) => (
-              <div key={index} className="flex items-center justify-between py-2">
+              <div key={index} className="flex items-centre justify-between py-2">
                 <span className="text-sm">{category.name}</span>
                 <span className={`font-semibold ${category.color}`}>{category.riskCount} Risks</span>
               </div>
@@ -661,8 +658,8 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
 
         {/* Ask HodieLabs */}
         <div className="bg-gradient-to-br from-purple-600/30 to-pink-600/30 rounded-2xl p-6">
-          <div className="flex items-center space-x-3 mb-4">
-            <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
+          <div className="flex items-centre space-x-3 mb-4">
+            <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-centre justify-centre">
               <MessageCircle className="w-5 h-5" />
             </div>
             <div>
@@ -674,10 +671,30 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
           <div className="mb-4">
             <p className="text-sm font-medium mb-2">Quick Suggestions</p>
             <div className="space-y-2 text-sm">
-              <button className="block text-left text-white/80 hover:text-white">What's the best dinner for recovery?</button>
-              <button className="block text-left text-white/80 hover:text-white">How can I improve my sleep quality?</button>
-              <button className="block text-left text-white/80 hover:text-white">Should I take magnesium supplements?</button>
-              <button className="block text-left text-white/80 hover:text-white">What workout fits my DNA profile?</button>
+              <button 
+                onClick={() => handleQuickSuggestionClick("What's the best dinner for recovery?")}
+                className="block w-full text-left text-white/80 hover:text-white hover:bg-white/10 p-2 rounded transition-colors"
+              >
+                What's the best dinner for recovery?
+              </button>
+              <button 
+                onClick={() => handleQuickSuggestionClick("How can I improve my sleep quality?")}
+                className="block w-full text-left text-white/80 hover:text-white hover:bg-white/10 p-2 rounded transition-colors"
+              >
+                How can I improve my sleep quality?
+              </button>
+              <button 
+                onClick={() => handleQuickSuggestionClick("Should I take magnesium supplements?")}
+                className="block w-full text-left text-white/80 hover:text-white hover:bg-white/10 p-2 rounded transition-colors"
+              >
+                Should I take magnesium supplements?
+              </button>
+              <button 
+                onClick={() => handleQuickSuggestionClick("What workout fits my DNA profile?")}
+                className="block w-full text-left text-white/80 hover:text-white hover:bg-white/10 p-2 rounded transition-colors"
+              >
+                What workout fits my DNA profile?
+              </button>
             </div>
           </div>
 
@@ -705,8 +722,8 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white flex items-center justify-center">
-        <div className="text-center">
+      <div className="bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white flex items-centre justify-centre" style={{ minHeight: '100vh' }}>
+        <div className="text-centre">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
           <p>Loading your health metrics...</p>
         </div>
@@ -715,12 +732,12 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white font-poppins">
+    <div className="bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white font-poppins" style={{ minHeight: '100vh' }}>
       {/* Brand Header */}
       <BrandHeader 
         user={user}
         currentScreen={currentScreen}
-        onScreenChange={(screen) => setCurrentScreen(screen as 'home' | 'recommendations' | 'dna' | 'labs' | 'reports' | 'faq' | 'settings')}
+        onScreenChange={(screen) => setCurrentScreen(screen as 'home' | 'recommendations' | 'dna' | 'labs' | 'reports' | 'faq' | 'settings' | 'testing' | 'demo')}
         showNavigation={true}
       />
 
@@ -782,6 +799,24 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
             >
               FAQ
             </button>
+            <button 
+              onClick={() => {
+                setCurrentScreen('demo');
+                setMobileMenuOpen(false);
+              }}
+              className={`text-left text-white hover:text-blue-300 ${currentScreen === 'demo' ? 'text-blue-300' : ''}`}
+            >
+              🚀 AI Demo
+            </button>
+            <button 
+              onClick={() => {
+                setCurrentScreen('testing');
+                setMobileMenuOpen(false);
+              }}
+              className={`text-left text-white hover:text-blue-300 ${currentScreen === 'testing' ? 'text-blue-300' : ''}`}
+            >
+              🧪 Platform Testing
+            </button>
           </nav>
         </div>
       )}
@@ -792,18 +827,27 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
 
       {/* Chat Modal */}
       {showChat && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-4xl h-[80vh] flex flex-col">
-            <div className="flex justify-between items-center p-4 border-b">
-              <h2 className="text-xl font-semibold text-gray-900">Ask HodieLabs</h2>
-              <button 
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          style={{ overscrollBehavior: 'contain', touchAction: 'none' }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowChat(false);
+          }}
+        >
+          <div
+            className="bg-white rounded-2xl w-full max-w-4xl h-[85vh] md:h-[80vh] flex flex-col overflow-hidden shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center p-4 border-b flex-shrink-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-t-2xl">
+              <h2 className="text-xl font-semibold text-white">Ask HodieLabs</h2>
+              <button
                 onClick={() => setShowChat(false)}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-white hover:text-gray-200 text-2xl leading-none"
               >
                 ✕
               </button>
             </div>
-            <div className="flex-1">
+            <div className="flex-1 overflow-hidden">
               <ChatInterface user={user} />
             </div>
           </div>

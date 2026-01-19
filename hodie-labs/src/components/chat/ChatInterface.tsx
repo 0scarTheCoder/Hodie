@@ -445,7 +445,7 @@ ${enabled ? 'I use advanced AI with memory of our past discussions to provide co
   };
 
   return (
-    <div className="flex flex-col h-screen max-h-screen overflow-hidden">
+    <div className="flex flex-col h-full overflow-hidden">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 md:px-6 py-3 md:py-4 flex-shrink-0">
         <h2 className="text-lg md:text-xl font-semibold flex items-centre">
@@ -462,8 +462,16 @@ ${enabled ? 'I use advanced AI with memory of our past discussions to provide co
       </div>
 
       {/* Messages Container - Scrollable */}
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-gray-50 overscroll-contain"
-           style={{ minHeight: 0, WebkitOverflowScrolling: 'touch' }}>
+      <div
+        className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-gray-50"
+        style={{
+          minHeight: 0,
+          WebkitOverflowScrolling: 'touch',
+          overscrollBehavior: 'contain',
+          touchAction: 'pan-y'
+        }}
+        onTouchStart={(e) => e.stopPropagation()}
+      >
         {messages.map((message) => (
           <div
             key={message.id}
@@ -520,7 +528,10 @@ ${enabled ? 'I use advanced AI with memory of our past discussions to provide co
       </div>
 
       {/* Input Area - Sticky at bottom */}
-      <div className="flex-shrink-0 bg-white border-t border-gray-200 p-3 md:p-4 max-h-[50vh] overflow-y-auto">
+      <div
+        className="flex-shrink-0 bg-white border-t border-gray-200 p-3 md:p-4"
+        style={{ maxHeight: '40vh', overflowY: 'auto', overscrollBehavior: 'contain' }}
+      >
         {/* Enhanced Quick topic buttons - Collapsible on mobile */}
         {!inputValue && (
           <div className="mb-3">
@@ -656,6 +667,10 @@ ${enabled ? 'I use advanced AI with memory of our past discussions to provide co
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
+            onFocus={(e) => {
+              // Prevent body scroll on focus
+              setTimeout(() => e.target.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+            }}
             placeholder={uploadedFiles.length > 0 ? "Ask about your data..." : "Type your health question..."}
             className="flex-1 resize-none border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
             rows={1}
