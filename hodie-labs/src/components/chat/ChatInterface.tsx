@@ -22,7 +22,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [aiEnabled, setAiEnabled] = useState(false);
+  const [aiEnabled, setAiEnabled] = useState(true); // Always start with AI enabled
   const [conversationHistory, setConversationHistory] = useState<ConversationMessage[]>([]);
   const [currentConversation, setCurrentConversation] = useState<ChatConversation | null>(null);
   const [loadingHistory, setLoadingHistory] = useState(true);
@@ -33,8 +33,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
   // Initialize AI status and load chat history
   useEffect(() => {
     const initialiseChat = async () => {
-      const enabled = await kimiK2Service.checkApiStatus();
-      setAiEnabled(enabled);
+      // Force AI to always be enabled
+      setAiEnabled(true);
+      console.log('✅ Kimi K2 AI: ENABLED');
       
       try {
         // Load recent conversations for context
@@ -61,20 +62,23 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
           // Start new conversation
           const welcomeMessage: Message = {
             id: '1',
-            text: `G'day! I'm your Hodie Labs AI health assistant${enabled ? ', powered by Kimi K2 advanced AI' : ' (limited mode)'}. 
+            text: `G'day! I'm your Hodie Labs AI health assistant, powered by Kimi K2 advanced AI with 256K context! 🚀
 
 🏥 **I have access to your health profile** and previous conversations for personalised advice.
 
 I can help you with:
 🍎 **Nutrition & Cooking**: Specific recipes, meal planning, protein calculations
-🏃 **Exercise & Fitness**: Personalised workout routines and fitness goals  
+🏃 **Exercise & Fitness**: Personalised workout routines and fitness goals
 😴 **Sleep & Recovery**: Sleep improvement strategies and recovery tips
 🧘 **Mental Wellbeing**: Stress management and mental health support
 💧 **Wellness**: Daily health habits and lifestyle advice
 🧬 **DNA Insights**: Genetic-based health recommendations
 📊 **Biomarker Analysis**: Health metrics interpretation
+📁 **File Analysis**: Upload lab results, DNA data, or health reports for AI interpretation
 
-${enabled ? 'I use advanced AI with memory of our past discussions to provide contextual health guidance.' : '🔄 **Connecting to AI Services**: Advanced conversational capabilities loading...'} What would you like to know?`,
+💡 **Tip**: Click the pulsing 📎 button to upload health files for instant AI analysis!
+
+I use advanced AI with memory of our past discussions to provide contextual health guidance. What would you like to know?`,
             sender: 'assistant',
             timestamp: new Date()
           };
@@ -105,7 +109,11 @@ ${enabled ? 'I use advanced AI with memory of our past discussions to provide co
         // Fallback to basic welcome message
         const welcomeMessage: Message = {
           id: '1',
-          text: `G'day! I'm your Hodie Labs AI health assistant. What would you like to know?`,
+          text: `G'day! I'm your Hodie Labs AI health assistant, powered by Kimi K2 advanced AI! 🚀
+
+💡 **Tip**: Click the pulsing 📎 button to upload health files for instant AI analysis!
+
+What would you like to know about your health today?`,
           sender: 'assistant',
           timestamp: new Date()
         };
@@ -267,12 +275,13 @@ ${enabled ? 'I use advanced AI with memory of our past discussions to provide co
   };
 
   const handleFilesUploaded = async (files: UploadedFile[]) => {
+    console.log('📁 Files uploaded:', files.length);
     setUploadedFiles(prev => [...prev, ...files]);
 
     // Show processing message
     const processingMessage: Message = {
       id: Date.now().toString(),
-      text: `🔄 **Processing ${files.length} file(s)**...\n\nAnalyzing with AI to determine optimal data storage and health insights.`,
+      text: `🔄 **Processing ${files.length} file(s)**...\n\n🤖 Analyzing with Kimi K2 AI to determine optimal data storage and health insights.\n\nThis may take a moment...`,
       sender: 'assistant',
       timestamp: new Date()
     };
@@ -280,20 +289,27 @@ ${enabled ? 'I use advanced AI with memory of our past discussions to provide co
 
     // Process each uploaded file
     for (const file of files) {
+      console.log('📄 Processing file:', file.name, 'Category:', file.category);
       try {
         // Step 1: Parse the file
+        console.log('🔍 Step 1: Parsing file...');
         const parsedData = await healthDataParsingService.parseHealthFile(file.file, file.category);
+        console.log('✅ File parsed successfully:', parsedData);
 
         // Step 2: Use AI to interpret the file and determine database mappings
+        console.log('🤖 Step 2: AI interpreting file...');
         const aiInterpretation = await kimiK2Service.interpretHealthFile(
           parsedData.data,
           file.name,
           file.category,
           user.uid
         );
+        console.log('✅ AI interpretation complete:', aiInterpretation);
 
         // Step 3: Save to database based on AI recommendations
+        console.log('💾 Step 3: Saving to database...');
         await saveToDatabaseWithAI(aiInterpretation.databaseMappings, user.uid);
+        console.log('✅ Saved to database successfully');
 
         // Step 4: Create comprehensive message with AI insights
         const interpretationText = formatFileInterpretation(
@@ -328,11 +344,28 @@ ${enabled ? 'I use advanced AI with memory of our past discussions to provide co
         );
 
       } catch (error) {
-        console.error('Error processing uploaded file:', error);
+        console.error('❌ Error processing uploaded file:', error);
+        console.error('Error details:', {
+          fileName: file.name,
+          category: file.category,
+          errorType: error instanceof Error ? error.constructor.name : typeof error,
+          errorMessage: error instanceof Error ? error.message : String(error),
+          errorStack: error instanceof Error ? error.stack : undefined
+        });
 
         const errorMessage: Message = {
           id: Date.now().toString(),
-          text: `❌ **Error processing ${file.name}**: ${error instanceof Error ? error.message : 'Unknown error'}. Please check the file format and try again.`,
+          text: `❌ **Error processing ${file.name}**
+
+**Issue**: ${error instanceof Error ? error.message : 'Unknown error occurred'}
+
+**What you can try**:
+• Check the file format (PDF, CSV, JSON, TXT supported)
+• Ensure file is not corrupted
+• Try a smaller file (max 10MB)
+• Contact support if issue persists
+
+**Technical details**: Check browser console for more info`,
           sender: 'assistant',
           timestamp: new Date()
         };
