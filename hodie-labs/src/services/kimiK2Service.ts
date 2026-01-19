@@ -96,36 +96,44 @@ class KimiK2Service {
     conversationHistory: ConversationMessage[] = []
   ): Promise<string> {
     console.log('🧬 Starting enhanced health response generation for:', userMessage);
-    
-    // Check for genetic or lab-specific queries
-    const message = userMessage.toLowerCase();
-    
-    if (message.includes('genetic') || message.includes('dna') || message.includes('variant')) {
+
+    // Normalize input to handle typos and misspellings
+    const normalizedMessage = this.normalizeUserInput(userMessage);
+    console.log('✨ Normalized message:', normalizedMessage);
+
+    // Extract user intent
+    const intent = this.extractUserIntent(userMessage);
+    console.log('🎯 Detected intent:', intent.category, 'with confidence:', intent.confidence);
+
+    // Route to specialized handlers based on intent
+    if (intent.category === 'genetic' || normalizedMessage.includes('genetic') || normalizedMessage.includes('dna') || normalizedMessage.includes('variant')) {
       return this.handleGeneticQuery(userMessage, context);
     }
-    
-    if (message.includes('lab') || message.includes('blood') || message.includes('test')) {
+
+    if (intent.category === 'lab' || normalizedMessage.includes('lab') || normalizedMessage.includes('blood') || normalizedMessage.includes('test')) {
       return this.handleLabQuery(userMessage, context);
     }
-    
-    if (message.includes('supplement') || message.includes('vitamin') || message.includes('personalised')) {
+
+    if (intent.category === 'nutrition' && (normalizedMessage.includes('supplement') || normalizedMessage.includes('vitamin') || normalizedMessage.includes('personalised'))) {
       return this.handlePersonalizedQuery(userMessage, context);
     }
-    
+
     // Enhanced intelligent response with genetic context
-    return await this.generateIntelligentResponse(userMessage, context, conversationHistory);
+    return await this.generateIntelligentResponse(userMessage, context, conversationHistory, intent);
   }
 
   // Generate intelligent responses without API dependency
   private async generateIntelligentResponse(
     userMessage: string,
     context?: HealthContext,
-    conversationHistory: ConversationMessage[] = []
+    conversationHistory: ConversationMessage[] = [],
+    intent?: { category: string; keywords: string[]; confidence: number }
   ): Promise<string> {
     const timeOfDay = new Date().getHours();
     const greeting = timeOfDay < 12 ? 'Good morning' : timeOfDay < 18 ? 'Good afternoon' : 'Good evening';
-    
-    const message = userMessage.toLowerCase();
+
+    // Use normalized message for matching
+    const message = this.normalizeUserInput(userMessage);
     
     // Handle non-health queries first
     if (message.includes('api key') || message.includes('api') || message.includes('key')) {
@@ -469,7 +477,7 @@ Try asking me something like "I want to lose 5kg" or "I'm always tired" and I'll
     const timeOfDay = new Date().getHours();
     const greeting = timeOfDay < 12 ? 'Good morning' : timeOfDay < 18 ? 'Good afternoon' : 'Good evening';
 
-    const systemPrompt = `You are the Hodie Health Assistant, an expert Australian health and wellness advisor powered by advanced AI. You have access to comprehensive health analytics and personalised insights.
+    const systemPrompt = `You are the Hodie Health Assistant, an expert Australian health and wellness advisor powered by advanced AI with 256K context. You have access to comprehensive health analytics and personalised insights.
 
 KEY GUIDELINES:
 - Use Australian English spelling and terminology (GP, chemist, Medicare, etc.)
@@ -479,8 +487,15 @@ KEY GUIDELINES:
 - Always suggest consulting a GP for serious concerns
 - Include Australian health contact numbers when relevant
 
-HEALTH CONTEXT: ${context?.recentHealthData ? 
-  `Health Score: ${context.recentHealthData.healthScore || 'N/A'}/100, Steps: ${context.recentHealthData.steps || 'N/A'}, Sleep: ${context.recentHealthData.sleep || 'N/A'} hours, Mood: ${context.recentHealthData.mood || 'N/A'}${context.recentHealthData.heartRate ? `, Heart Rate: ${context.recentHealthData.heartRate} bpm` : ''}${context.recentHealthData.bloodPressure ? `, Blood Pressure: ${context.recentHealthData.bloodPressure}` : ''}` : 
+IMPORTANT - TYPO TOLERANCE:
+- Users may have typos or misspellings in their questions - understand their INTENT, not just exact words
+- Common misspellings: "protien" = protein, "excersize" = exercise, "diabeties" = diabetes, "colesterol" = cholesterol
+- Be flexible and adaptive - if a question has spelling errors, respond to what they meant to ask
+- Never correct the user's spelling - just understand and respond helpfully
+- Look for context clues and related terms to understand unclear questions
+
+HEALTH CONTEXT: ${context?.recentHealthData ?
+  `Health Score: ${context.recentHealthData.healthScore || 'N/A'}/100, Steps: ${context.recentHealthData.steps || 'N/A'}, Sleep: ${context.recentHealthData.sleep || 'N/A'} hours, Mood: ${context.recentHealthData.mood || 'N/A'}${context.recentHealthData.heartRate ? `, Heart Rate: ${context.recentHealthData.heartRate} bpm` : ''}${context.recentHealthData.bloodPressure ? `, Blood Pressure: ${context.recentHealthData.bloodPressure}` : ''}` :
   'No recent health data available'}
 
 Current time: ${greeting}`;
@@ -988,12 +1003,123 @@ Would you like detailed implementation guidance for any of these recommendations
     try {
       const nutrients = await geneticAnalysisService.generateNutrientRecommendations(geneticProfile);
       if (nutrients.length === 0) return '';
-      
+
       const topNutrient = nutrients[0];
       return `\n🧬 **Your Genetic Nutrition Need**: ${topNutrient.nutrient} - ${topNutrient.recommendedDailyAmount} (${topNutrient.supplementForm})\n`;
     } catch (error) {
       return '';
     }
+  }
+
+  /**
+   * Normalize user input to handle typos, misspellings, and variations
+   */
+  private normalizeUserInput(text: string): string {
+    // Common health-related misspellings and their corrections
+    const misspellingMap: { [key: string]: string } = {
+      // Nutrition
+      'protien': 'protein', 'protine': 'protein', 'proteen': 'protein',
+      'carbohidrate': 'carbohydrate', 'carbohydrates': 'carbohydrate', 'carbs': 'carbohydrate',
+      'vitamen': 'vitamin', 'vitamn': 'vitamin', 'vitiman': 'vitamin',
+      'suppliment': 'supplement', 'supliment': 'supplement', 'suppliments': 'supplement',
+      'nutrtion': 'nutrition', 'nutition': 'nutrition', 'nutritian': 'nutrition',
+
+      // Fitness
+      'excersize': 'exercise', 'excercise': 'exercise', 'exercize': 'exercise', 'exersize': 'exercise',
+      'workout': 'exercise', 'work out': 'exercise', 'workouts': 'exercise',
+      'cardio': 'cardiovascular', 'cadrio': 'cardiovascular',
+      'wieght': 'weight', 'wait': 'weight', 'weigth': 'weight',
+
+      // Health conditions
+      'diabeties': 'diabetes', 'diabetis': 'diabetes', 'diabites': 'diabetes',
+      'colesterol': 'cholesterol', 'cholestrol': 'cholesterol', 'cholestorol': 'cholesterol',
+      'pressur': 'pressure', 'presure': 'pressure',
+      'inflamation': 'inflammation', 'inflamtion': 'inflammation',
+
+      // Sleep
+      'insomia': 'insomnia', 'insommnia': 'insomnia',
+      'sleap': 'sleep', 'slep': 'sleep',
+
+      // DNA/Genetics
+      'gentic': 'genetic', 'genetik': 'genetic', 'genetics': 'genetic',
+      'varient': 'variant', 'varaint': 'variant',
+
+      // Lab tests
+      'bloodtest': 'blood test', 'blod test': 'blood test',
+      'biomarker': 'biomarker', 'bio marker': 'biomarker', 'biomarkers': 'biomarker',
+
+      // General
+      'recomendation': 'recommendation', 'recomendations': 'recommendation', 'reccomendation': 'recommendation',
+      'analize': 'analyze', 'analise': 'analyze', 'analyse': 'analyze',
+      'halth': 'health', 'helth': 'health',
+      'recepie': 'recipe', 'recepies': 'recipe', 'recipies': 'recipe',
+      'loosing': 'losing', 'loose': 'lose'
+    };
+
+    // Normalize text
+    let normalized = text.toLowerCase().trim();
+
+    // Replace common misspellings
+    Object.keys(misspellingMap).forEach(misspelling => {
+      const regex = new RegExp(`\\b${misspelling}\\b`, 'gi');
+      normalized = normalized.replace(regex, misspellingMap[misspelling]);
+    });
+
+    return normalized;
+  }
+
+  /**
+   * Extract intent from user message even with typos
+   */
+  private extractUserIntent(text: string): {
+    category: string;
+    keywords: string[];
+    confidence: number;
+  } {
+    const normalized = this.normalizeUserInput(text);
+
+    // Define intent patterns with flexible matching
+    const intentPatterns = {
+      nutrition: ['nutrition', 'food', 'eat', 'diet', 'meal', 'protein', 'carbohydrate', 'vitamin', 'supplement', 'recipe', 'cooking'],
+      fitness: ['exercise', 'workout', 'fitness', 'train', 'gym', 'cardio', 'strength', 'run', 'walk', 'activity'],
+      sleep: ['sleep', 'insomnia', 'rest', 'tired', 'fatigue', 'wake', 'bed'],
+      mental: ['stress', 'anxiety', 'mental', 'mood', 'depression', 'wellbeing', 'mindfulness', 'meditation'],
+      weight: ['weight', 'lose', 'gain', 'obesity', 'bmi', 'fat', 'lean'],
+      genetic: ['genetic', 'dna', 'gene', 'variant', 'hereditary', 'ancestry'],
+      lab: ['lab', 'blood', 'test', 'biomarker', 'result', 'panel', 'cholesterol', 'glucose'],
+      general: ['health', 'wellness', 'advice', 'help', 'recommend', 'suggest']
+    };
+
+    // Score each category
+    const scores: { [key: string]: number } = {};
+
+    Object.keys(intentPatterns).forEach(category => {
+      const keywords = intentPatterns[category as keyof typeof intentPatterns];
+      let score = 0;
+      const foundKeywords: string[] = [];
+
+      keywords.forEach(keyword => {
+        if (normalized.includes(keyword)) {
+          score += 1;
+          foundKeywords.push(keyword);
+        }
+      });
+
+      if (score > 0) {
+        scores[category] = score;
+      }
+    });
+
+    // Find best matching category
+    const bestCategory = Object.keys(scores).reduce((a, b) =>
+      scores[a] > scores[b] ? a : b, 'general'
+    );
+
+    return {
+      category: bestCategory,
+      keywords: intentPatterns[bestCategory as keyof typeof intentPatterns],
+      confidence: scores[bestCategory] || 0
+    };
   }
 
   /**
