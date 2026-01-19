@@ -106,7 +106,7 @@ const Auth0LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-hodie-bg font-poppins flex flex-col items-center justify-center px-4"
+    <div className="min-h-screen bg-hodie-bg font-poppins flex flex-col items-centre justify-centre px-4"
          style={{
            background: 'linear-gradient(135deg, #F4F7FF 0%, #E8EFFF 50%, #F4F7FF 100%)'
          }}>
@@ -138,17 +138,17 @@ const Auth0LoginPage: React.FC = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
-        className="w-full max-w-md"
+        className="w-full max-w-xl lg:max-w-2xl"
       >
-        <div className="bg-[#1e1548]/80 backdrop-blur-sm border border-[#2a1e5c]/50 rounded-3xl p-8 shadow-2xl">
+        <div className="bg-[#1e1548]/80 backdrop-blur-sm border border-[#2a1e5c]/50 rounded-3xl p-8 md:p-12 shadow-2xl">
           
           {/* Header */}
-          <div className="text-center mb-8">
+          <div className="text-centre mb-8">
             <h2 className="text-3xl font-semibold text-white mb-2">Welcome to HodieLabs</h2>
             <p className="text-white/70 text-sm">Your AI-powered health intelligence platform</p>
             
             {/* Auth0 Status */}
-            <div className="mt-4 flex items-center justify-center space-x-2">
+            <div className="mt-4 flex items-centre justify-centre space-x-2">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
               <span className="text-xs text-green-400 font-medium">Powered by Auth0 Security</span>
             </div>
@@ -159,7 +159,7 @@ const Auth0LoginPage: React.FC = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-3 rounded-xl text-sm text-center mb-6"
+              className="bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-3 rounded-xl text-sm text-centre mb-6"
             >
               {error.message || 'Authentication error occurred'}
             </motion.div>
@@ -170,7 +170,7 @@ const Auth0LoginPage: React.FC = () => {
             <button
               onClick={handleLogin}
               disabled={isLoading}
-              className="w-full py-4 bg-gradient-to-r from-[#8b5cf6] via-[#ec4899] to-[#f97316] text-white font-semibold rounded-2xl hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+              className="w-full py-4 bg-gradient-to-r from-[#8b5cf6] via-[#ec4899] to-[#f97316] text-white font-semibold rounded-2xl hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-centre justify-centre space-x-2"
             >
               {isLoading ? (
                 <>
@@ -199,7 +199,7 @@ const Auth0LoginPage: React.FC = () => {
             </button>
 
             {/* Forgot Password Link */}
-            <div className="text-center">
+            <div className="text-centre">
               <button
                 type="button"
                 onClick={() => setShowForgotPassword(true)}
@@ -212,22 +212,22 @@ const Auth0LoginPage: React.FC = () => {
 
           {/* Auth0 Features */}
           <div className="mt-8 pt-6 border-t border-white/10">
-            <div className="text-center">
+            <div className="text-centre">
               <p className="text-xs text-white/60 mb-3">Secure authentication features:</p>
               <div className="grid grid-cols-2 gap-2 text-xs text-white/70">
-                <div className="flex items-center space-x-1">
+                <div className="flex items-centre space-x-1">
                   <div className="w-1 h-1 bg-green-400 rounded-full"></div>
                   <span>Enterprise Security</span>
                 </div>
-                <div className="flex items-center space-x-1">
+                <div className="flex items-centre space-x-1">
                   <div className="w-1 h-1 bg-blue-400 rounded-full"></div>
                   <span>Multi-Factor Auth</span>
                 </div>
-                <div className="flex items-center space-x-1">
+                <div className="flex items-centre space-x-1">
                   <div className="w-1 h-1 bg-purple-400 rounded-full"></div>
                   <span>Social Login</span>
                 </div>
-                <div className="flex items-center space-x-1">
+                <div className="flex items-centre space-x-1">
                   <div className="w-1 h-1 bg-orange-400 rounded-full"></div>
                   <span>Password Reset</span>
                 </div>
@@ -243,7 +243,7 @@ const Auth0LoginPage: React.FC = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-centre justify-centre z-50"
         >
           <div className="relative w-full h-full">
             <button
@@ -263,20 +263,20 @@ const Auth0LoginPage: React.FC = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center px-4 z-50"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-centre justify-centre px-4 z-50"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.3 }}
-            className="w-full max-w-md"
+            className="w-full max-w-xl"
           >
-            <div className="bg-[#1e1548]/95 backdrop-blur-sm border border-[#2a1e5c]/50 rounded-3xl p-8 shadow-2xl">
+            <div className="bg-[#1e1548]/95 backdrop-blur-sm border border-[#2a1e5c]/50 rounded-3xl p-8 md:p-10 shadow-2xl">
               {!resetSuccess ? (
                 <>
                   {/* Header */}
-                  <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-centre justify-between mb-6">
                     <button
                       onClick={handleBackToLogin}
                       className="text-[#8b7ed8] hover:text-white transition-colors"
@@ -288,7 +288,7 @@ const Auth0LoginPage: React.FC = () => {
                   </div>
 
                   {/* Instructions */}
-                  <div className="text-center mb-6">
+                  <div className="text-centre mb-6">
                     <Mail className="w-12 h-12 text-[#8b7ed8] mx-auto mb-3" />
                     <p className="text-gray-300 text-sm">
                       Enter your email address and we'll send you a secure link to reset your password.
@@ -316,7 +316,7 @@ const Auth0LoginPage: React.FC = () => {
                       <motion.div
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-3 rounded-xl text-sm text-center"
+                        className="bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-3 rounded-xl text-sm text-centre"
                       >
                         {resetError}
                       </motion.div>
@@ -326,7 +326,7 @@ const Auth0LoginPage: React.FC = () => {
                     <button
                       type="submit"
                       disabled={resetLoading}
-                      className="w-full py-4 bg-gradient-to-r from-[#8b5cf6] via-[#ec4899] to-[#f97316] text-white font-semibold rounded-2xl hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                      className="w-full py-4 bg-gradient-to-r from-[#8b5cf6] via-[#ec4899] to-[#f97316] text-white font-semibold rounded-2xl hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-centre justify-centre space-x-2"
                     >
                       {resetLoading ? (
                         <>
@@ -341,7 +341,7 @@ const Auth0LoginPage: React.FC = () => {
                 </>
               ) : (
                 /* Success State */
-                <div className="text-center">
+                <div className="text-centre">
                   <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
                   <h3 className="text-xl font-semibold text-white mb-3">Check Your Email</h3>
                   <p className="text-gray-300 text-sm mb-6">
