@@ -70,6 +70,28 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
   const [loginData, setLoginData] = useState<UserLoginData | null>(null);
   const [loading, setLoading] = useState(true);
   const [showChat, setShowChat] = useState(false);
+
+  // Lock body scroll when chat is open
+  useEffect(() => {
+    if (showChat) {
+      // Prevent body scroll on mobile
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+    } else {
+      // Restore body scroll
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    }
+
+    return () => {
+      // Cleanup on unmount
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    };
+  }, [showChat]);
   const [currentStep, setCurrentStep] = useState<'blood' | 'dna' | 'body' | null>(null);
   const [currentScreen, setCurrentScreen] = useState<'home' | 'recommendations' | 'dna' | 'labs' | 'reports' | 'faq' | 'settings' | 'testing' | 'demo'>('home');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

@@ -618,9 +618,13 @@ ${enabled ? 'I use advanced AI with memory of our past discussions to provide co
         </div>
         )}
 
-        {/* File Upload Zone */}
+        {/* File Upload Zone - More prominent */}
         {showFileUpload && (
-          <div className="mb-4 p-4 bg-gray-50 rounded-lg border">
+          <div className="mb-4 p-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg border-2 border-dashed border-blue-300 shadow-sm">
+            <div className="text-center mb-3">
+              <p className="text-sm font-medium text-gray-700">📎 Upload Health Files</p>
+              <p className="text-xs text-gray-500 mt-1">Lab results, DNA data, medical reports</p>
+            </div>
             <FileUploadZone
               onFilesUploaded={handleFilesUploaded}
               onFileRemove={handleFileRemove}
@@ -651,17 +655,26 @@ ${enabled ? 'I use advanced AI with memory of our past discussions to provide co
         
         {/* Message input - Mobile optimized */}
         <div className="flex items-end space-x-2">
-          <button
-            onClick={() => setShowFileUpload(!showFileUpload)}
-            className={`flex-shrink-0 p-2 md:px-3 md:py-2 rounded-lg transition-all duration-200 ${
-              showFileUpload
-                ? 'bg-blue-100 text-blue-600 border border-blue-300'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-            title="Upload health data files"
-          >
-            <Paperclip className="w-5 h-5 md:w-4 md:h-4" />
-          </button>
+          <div className="relative">
+            <button
+              onClick={() => setShowFileUpload(!showFileUpload)}
+              className={`flex-shrink-0 p-2 md:px-3 md:py-2 rounded-lg transition-all duration-200 touch-manipulation ${
+                showFileUpload
+                  ? 'bg-blue-600 text-white border border-blue-600 shadow-lg'
+                  : 'bg-gradient-to-br from-blue-50 to-purple-50 text-blue-600 hover:from-blue-100 hover:to-purple-100 border border-blue-200'
+              }`}
+              title="Upload health data files"
+              aria-label={showFileUpload ? 'Close file upload' : 'Upload files'}
+            >
+              <Paperclip className="w-5 h-5 md:w-4 md:h-4" />
+            </button>
+            {!showFileUpload && uploadedFiles.length === 0 && (
+              <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+              </span>
+            )}
+          </div>
 
           <textarea
             value={inputValue}

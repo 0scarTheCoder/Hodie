@@ -252,28 +252,42 @@ const FileUploadZone: React.FC<FileUploadZoneProps> = ({
 
   return (
     <div className="w-full">
-      {/* Upload Zone */}
+      {/* Upload Zone - Mobile optimized */}
       <div
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        className={`border-2 border-dashed rounded-lg p-6 text-centre transition-colors cursor-pointer ${
+        className={`border-2 border-dashed rounded-lg p-6 text-center transition-all cursor-pointer touch-manipulation active:scale-95 ${
           isDragOver
             ? 'border-blue-500 bg-blue-50'
-            : 'border-gray-300 hover:border-gray-400'
+            : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
         }`}
         onClick={() => fileInputRef.current?.click()}
+        role="button"
+        aria-label="Upload health files"
       >
-        <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-        <p className="text-sm text-gray-600 mb-1">
-          Drop your health files here or{' '}
-          <span className="text-blue-600 font-medium">browse</span>
+        <Upload className="w-10 h-10 md:w-8 md:h-8 text-blue-500 mx-auto mb-3" />
+        <p className="text-base md:text-sm text-gray-700 mb-2 font-medium">
+          Tap to select files
         </p>
-        <p className="text-xs text-gray-500">
-          Supports: Lab results, genetic data, medical reports, images
+        <p className="text-xs text-gray-500 mb-1">
+          or drag & drop (desktop only)
         </p>
-        <p className="text-xs text-gray-400 mt-1">
-          Max {maxSize}MB • {acceptedTypes.join(', ')}
+        <p className="text-xs text-gray-500 mb-2">
+          Lab results • DNA data • Reports • Images
+        </p>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            fileInputRef.current?.click();
+          }}
+          className="mt-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-medium rounded-lg hover:shadow-lg transition-all"
+        >
+          Choose Files
+        </button>
+        <p className="text-xs text-gray-400 mt-3">
+          Max {maxSize}MB per file
         </p>
       </div>
 
