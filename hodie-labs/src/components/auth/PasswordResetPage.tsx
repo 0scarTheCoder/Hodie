@@ -105,8 +105,8 @@ const PasswordResetPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 flex items-center justify-center">
-        <div className="text-center text-white">
+      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 flex items-centre justify-centre">
+        <div className="text-centre text-white">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
           <p>Loading password reset...</p>
         </div>
@@ -116,10 +116,10 @@ const PasswordResetPage: React.FC = () => {
 
   if (resetSuccess) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 flex items-centre justify-centre p-4">
         <div className="max-w-md w-full">
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20 text-center">
-            <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20 text-centre">
+            <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-centre justify-centre mx-auto mb-6">
               <Check className="w-8 h-8 text-green-400" />
             </div>
             <h1 className="text-2xl font-bold text-white mb-4">Password Reset Successful!</h1>
@@ -139,11 +139,11 @@ const PasswordResetPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 flex items-centre justify-centre p-4">
       <div className="max-w-md w-full">
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20">
           {/* Header */}
-          <div className="text-center mb-8">
+          <div className="text-centre mb-8">
             <img
               src="/hodie_transparent_logo.png"
               alt="HodieLabs"
@@ -174,13 +174,13 @@ const PasswordResetPage: React.FC = () => {
 
           {/* Password Requirements */}
           <div className="mb-6 p-4 bg-white/5 rounded-lg border border-white/10">
-            <h3 className="text-sm font-semibold text-white mb-3 flex items-center">
+            <h3 className="text-sm font-semibold text-white mb-3 flex items-centre">
               <Shield className="w-4 h-4 mr-2" />
               Password Requirements
             </h3>
             <div className="space-y-2">
               {requirements.map((req) => (
-                <div key={req.id} className="flex items-center space-x-2 text-sm">
+                <div key={req.id} className="flex items-centre space-x-2 text-sm">
                   {req.met ? (
                     <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
                   ) : (
@@ -267,12 +267,12 @@ const PasswordResetPage: React.FC = () => {
               }`}
             >
               {isSubmitting ? (
-                <div className="flex items-center justify-center space-x-2">
+                <div className="flex items-centre justify-centre space-x-2">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                   <span>Resetting Password...</span>
                 </div>
               ) : (
-                <div className="flex items-center justify-center space-x-2">
+                <div className="flex items-centre justify-centre space-x-2">
                   <Lock className="w-4 h-4" />
                   <span>Reset Password</span>
                 </div>
@@ -295,7 +295,7 @@ const PasswordResetPage: React.FC = () => {
           </div>
 
           {/* Help Links */}
-          <div className="mt-6 text-center space-y-2">
+          <div className="mt-6 text-centre space-y-2">
             <p className="text-xs text-white/60">
               Having trouble? Visit our{' '}
               <a 
@@ -304,15 +304,15 @@ const PasswordResetPage: React.FC = () => {
                 target="_blank" 
                 rel="noopener noreferrer"
               >
-                help center
+                help centre
               </a>
             </p>
-            <div className="flex items-center justify-center space-x-4 text-xs text-white/50">
+            <div className="flex items-centre justify-centre space-x-4 text-xs text-white/50">
               <a href="/privacy" className="hover:text-white/70">Privacy Policy</a>
               <span>•</span>
               <a href="/terms" className="hover:text-white/70">Terms of Service</a>
               <span>•</span>
-              <a href="https://hodielabs.com/contact" className="hover:text-white/70 flex items-center">
+              <a href="https://hodielabs.com/contact" className="hover:text-white/70 flex items-centre">
                 <HelpCircle className="w-3 h-3 mr-1" />
                 Support
               </a>

@@ -203,7 +203,7 @@ const EnhancedHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
 
   if (loading) {
     return (
-      <div className="p-6 bg-gray-50 min-h-screen flex items-center justify-center">
+      <div className="p-6 bg-gray-50 min-h-screen flex items-centre justify-centre">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
       </div>
     );
@@ -217,14 +217,14 @@ const EnhancedHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
       <div className="max-w-7xl mx-auto">
         
         {/* Header */}
-        <div className="mb-8 flex justify-between items-center">
+        <div className="mb-8 flex justify-between items-centre">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Health Dashboard</h1>
             <p className="text-gray-600 mt-1">Track your health journey with real-time insights</p>
           </div>
           <button
             onClick={() => setShowInputForm(!showInputForm)}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl hover:shadow-lg transition-all duration-300 flex items-center space-x-2"
+            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl hover:shadow-lg transition-all duration-300 flex items-centre space-x-2"
           >
             <Activity size={20} />
             <span>{showInputForm ? 'Cancel' : 'Add Today\'s Data'}</span>
@@ -243,7 +243,7 @@ const EnhancedHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm ${
+                  className={`flex items-centre space-x-2 py-4 px-1 border-b-2 font-medium text-sm ${
                     activeTab === tab.id
                       ? 'border-blue-500 text-blue-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -264,7 +264,7 @@ const EnhancedHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-2xl p-6 shadow-lg mb-8 border border-gray-100"
           >
-            <h3 className="text-xl font-semibold mb-6 flex items-center space-x-2">
+            <h3 className="text-xl font-semibold mb-6 flex items-centre space-x-2">
               <Activity className="text-blue-600" size={24} />
               <span>Enter Today's Health Data</span>
             </h3>
@@ -371,7 +371,7 @@ const EnhancedHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
               <div className="md:col-span-2 lg:col-span-4">
                 <button
                   type="submit"
-                  className="bg-gradient-to-r from-green-500 to-blue-600 text-white px-8 py-3 rounded-xl hover:shadow-lg transition-all duration-300 flex items-center space-x-2"
+                  className="bg-gradient-to-r from-green-500 to-blue-600 text-white px-8 py-3 rounded-xl hover:shadow-lg transition-all duration-300 flex items-centre space-x-2"
                 >
                   <Heart size={20} />
                   <span>Save Health Data</span>
@@ -394,7 +394,7 @@ const EnhancedHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl p-6 text-white"
               >
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-centre justify-between mb-4">
                   <TrendingUp size={24} />
                   <span className="text-sm opacity-90">Health Score</span>
                 </div>
@@ -413,7 +413,7 @@ const EnhancedHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
                 transition={{ delay: 0.1 }}
                 className="bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl p-6 text-white"
               >
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-centre justify-between mb-4">
                   <Target size={24} />
                   <span className="text-sm opacity-90">Streak</span>
                 </div>
@@ -428,7 +428,7 @@ const EnhancedHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
                 transition={{ delay: 0.2 }}
                 className="bg-gradient-to-br from-green-500 to-teal-500 rounded-2xl p-6 text-white"
               >
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-centre justify-between mb-4">
                   <Activity size={24} />
                   <span className="text-sm opacity-90">Steps Today</span>
                 </div>
@@ -447,7 +447,7 @@ const EnhancedHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
                 transition={{ delay: 0.3 }}
                 className="bg-gradient-to-br from-indigo-500 to-blue-600 rounded-2xl p-6 text-white"
               >
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-centre justify-between mb-4">
                   <Moon size={24} />
                   <span className="text-sm opacity-90">Sleep</span>
                 </div>
@@ -465,7 +465,7 @@ const EnhancedHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
               
               {/* Health Score Trend */}
               <div className="bg-white rounded-2xl p-6 shadow-lg">
-                <h3 className="text-xl font-semibold mb-6 flex items-center space-x-2">
+                <h3 className="text-xl font-semibold mb-6 flex items-centre space-x-2">
                   <TrendingUp className="text-blue-600" size={24} />
                   <span>Health Score Trend</span>
                 </h3>
@@ -493,7 +493,7 @@ const EnhancedHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
 
               {/* Steps vs Calories */}
               <div className="bg-white rounded-2xl p-6 shadow-lg">
-                <h3 className="text-xl font-semibold mb-6 flex items-center space-x-2">
+                <h3 className="text-xl font-semibold mb-6 flex items-centre space-x-2">
                   <Activity className="text-green-600" size={24} />
                   <span>Activity Trends</span>
                 </h3>
@@ -515,7 +515,7 @@ const EnhancedHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
               
               {/* Sleep Pattern */}
               <div className="bg-white rounded-2xl p-6 shadow-lg">
-                <h3 className="text-xl font-semibold mb-6 flex items-center space-x-2">
+                <h3 className="text-xl font-semibold mb-6 flex items-centre space-x-2">
                   <Moon className="text-indigo-600" size={24} />
                   <span>Sleep Pattern</span>
                 </h3>
@@ -531,7 +531,7 @@ const EnhancedHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
 
               {/* Mood Distribution */}
               <div className="bg-white rounded-2xl p-6 shadow-lg">
-                <h3 className="text-xl font-semibold mb-6 flex items-center space-x-2">
+                <h3 className="text-xl font-semibold mb-6 flex items-centre space-x-2">
                   <Heart className="text-pink-600" size={24} />
                   <span>Mood Distribution</span>
                 </h3>
@@ -559,25 +559,25 @@ const EnhancedHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
               <div className="bg-white rounded-2xl p-6 shadow-lg">
                 <h3 className="text-xl font-semibold mb-6">Quick Stats</h3>
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-centre">
                     <span className="text-gray-600">Avg Daily Steps</span>
                     <span className="font-semibold">
                       {Math.round(chartData.reduce((sum, day) => sum + day.steps, 0) / chartData.length).toLocaleString()}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-centre">
                     <span className="text-gray-600">Avg Sleep</span>
                     <span className="font-semibold">
                       {(chartData.reduce((sum, day) => sum + day.sleep, 0) / chartData.length).toFixed(1)}h
                     </span>
                   </div>
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-centre">
                     <span className="text-gray-600">Best Day</span>
                     <span className="font-semibold">
                       {chartData.reduce((best, day) => day.healthScore > best.healthScore ? day : best, chartData[0])?.date || 'N/A'}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-centre">
                     <span className="text-gray-600">Improvement</span>
                     <span className="font-semibold text-green-600">+12%</span>
                   </div>

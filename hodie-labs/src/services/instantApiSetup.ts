@@ -35,14 +35,6 @@ export const forceSetupApiForCurrentUser = async (userId: string): Promise<void>
   localStorage.setItem(`aiSettings_${userId}`, JSON.stringify(aiSettings));
   
   console.log('✅ INSTANT SETUP COMPLETE: User now has full AI access');
-  
-  // 5. Show success notification
-  showInstantSetupNotification();
-  
-  // 6. Force page refresh to apply changes immediately
-  setTimeout(() => {
-    window.location.reload();
-  }, 2000);
 };
 
 const showInstantSetupNotification = () => {

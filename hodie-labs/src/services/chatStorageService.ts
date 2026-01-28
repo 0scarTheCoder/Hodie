@@ -209,7 +209,7 @@ class ChatStorageService {
 
   // Generate conversation summary using AI
   async generateConversationSummary(messages: ChatMessage[]): Promise<ConversationSummary> {
-    // This would integrate with your AI service to analyze the conversation
+    // This would integrate with your AI service to analyse the conversation
     const topics = this.extractTopicsFromMessages(messages);
     const concerns = this.extractHealthConcerns(messages);
     const recommendations = this.extractRecommendations(messages);
@@ -365,13 +365,13 @@ class ChatStorageService {
           recommendation,
           date: conv.updatedAt,
           conversationId: conv.id,
-          category: this.categorizeRecommendation(recommendation),
+          category: this.categoriseRecommendation(recommendation),
           followed: null // Could be tracked with follow-up questions
         })) || []
       );
   }
 
-  private categorizeRecommendation(recommendation: string): string {
+  private categoriseRecommendation(recommendation: string): string {
     const categories = {
       'nutrition': ['eat', 'food', 'diet', 'nutrition', 'vitamin', 'supplement'],
       'exercise': ['exercise', 'workout', 'activity', 'movement', 'physical'],

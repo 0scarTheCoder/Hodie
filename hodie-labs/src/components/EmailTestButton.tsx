@@ -45,7 +45,7 @@ const EmailTestButton: React.FC = () => {
   return (
     <div className="fixed bottom-4 right-4 z-50">
       <div className="bg-white rounded-xl shadow-lg border p-4 max-w-md">
-        <div className="flex items-center space-x-2 mb-3">
+        <div className="flex items-centre space-x-2 mb-3">
           <Mail className="w-5 h-5 text-blue-500" />
           <h3 className="font-semibold">Email Diagnostic Tool</h3>
         </div>
@@ -62,7 +62,7 @@ const EmailTestButton: React.FC = () => {
           <button
             onClick={runTest}
             disabled={testing}
-            className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
+            className="w-full flex items-centre justify-centre space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
           >
             {testing ? (
               <>
@@ -90,7 +90,7 @@ const EmailTestButton: React.FC = () => {
                     : 'bg-red-50 border border-red-200'
                 }`}
               >
-                <div className="flex items-center space-x-2 mb-1">
+                <div className="flex items-centre space-x-2 mb-1">
                   {result.success ? (
                     <CheckCircle className="w-4 h-4 text-green-600" />
                   ) : (

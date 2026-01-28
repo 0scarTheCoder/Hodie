@@ -162,7 +162,7 @@ const DynamicHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
 
   if (loading) {
     return (
-      <div className="p-6 bg-gray-50 min-h-screen flex items-center justify-center">
+      <div className="p-6 bg-gray-50 min-h-screen flex items-centre justify-centre">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
       </div>
     );
@@ -176,7 +176,7 @@ const DynamicHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
       <div className="max-w-7xl mx-auto">
         
         {/* Add Data Button */}
-        <div className="mb-6 flex justify-between items-center">
+        <div className="mb-6 flex justify-between items-centre">
           <h1 className="text-2xl font-bold text-gray-900">Health Dashboard</h1>
           <button
             onClick={() => setShowInputForm(!showInputForm)}
@@ -313,9 +313,9 @@ const DynamicHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
               {/* Dynamic Streak Card */}
               <div className="bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl p-6 text-white relative overflow-hidden">
                 <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-centre justify-between mb-4">
                     <h3 className="text-lg font-semibold">{streak} Day Streak</h3>
-                    <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-centre justify-centre">
                       <div className="w-6 h-6 bg-white rounded-full"></div>
                     </div>
                   </div>
@@ -338,7 +338,7 @@ const DynamicHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
               <div className="bg-gradient-to-br from-teal-400 to-teal-600 rounded-2xl p-6 text-white relative overflow-hidden">
                 <div className="relative z-10">
                   <h3 className="text-lg font-semibold mb-2">Your Health Score</h3>
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-centre justify-between mb-4">
                     <div className="text-4xl font-bold">{healthScore}</div>
                     <div className="text-right">
                       <div className="text-sm opacity-90">Today</div>
@@ -369,7 +369,7 @@ const DynamicHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
               
               {/* Daily Activity */}
               <div className="bg-white rounded-2xl p-6 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-centre justify-between mb-4">
                   <h4 className="text-lg font-semibold text-gray-900">Daily Activity</h4>
                   <div className="text-xs text-gray-500">Today</div>
                 </div>
@@ -403,11 +403,11 @@ const DynamicHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
 
               {/* Mood Check */}
               <div className="bg-white rounded-2xl p-6 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-centre justify-between mb-4">
                   <h4 className="text-lg font-semibold text-gray-900">Mood Check</h4>
                   <div className="text-xs text-gray-500">Today</div>
                 </div>
-                <div className="text-center py-4">
+                <div className="text-centre py-4">
                   <div className="text-3xl mb-2">{healthMetrics?.mood || '❓'}</div>
                   <div className="text-sm text-gray-600 mb-4">
                     {healthMetrics ? 'Today\'s mood' : 'How are you feeling today?'}
@@ -423,7 +423,7 @@ const DynamicHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
 
               {/* Sleep Tracker */}
               <div className="bg-white rounded-2xl p-6 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-centre justify-between mb-4">
                   <h4 className="text-lg font-semibold text-gray-900">Sleep</h4>
                   <div className="text-xs text-gray-500">Last night</div>
                 </div>
@@ -469,8 +469,8 @@ const DynamicHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
               <div className="space-y-4">
                 
                 {healthMetrics && healthMetrics.steps < 10000 && (
-                  <div className="flex items-center justify-between p-4 bg-blue-50 rounded-xl">
-                    <div className="flex items-center space-x-3">
+                  <div className="flex items-centre justify-between p-4 bg-blue-50 rounded-xl">
+                    <div className="flex items-centre space-x-3">
                       <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                       <span className="text-blue-800 font-medium">Increase daily steps</span>
                     </div>
@@ -479,8 +479,8 @@ const DynamicHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
                 )}
 
                 {healthMetrics && healthMetrics.sleepHours < 7 && (
-                  <div className="flex items-center justify-between p-4 bg-purple-50 rounded-xl">
-                    <div className="flex items-center space-x-3">
+                  <div className="flex items-centre justify-between p-4 bg-purple-50 rounded-xl">
+                    <div className="flex items-centre space-x-3">
                       <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
                       <span className="text-purple-800 font-medium">Get more sleep</span>
                     </div>
@@ -489,8 +489,8 @@ const DynamicHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
                 )}
 
                 {healthMetrics && healthMetrics.calories < 200 && (
-                  <div className="flex items-center justify-between p-4 bg-orange-50 rounded-xl">
-                    <div className="flex items-center space-x-3">
+                  <div className="flex items-centre justify-between p-4 bg-orange-50 rounded-xl">
+                    <div className="flex items-centre space-x-3">
                       <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
                       <span className="text-orange-800 font-medium">Increase physical activity</span>
                     </div>
@@ -499,8 +499,8 @@ const DynamicHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
                 )}
 
                 {!healthMetrics && (
-                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                    <div className="flex items-center space-x-3">
+                  <div className="flex items-centre justify-between p-4 bg-gray-50 rounded-xl">
+                    <div className="flex items-centre space-x-3">
                       <div className="w-3 h-3 bg-gray-500 rounded-full"></div>
                       <span className="text-gray-800 font-medium">Start tracking your health data</span>
                     </div>
@@ -514,7 +514,7 @@ const DynamicHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
             <div className="bg-white rounded-2xl p-6 shadow-sm">
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Data Status</h3>
               <div className="space-y-3">
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-centre">
                   <span className="text-sm text-gray-600">Today's Data</span>
                   <span className={`text-sm font-medium ${
                     healthMetrics ? 'text-green-600' : 'text-red-600'
@@ -522,11 +522,11 @@ const DynamicHealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
                     {healthMetrics ? 'Complete' : 'Missing'}
                   </span>
                 </div>
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-centre">
                   <span className="text-sm text-gray-600">Health Score</span>
                   <span className="text-sm font-medium text-gray-900">{healthScore}/100</span>
                 </div>
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-centre">
                   <span className="text-sm text-gray-600">Streak</span>
                   <span className="text-sm font-medium text-gray-900">{streak} days</span>
                 </div>

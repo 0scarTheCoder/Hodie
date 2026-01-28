@@ -198,7 +198,7 @@ const ComprehensiveSignup: React.FC = () => {
       exit={{ opacity: 0, x: -20 }}
       className="space-y-6"
     >
-      <div className="text-center mb-8">
+      <div className="text-centre mb-8">
         <User className="w-16 h-16 text-purple-500 mx-auto mb-4" />
         <h2 className="text-2xl font-bold text-white mb-2">Personal Information</h2>
         <p className="text-white/70">Let's start with the basics</p>
@@ -321,7 +321,7 @@ const ComprehensiveSignup: React.FC = () => {
       exit={{ opacity: 0, x: -20 }}
       className="space-y-6"
     >
-      <div className="text-center mb-8">
+      <div className="text-centre mb-8">
         <Heart className="w-16 h-16 text-red-500 mx-auto mb-4" />
         <h2 className="text-2xl font-bold text-white mb-2">Health Profile</h2>
         <p className="text-white/70">Help us personalize your health insights</p>
@@ -403,7 +403,7 @@ const ComprehensiveSignup: React.FC = () => {
               key={level.value}
               type="button"
               onClick={() => updateFormData('activityLevel', level.value)}
-              className={`p-3 rounded-xl text-center transition-all ${
+              className={`p-3 rounded-xl text-centre transition-all ${
                 formData.activityLevel === level.value
                   ? 'bg-purple-500 text-white'
                   : 'bg-white/10 text-white/70 hover:bg-white/20'
@@ -467,7 +467,7 @@ const ComprehensiveSignup: React.FC = () => {
       exit={{ opacity: 0, x: -20 }}
       className="space-y-6"
     >
-      <div className="text-center mb-8">
+      <div className="text-centre mb-8">
         <Target className="w-16 h-16 text-green-500 mx-auto mb-4" />
         <h2 className="text-2xl font-bold text-white mb-2">Health Goals</h2>
         <p className="text-white/70">What do you want to achieve? (Select all that apply)</p>
@@ -500,7 +500,7 @@ const ComprehensiveSignup: React.FC = () => {
                 : 'bg-white/10 text-white/70 hover:bg-white/20'
             }`}
           >
-            <div className="flex items-center">
+            <div className="flex items-centre">
               {formData.primaryGoals.includes(goal) && (
                 <CheckCircle className="w-5 h-5 mr-2" />
               )}
@@ -521,7 +521,7 @@ const ComprehensiveSignup: React.FC = () => {
               key={diet}
               type="button"
               onClick={() => updateFormData('dietType', diet)}
-              className={`p-3 rounded-xl text-center transition-all capitalize ${
+              className={`p-3 rounded-xl text-centre transition-all capitalize ${
                 formData.dietType === diet
                   ? 'bg-orange-500 text-white'
                   : 'bg-white/10 text-white/70 hover:bg-white/20'
@@ -542,10 +542,10 @@ const ComprehensiveSignup: React.FC = () => {
       exit={{ opacity: 0, x: -20 }}
       className="space-y-6"
     >
-      <div className="text-center mb-8">
+      <div className="text-centre mb-8">
         <AlertTriangle className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
         <h2 className="text-2xl font-bold text-white mb-2">Health Information</h2>
-        <p className="text-white/70">Help us provide safer, more personalized recommendations</p>
+        <p className="text-white/70">Help us provide safer, more personalised recommendations</p>
       </div>
 
       <div>
@@ -566,7 +566,7 @@ const ComprehensiveSignup: React.FC = () => {
                   : 'bg-white/10 text-white/70 hover:bg-white/20'
               }`}
             >
-              <div className="flex items-center">
+              <div className="flex items-centre">
                 {formData.healthConditions.includes(condition) && (
                   <CheckCircle className="w-4 h-4 mr-2" />
                 )}
@@ -608,14 +608,14 @@ const ComprehensiveSignup: React.FC = () => {
       exit={{ opacity: 0, x: -20 }}
       className="space-y-6"
     >
-      <div className="text-center mb-8">
+      <div className="text-centre mb-8">
         <Sparkles className="w-16 h-16 text-blue-500 mx-auto mb-4" />
         <h2 className="text-2xl font-bold text-white mb-2">Preferences</h2>
         <p className="text-white/70">Customize your HodieLabs experience</p>
       </div>
 
       <div className="space-y-4">
-        <div className="flex items-center justify-between p-4 bg-white/10 rounded-xl">
+        <div className="flex items-centre justify-between p-4 bg-white/10 rounded-xl">
           <div>
             <h3 className="text-white font-medium">Health Notifications</h3>
             <p className="text-white/60 text-sm">Get reminders for health goals and check-ups</p>
@@ -623,7 +623,7 @@ const ComprehensiveSignup: React.FC = () => {
           <button
             type="button"
             onClick={() => updateFormData('notifications', !formData.notifications)}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+            className={`relative inline-flex h-6 w-11 items-centre rounded-full transition-colors ${
               formData.notifications ? 'bg-green-500' : 'bg-white/20'
             }`}
           >
@@ -635,7 +635,7 @@ const ComprehensiveSignup: React.FC = () => {
           </button>
         </div>
 
-        <div className="flex items-center justify-between p-4 bg-white/10 rounded-xl">
+        <div className="flex items-centre justify-between p-4 bg-white/10 rounded-xl">
           <div>
             <h3 className="text-white font-medium">Data Sharing for Research</h3>
             <p className="text-white/60 text-sm">Help improve health insights (anonymized data only)</p>
@@ -643,7 +643,7 @@ const ComprehensiveSignup: React.FC = () => {
           <button
             type="button"
             onClick={() => updateFormData('dataSharing', !formData.dataSharing)}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+            className={`relative inline-flex h-6 w-11 items-centre rounded-full transition-colors ${
               formData.dataSharing ? 'bg-green-500' : 'bg-white/20'
             }`}
           >
@@ -655,7 +655,7 @@ const ComprehensiveSignup: React.FC = () => {
           </button>
         </div>
 
-        <div className="flex items-center justify-between p-4 bg-white/10 rounded-xl">
+        <div className="flex items-centre justify-between p-4 bg-white/10 rounded-xl">
           <div>
             <h3 className="text-white font-medium">Newsletter & Updates</h3>
             <p className="text-white/60 text-sm">Stay updated with health tips and platform updates</p>
@@ -663,7 +663,7 @@ const ComprehensiveSignup: React.FC = () => {
           <button
             type="button"
             onClick={() => updateFormData('newsletter', !formData.newsletter)}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+            className={`relative inline-flex h-6 w-11 items-centre rounded-full transition-colors ${
               formData.newsletter ? 'bg-green-500' : 'bg-white/20'
             }`}
           >
@@ -698,11 +698,11 @@ const ComprehensiveSignup: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#2a1e5c] via-[#1a0f3a] to-[#0f0622] flex items-center justify-center px-4 py-4">
+    <div className="min-h-screen bg-gradient-to-b from-[#2a1e5c] via-[#1a0f3a] to-[#0f0622] flex items-centre justify-centre px-4 py-4">
       <div className="w-full max-w-2xl h-full max-h-screen flex flex-col">
         {/* Progress Bar */}
         <div className="mb-6 flex-shrink-0">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-centre justify-between mb-4">
             <h1 className="text-2xl font-bold text-white">Join HodieLabs</h1>
             <span className="text-white/60">{currentStep} of {totalSteps}</span>
           </div>
@@ -724,12 +724,12 @@ const ComprehensiveSignup: React.FC = () => {
           </div>
 
           {/* Navigation */}
-          <div className="flex justify-between items-center p-8 pt-6 border-t border-white/10 flex-shrink-0">
+          <div className="flex justify-between items-centre p-8 pt-6 border-t border-white/10 flex-shrink-0">
             <button
               type="button"
               onClick={handlePrevious}
               disabled={currentStep === 1}
-              className="flex items-center space-x-2 px-6 py-3 border border-white/20 text-white rounded-xl hover:bg-white/10 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-centre space-x-2 px-6 py-3 border border-white/20 text-white rounded-xl hover:bg-white/10 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ArrowLeft className="w-5 h-5" />
               <span>Previous</span>
@@ -740,7 +740,7 @@ const ComprehensiveSignup: React.FC = () => {
                 type="button"
                 onClick={handleSignup}
                 disabled={loading || !validateStep(currentStep)}
-                className="flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-[#8b5cf6] via-[#ec4899] to-[#f97316] text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-centre space-x-2 px-8 py-3 bg-gradient-to-r from-[#8b5cf6] via-[#ec4899] to-[#f97316] text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <>
@@ -759,7 +759,7 @@ const ComprehensiveSignup: React.FC = () => {
                 type="button"
                 onClick={handleNext}
                 disabled={!validateStep(currentStep)}
-                className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-centre space-x-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <span>Next</span>
                 <ArrowRight className="w-5 h-5" />
@@ -769,7 +769,7 @@ const ComprehensiveSignup: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-6">
+        <div className="text-centre mt-6">
           <p className="text-white/60 text-sm">
             Already have an account?{' '}
             <button 

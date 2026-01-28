@@ -37,8 +37,8 @@ const Auth0AppContent: React.FC = () => {
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#2a1e5c] via-[#1a0f3a] to-[#0f0622] flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#2a1e5c] via-[#1a0f3a] to-[#0f0622] flex items-centre justify-centre">
+        <div className="text-centre">
           <Loader2 className="w-16 h-16 text-white animate-spin mx-auto mb-4" />
           <div className="text-white text-lg font-medium">Securing your session...</div>
           <div className="text-white/60 text-sm mt-2">Powered by Auth0</div>
@@ -50,8 +50,8 @@ const Auth0AppContent: React.FC = () => {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#2a1e5c] via-[#1a0f3a] to-[#0f0622] flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto px-4">
+      <div className="min-h-screen bg-gradient-to-b from-[#2a1e5c] via-[#1a0f3a] to-[#0f0622] flex items-centre justify-centre">
+        <div className="text-centre max-w-md mx-auto px-4">
           <div className="text-red-400 text-6xl mb-4">⚠️</div>
           <h1 className="text-white text-2xl font-bold mb-4">Authentication Error</h1>
           <p className="text-white/70 mb-6">{error.message}</p>
@@ -95,8 +95,8 @@ function Auth0App() {
   // Fallback if Auth0 is not configured
   if (!isAuth0Configured) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#2a1e5c] via-[#1a0f3a] to-[#0f0622] flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto px-4">
+      <div className="min-h-screen bg-gradient-to-b from-[#2a1e5c] via-[#1a0f3a] to-[#0f0622] flex items-centre justify-centre">
+        <div className="text-centre max-w-md mx-auto px-4">
           <div className="text-yellow-400 text-6xl mb-4">🔧</div>
           <h1 className="text-white text-2xl font-bold mb-4">Auth0 Configuration Required</h1>
           <p className="text-white/70 mb-6">

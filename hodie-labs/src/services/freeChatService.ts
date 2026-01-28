@@ -103,9 +103,9 @@ class FreeChatService {
     // Clean and enhance AI response
     let refined = aiResponse
       .replace(/\bcolor\b/gi, 'colour')
-      .replace(/\brealize\b/gi, 'realise')
+      .replace(/\brealise\b/gi, 'realise')
       .replace(/\borganize\b/gi, 'organise')
-      .replace(/\bcenter\b/gi, 'centre')
+      .replace(/\bcentre\b/gi, 'centre')
       .replace(/\bdoctor\b/gi, 'GP')
       .replace(/\bpharmacy\b/gi, 'chemist');
 

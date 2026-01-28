@@ -5,7 +5,7 @@ interface QueryLog {
   response?: string;
   userId?: string;
   sessionId: string;
-  type: 'health_query' | 'general_query' | 'api_call';
+  type: 'health_query' | 'general_query' | 'api_call' | 'file_upload';
   metadata?: Record<string, any>;
 }
 

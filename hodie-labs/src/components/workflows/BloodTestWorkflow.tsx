@@ -35,7 +35,7 @@ const BloodTestWorkflow: React.FC<BloodTestWorkflowProps> = ({ user, onClose }) 
 
   const renderChooseOption = () => (
     <div className="space-y-6">
-      <div className="text-center">
+      <div className="text-centre">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose Your Blood Test Option</h2>
         <p className="text-gray-600">Select how you'd like to complete your blood test</p>
       </div>
@@ -47,7 +47,7 @@ const BloodTestWorkflow: React.FC<BloodTestWorkflowProps> = ({ user, onClose }) 
             selectedOption === 'lab' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
           }`}
         >
-          <div className="text-center">
+          <div className="text-centre">
             <MapPin className="w-12 h-12 mx-auto mb-4 text-blue-600" />
             <h3 className="text-lg font-semibold mb-2">Visit Pathology Lab</h3>
             <p className="text-gray-600 mb-4">Visit one of our partner labs near you</p>
@@ -66,7 +66,7 @@ const BloodTestWorkflow: React.FC<BloodTestWorkflowProps> = ({ user, onClose }) 
             selectedOption === 'home' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
           }`}
         >
-          <div className="text-center">
+          <div className="text-centre">
             <Clock className="w-12 h-12 mx-auto mb-4 text-green-600" />
             <h3 className="text-lg font-semibold mb-2">Home Collection</h3>
             <p className="text-gray-600 mb-4">Qualified nurse visits your home/office</p>
@@ -119,7 +119,7 @@ const BloodTestWorkflow: React.FC<BloodTestWorkflowProps> = ({ user, onClose }) 
 
   const renderLocation = () => (
     <div className="space-y-6">
-      <div className="text-center">
+      <div className="text-centre">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
           {selectedOption === 'lab' ? 'Find Nearest Lab' : 'Schedule Home Collection'}
         </h2>
@@ -200,7 +200,7 @@ const BloodTestWorkflow: React.FC<BloodTestWorkflowProps> = ({ user, onClose }) 
 
   const renderBooking = () => (
     <div className="space-y-6">
-      <div className="text-center">
+      <div className="text-centre">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Confirm Your Booking</h2>
         <p className="text-gray-600">Review your selection and complete payment</p>
       </div>
@@ -261,7 +261,7 @@ const BloodTestWorkflow: React.FC<BloodTestWorkflowProps> = ({ user, onClose }) 
   );
 
   const renderConfirmation = () => (
-    <div className="text-center space-y-6">
+    <div className="text-centre space-y-6">
       <CheckCircle className="w-16 h-16 text-green-500 mx-auto" />
       <div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Booking Confirmed!</h2>
@@ -299,7 +299,7 @@ const BloodTestWorkflow: React.FC<BloodTestWorkflowProps> = ({ user, onClose }) 
   );
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/50 flex items-centre justify-centre z-50 p-4">
       <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           {step === 'choose' && renderChooseOption()}

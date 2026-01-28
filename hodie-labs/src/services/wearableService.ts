@@ -202,7 +202,7 @@ This will allow us to:
 • Import your step count and activity data
 • Track your heart rate and sleep patterns  
 • Monitor your weight and body metrics
-• Provide personalized health insights
+• Provide personalised health insights
 
 Your data is encrypted and never shared with third parties.`
       );

@@ -30,13 +30,13 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
 
   // Check AI status and load insights on mount
   useEffect(() => {
-    const initializeAI = async () => {
+    const initialiseAI = async () => {
       const isEnabled = await kimiK2Service.checkApiStatus();
       setAiEnabled(isEnabled);
       loadInsights();
     };
 
-    initializeAI();
+    initialiseAI();
   }, []);
 
   // Load AI-generated insights
@@ -107,13 +107,13 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
     <div className="space-y-6">
       {/* DNA Profile Summary */}
       <div className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-xl p-6">
-        <div className="flex items-center space-x-4 mb-4">
-          <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center">
+        <div className="flex items-centre space-x-4 mb-4">
+          <div className="w-12 h-12 bg-purple-600 rounded-full flex items-centre justify-centre">
             <Dna className="w-6 h-6 text-white" />
           </div>
           <div>
             <h2 className="text-2xl font-bold text-white">Your DNA Profile</h2>
-            <p className="text-white/70">Analysis of 850+ genetic variants affecting health and wellness</p>
+            <p className="text-white/70">Analysis of 700,000+ genetic variants affecting health and wellness</p>
           </div>
         </div>
         
@@ -123,8 +123,8 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
             <div className="text-sm text-white/70">European ancestry</div>
           </div>
           <div className="bg-white/10 rounded-lg p-4">
-            <div className="text-2xl font-bold text-white">850+</div>
-            <div className="text-sm text-white/70">Variants analyzed</div>
+            <div className="text-2xl font-bold text-white">700K+</div>
+            <div className="text-sm text-white/70">Variants analysed</div>
           </div>
           <div className="bg-white/10 rounded-lg p-4">
             <div className="text-2xl font-bold text-white">95%</div>
@@ -136,19 +136,19 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
       {/* Key Insights */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white/10 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-centre">
             <Activity className="w-5 h-5 mr-2" />
             Fitness Highlights {!aiEnabled && <span className="text-xs text-blue-400 ml-2">(AI Loading...)</span>}
           </h3>
           {loading ? (
-            <div className="flex items-center justify-center py-4">
+            <div className="flex items-centre justify-centre py-4">
               <Loader2 className="w-6 h-6 animate-spin text-white/60" />
               <span className="text-white/60 ml-2">Analyzing genetics...</span>
             </div>
           ) : (
             <div className="space-y-3">
               {fitnessInsights.slice(0, 3).map((insight, index) => (
-                <div key={index} className="flex items-center justify-between">
+                <div key={index} className="flex items-centre justify-between">
                   <span className="text-white/80">{insight.trait}</span>
                   <span className={`font-medium ${insight.color.replace('text-', 'text-').replace('-600', '-400')}`}>
                     {insight.impact} impact
@@ -156,27 +156,27 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
                 </div>
               ))}
               {fitnessInsights.length === 0 && (
-                <div className="text-white/60 text-sm">Configure Kimi K2 API for personalized insights</div>
+                <div className="text-white/60 text-sm">Configure Kimi K2 API for personalised insights</div>
               )}
             </div>
           )}
         </div>
 
         <div className="bg-white/10 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-centre">
             <Heart className="w-5 h-5 mr-2" />
             Health Risks
           </h3>
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
+            <div className="flex items-centre justify-between">
               <span className="text-white/80">Heart disease</span>
               <span className="text-green-400 font-medium">Low risk</span>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-centre justify-between">
               <span className="text-white/80">Type 2 diabetes</span>
               <span className="text-yellow-400 font-medium">Average risk</span>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-centre justify-between">
               <span className="text-white/80">Alzheimer's</span>
               <span className="text-orange-400 font-medium">Slightly elevated</span>
             </div>
@@ -186,7 +186,7 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
 
       {/* Actionable Recommendations */}
       <div className="bg-white/10 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+        <h3 className="text-lg font-semibold text-white mb-4 flex items-centre">
           Top DNA-Based Recommendations 
           <button 
             onClick={loadInsights}
@@ -197,9 +197,9 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
           </button>
         </h3>
         {loading ? (
-          <div className="flex items-center justify-center py-8">
+          <div className="flex items-centre justify-centre py-8">
             <Loader2 className="w-8 h-8 animate-spin text-white/60" />
-            <span className="text-white/60 ml-3">Generating personalized recommendations...</span>
+            <span className="text-white/60 ml-3">Generating personalised recommendations...</span>
           </div>
         ) : (
           <div className="space-y-4">
@@ -214,7 +214,7 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
               </div>
             ))}
             {[...fitnessInsights, ...nutritionInsights, ...healthInsights].length === 0 && (
-              <div className="text-center py-4">
+              <div className="text-centre py-4">
                 <div className="text-white/60">Configure your Kimi K2 API key to unlock AI-powered genetic insights</div>
                 <div className="text-white/40 text-sm mt-1">See KIMI_K2_SETUP.md for instructions</div>
               </div>
@@ -227,13 +227,13 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
 
   const renderFitness = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
+      <h2 className="text-2xl font-bold text-white mb-4 flex items-centre">
         Fitness & Exercise Genetics
         {loading && <Loader2 className="w-6 h-6 animate-spin text-white/60 ml-3" />}
         {!aiEnabled && <span className="text-sm text-blue-400 ml-3">(AI Activating...)</span>}
       </h2>
       {loading ? (
-        <div className="flex items-center justify-center py-12">
+        <div className="flex items-centre justify-centre py-12">
           <Loader2 className="w-8 h-8 animate-spin text-white/60" />
           <span className="text-white/60 ml-3">Analyzing your fitness genetics...</span>
         </div>
@@ -267,7 +267,7 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
         </div>
       ))}
           {fitnessInsights.length === 0 && (
-            <div className="bg-gray-50 rounded-xl p-8 text-center">
+            <div className="bg-gray-50 rounded-xl p-8 text-centre">
               <div className="text-gray-600 mb-2">No fitness insights available</div>
               <div className="text-gray-500 text-sm">Configure Kimi K2 API for AI-generated fitness genetics analysis</div>
             </div>
@@ -279,13 +279,13 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
 
   const renderNutrition = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
+      <h2 className="text-2xl font-bold text-white mb-4 flex items-centre">
         Nutrition & Metabolism
         {loading && <Loader2 className="w-6 h-6 animate-spin text-white/60 ml-3" />}
         {!aiEnabled && <span className="text-sm text-blue-400 ml-3">(AI Activating...)</span>}
       </h2>
       {loading ? (
-        <div className="flex items-center justify-center py-12">
+        <div className="flex items-centre justify-centre py-12">
           <Loader2 className="w-8 h-8 animate-spin text-white/60" />
           <span className="text-white/60 ml-3">Analyzing your nutrition genetics...</span>
         </div>
@@ -319,7 +319,7 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
         </div>
       ))}
           {nutritionInsights.length === 0 && (
-            <div className="bg-gray-50 rounded-xl p-8 text-center">
+            <div className="bg-gray-50 rounded-xl p-8 text-centre">
               <div className="text-gray-600 mb-2">No nutrition insights available</div>
               <div className="text-gray-500 text-sm">Configure Kimi K2 API for AI-generated nutrition genetics analysis</div>
             </div>
@@ -418,7 +418,7 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
             <button
               key={category.id}
               onClick={() => setSelectedCategory(category.id)}
-              className={`flex items-center space-x-2 px-6 py-3 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-centre space-x-2 px-6 py-3 rounded-lg text-sm font-medium transition-colors ${
                 selectedCategory === category.id
                   ? 'bg-blue-600 text-white'
                   : 'bg-white text-gray-700 hover:bg-gray-50 shadow-sm border border-gray-200'
@@ -437,7 +437,7 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
           <button
             key={category.id}
             onClick={() => setSelectedCategory(category.id)}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`flex items-centre space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               selectedCategory === category.id
                 ? 'bg-blue-600 text-white'
                 : 'bg-white/10 text-white/80 hover:bg-white/20'

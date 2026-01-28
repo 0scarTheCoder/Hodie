@@ -301,7 +301,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-md transition-all duration-200 ${
+              className={`flex-1 flex items-centre justify-centre space-x-2 py-3 px-4 rounded-md transition-all duration-200 ${
                 activeTab === tab.id
                   ? 'bg-white/20 text-white shadow-sm'
                   : 'text-white/70 hover:text-white hover:bg-white/10'
@@ -318,11 +318,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
           {/* Profile Tab */}
           {activeTab === 'profile' && (
             <div className="space-y-6">
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-centre">
                 <h2 className="text-xl font-semibold">Profile Information</h2>
                 <button
                   onClick={() => setIsEditing(!isEditing)}
-                  className="flex items-center space-x-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
+                  className="flex items-centre space-x-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
                 >
                   <Edit3 className="w-4 h-4" />
                   <span>{isEditing ? 'Cancel' : 'Edit'}</span>
@@ -332,7 +332,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium mb-2">Display Name</label>
-                  <div className="flex items-center space-x-3 p-3 bg-white/5 rounded-lg">
+                  <div className="flex items-centre space-x-3 p-3 bg-white/5 rounded-lg">
                     <UserIcon className="w-5 h-5 text-white/60" />
                     <input
                       type="text"
@@ -346,7 +346,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
 
                 <div>
                   <label className="block text-sm font-medium mb-2">Email</label>
-                  <div className="flex items-center space-x-3 p-3 bg-white/5 rounded-lg">
+                  <div className="flex items-centre space-x-3 p-3 bg-white/5 rounded-lg">
                     <Mail className="w-5 h-5 text-white/60" />
                     <input
                       type="email"
@@ -359,7 +359,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
 
                 <div>
                   <label className="block text-sm font-medium mb-2">Phone</label>
-                  <div className="flex items-center space-x-3 p-3 bg-white/5 rounded-lg">
+                  <div className="flex items-centre space-x-3 p-3 bg-white/5 rounded-lg">
                     <Phone className="w-5 h-5 text-white/60" />
                     <input
                       type="tel"
@@ -373,7 +373,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
 
                 <div>
                   <label className="block text-sm font-medium mb-2">Date of Birth</label>
-                  <div className="flex items-center space-x-3 p-3 bg-white/5 rounded-lg">
+                  <div className="flex items-centre space-x-3 p-3 bg-white/5 rounded-lg">
                     <Calendar className="w-5 h-5 text-white/60" />
                     <input
                       type="date"
@@ -387,7 +387,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
 
                 <div>
                   <label className="block text-sm font-medium mb-2">Location</label>
-                  <div className="flex items-center space-x-3 p-3 bg-white/5 rounded-lg">
+                  <div className="flex items-centre space-x-3 p-3 bg-white/5 rounded-lg">
                     <MapPin className="w-5 h-5 text-white/60" />
                     <input
                       type="text"
@@ -401,7 +401,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
 
                 <div>
                   <label className="block text-sm font-medium mb-2">Emergency Contact</label>
-                  <div className="flex items-center space-x-3 p-3 bg-white/5 rounded-lg">
+                  <div className="flex items-centre space-x-3 p-3 bg-white/5 rounded-lg">
                     <Phone className="w-5 h-5 text-white/60" />
                     <input
                       type="text"
@@ -424,7 +424,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
                   </button>
                   <button
                     onClick={handleSave}
-                    className="flex items-center space-x-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                    className="flex items-centre space-x-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
                   >
                     <Save className="w-4 h-4" />
                     <span>Save Changes</span>
@@ -441,18 +441,18 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
               
               <div className="space-y-4">
                 {Object.entries(privacySettings).map(([key, value]) => (
-                  <div key={key} className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
+                  <div key={key} className="flex items-centre justify-between p-4 bg-white/5 rounded-lg">
                     <div>
                       <h3 className="font-medium capitalize">{key.replace(/([A-Z])/g, ' $1')}</h3>
                       <p className="text-sm text-white/70">
                         {key === 'dataSharing' && 'Allow HodieLabs to share anonymized data for research'}
                         {key === 'marketingEmails' && 'Receive marketing emails and promotional content'}
-                        {key === 'healthInsights' && 'Get personalized health insights based on your data'}
+                        {key === 'healthInsights' && 'Get personalised health insights based on your data'}
                         {key === 'thirdPartyIntegration' && 'Allow integration with third-party health apps'}
                         {key === 'anonymousAnalytics' && 'Help improve our service with anonymous usage data'}
                       </p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
+                    <label className="relative inline-flex items-centre cursor-pointer">
                       <input
                         type="checkbox"
                         checked={value}
@@ -474,8 +474,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
               
               <div className="space-y-4">
                 {Object.entries(notificationSettings).map(([key, value]) => (
-                  <div key={key} className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
-                    <div className="flex items-center space-x-3">
+                  <div key={key} className="flex items-centre justify-between p-4 bg-white/5 rounded-lg">
+                    <div className="flex items-centre space-x-3">
                       <Bell className="w-5 h-5 text-white/60" />
                       <div>
                         <h3 className="font-medium capitalize">{key.replace(/([A-Z])/g, ' $1')}</h3>
@@ -489,7 +489,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
                         </p>
                       </div>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
+                    <label className="relative inline-flex items-centre cursor-pointer">
                       <input
                         type="checkbox"
                         checked={value}
@@ -512,8 +512,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
               {/* Current Subscription */}
               <div className="space-y-4">
                 <div className="p-6 bg-white/5 rounded-lg border border-white/10">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-3">
+                  <div className="flex items-centre justify-between mb-4">
+                    <div className="flex items-centre space-x-3">
                       <Star className="w-6 h-6 text-yellow-400" />
                       <div>
                         <h3 className="font-semibold text-lg capitalize">{paymentDetails.subscription.plan} Plan</h3>
@@ -531,15 +531,15 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <div className="text-center p-3 bg-white/5 rounded">
+                    <div className="text-centre p-3 bg-white/5 rounded">
                       <div className="text-sm text-white/70">Next Billing</div>
                       <div className="font-medium">{new Date(paymentDetails.subscription.nextBilling).toLocaleDateString()}</div>
                     </div>
-                    <div className="text-center p-3 bg-white/5 rounded">
+                    <div className="text-centre p-3 bg-white/5 rounded">
                       <div className="text-sm text-white/70">Billing Cycle</div>
                       <div className="font-medium">Monthly</div>
                     </div>
-                    <div className="text-center p-3 bg-white/5 rounded">
+                    <div className="text-centre p-3 bg-white/5 rounded">
                       <div className="text-sm text-white/70">Auto Renew</div>
                       <div className="font-medium text-green-400">Enabled</div>
                     </div>
@@ -563,14 +563,14 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
 
                 {/* Payment Method */}
                 <div className="p-4 bg-white/5 rounded-lg border border-white/10">
-                  <div className="flex items-center space-x-3 mb-4">
+                  <div className="flex items-centre space-x-3 mb-4">
                     <CreditCard className="w-5 h-5 text-blue-400" />
                     <h3 className="font-medium">Payment Method</h3>
                   </div>
                   
-                  <div className="flex items-center justify-between p-4 bg-white/5 rounded border border-white/5">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-8 bg-blue-600 rounded flex items-center justify-center text-xs font-bold">
+                  <div className="flex items-centre justify-between p-4 bg-white/5 rounded border border-white/5">
+                    <div className="flex items-centre space-x-4">
+                      <div className="w-12 h-8 bg-blue-600 rounded flex items-centre justify-centre text-xs font-bold">
                         {paymentDetails.paymentMethod.brand.toUpperCase()}
                       </div>
                       <div>
@@ -586,7 +586,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
 
                 {/* Billing Address */}
                 <div className="p-4 bg-white/5 rounded-lg border border-white/10">
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-centre justify-between mb-4">
                     <h3 className="font-medium">Billing Address</h3>
                     <button className="px-3 py-1 bg-white/10 hover:bg-white/20 text-sm rounded transition-colors">
                       Edit
@@ -603,7 +603,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
 
                 {/* Billing History */}
                 <div className="p-4 bg-white/5 rounded-lg border border-white/10">
-                  <div className="flex items-center space-x-3 mb-4">
+                  <div className="flex items-centre space-x-3 mb-4">
                     <Receipt className="w-5 h-5 text-green-400" />
                     <h3 className="font-medium">Recent Invoices</h3>
                   </div>
@@ -614,14 +614,14 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
                       { date: '2024-11-15', amount: 29.99, status: 'paid' },
                       { date: '2024-10-15', amount: 29.99, status: 'paid' }
                     ].map((invoice, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded">
-                        <div className="flex items-center space-x-4">
+                      <div key={index} className="flex items-centre justify-between p-3 bg-white/5 rounded">
+                        <div className="flex items-centre space-x-4">
                           <div>
                             <div className="font-medium">${invoice.amount}</div>
                             <div className="text-sm text-white/60">{new Date(invoice.date).toLocaleDateString()}</div>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-3">
+                        <div className="flex items-centre space-x-3">
                           <span className={`px-2 py-1 rounded-full text-xs ${
                             invoice.status === 'paid' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
                           }`}>
@@ -651,7 +651,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
                           ? 'border-blue-400 bg-blue-500/10' 
                           : 'border-white/20 bg-white/5'
                       }`}>
-                        <div className="text-center mb-3">
+                        <div className="text-centre mb-3">
                           <h4 className="font-semibold capitalize">{plan.name}</h4>
                           <div className="text-2xl font-bold">${plan.price}</div>
                           <div className="text-sm text-white/60">per month</div>
@@ -659,7 +659,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
                         
                         <ul className="space-y-2 text-sm mb-4">
                           {plan.features.map((feature, index) => (
-                            <li key={index} className="flex items-center space-x-2">
+                            <li key={index} className="flex items-centre space-x-2">
                               <span className="w-1 h-1 bg-white/60 rounded-full"></span>
                               <span>{feature}</span>
                             </li>
@@ -667,7 +667,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
                         </ul>
                         
                         {paymentDetails.subscription.plan === plan.name ? (
-                          <div className="text-center text-blue-400 font-medium">Current Plan</div>
+                          <div className="text-centre text-blue-400 font-medium">Current Plan</div>
                         ) : (
                           <button
                             onClick={() => handleUpgrade(plan.name)}
@@ -691,8 +691,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
               
               {/* Automatic AI Status */}
               <div className="p-6 bg-gradient-to-r from-green-500/20 to-emerald-600/20 rounded-lg border border-green-400/30">
-                <div className="flex items-center space-x-4 mb-4">
-                  <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
+                <div className="flex items-centre space-x-4 mb-4">
+                  <div className="w-12 h-12 bg-green-500 rounded-full flex items-centre justify-centre">
                     <Bot className="w-6 h-6 text-white" />
                   </div>
                   <div className="flex-1">
@@ -707,15 +707,15 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                  <div className="text-center p-4 bg-white/10 rounded-lg">
+                  <div className="text-centre p-4 bg-white/10 rounded-lg">
                     <div className="text-2xl font-bold text-white">256k</div>
                     <div className="text-sm text-green-100">Context Window</div>
                   </div>
-                  <div className="text-center p-4 bg-white/10 rounded-lg">
+                  <div className="text-centre p-4 bg-white/10 rounded-lg">
                     <div className="text-2xl font-bold text-white">Unlimited</div>
                     <div className="text-sm text-green-100">Daily Usage</div>
                   </div>
-                  <div className="text-center p-4 bg-white/10 rounded-lg">
+                  <div className="text-centre p-4 bg-white/10 rounded-lg">
                     <div className="text-2xl font-bold text-white">Kimi K2</div>
                     <div className="text-sm text-green-100">AI Model</div>
                   </div>
@@ -742,7 +742,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
                     { name: 'Health Recommendations', desc: 'Personalized suggestions based on your data', icon: '📋' },
                     { name: 'Biomarker Interpretation', desc: 'Understand your health metrics with AI insights', icon: '📊' }
                   ].map((feature, index) => (
-                    <div key={index} className="flex items-center space-x-3 p-4 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg border border-white/10">
+                    <div key={index} className="flex items-centre space-x-3 p-4 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg border border-white/10">
                       <div className="text-2xl">{feature.icon}</div>
                       <div className="flex-1">
                         <div className="text-sm font-medium text-white">{feature.name}</div>
@@ -758,15 +758,15 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
               <div className="p-6 bg-white/5 rounded-lg border border-white/10">
                 <h3 className="font-semibold mb-4 text-white">📈 Usage Overview</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="text-center">
+                  <div className="text-centre">
                     <div className="text-lg font-bold text-blue-400">47</div>
                     <div className="text-sm text-white/60">AI Conversations</div>
                   </div>
-                  <div className="text-center">
+                  <div className="text-centre">
                     <div className="text-lg font-bold text-green-400">12</div>
                     <div className="text-sm text-white/60">Health Insights</div>
                   </div>
-                  <div className="text-center">
+                  <div className="text-centre">
                     <div className="text-lg font-bold text-purple-400">5</div>
                     <div className="text-sm text-white/60">DNA Reports</div>
                   </div>
@@ -782,7 +782,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
               
               <div className="space-y-4">
                 <div className="p-4 bg-white/5 rounded-lg border border-white/10">
-                  <div className="flex items-center space-x-3 mb-3">
+                  <div className="flex items-centre space-x-3 mb-3">
                     <Download className="w-5 h-5 text-blue-400" />
                     <h3 className="font-medium">Export Your Data</h3>
                   </div>
@@ -798,7 +798,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
                 </div>
 
                 <div className="p-4 bg-white/5 rounded-lg border border-white/10">
-                  <div className="flex items-center space-x-3 mb-3">
+                  <div className="flex items-centre space-x-3 mb-3">
                     <Globe className="w-5 h-5 text-green-400" />
                     <h3 className="font-medium">Connected Services</h3>
                   </div>
@@ -806,15 +806,15 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
                     Manage your connected health apps and devices.
                   </p>
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between p-3 bg-white/5 rounded">
+                    <div className="flex items-centre justify-between p-3 bg-white/5 rounded">
                       <span className="text-sm">Apple Health</span>
                       <span className="text-xs text-green-400">Connected</span>
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-white/5 rounded">
+                    <div className="flex items-centre justify-between p-3 bg-white/5 rounded">
                       <span className="text-sm">Google Fit</span>
                       <span className="text-xs text-white/60">Not Connected</span>
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-white/5 rounded">
+                    <div className="flex items-centre justify-between p-3 bg-white/5 rounded">
                       <span className="text-sm">Fitbit</span>
                       <span className="text-xs text-white/60">Not Connected</span>
                     </div>
@@ -822,7 +822,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
                 </div>
 
                 <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
-                  <div className="flex items-center space-x-3 mb-3">
+                  <div className="flex items-centre space-x-3 mb-3">
                     <Trash2 className="w-5 h-5 text-red-400" />
                     <h3 className="font-medium text-red-400">Danger Zone</h3>
                   </div>

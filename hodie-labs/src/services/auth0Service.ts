@@ -53,7 +53,7 @@ class Auth0Service {
     if (!this.config.domain || !this.config.clientId) {
       console.warn('⚠️ Auth0 configuration missing. Add REACT_APP_AUTH0_DOMAIN and REACT_APP_AUTH0_CLIENT_ID to .env file');
     } else {
-      console.log('✅ Auth0 service initialized for HodieLabs');
+      console.log('✅ Auth0 service initialised for HodieLabs');
     }
   }
 

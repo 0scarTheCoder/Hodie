@@ -101,12 +101,78 @@ const healthMetricsSchema = new mongoose.Schema({
     systolic: Number,
     diastolic: Number
   },
-  heartRate: Number
+  heartRate: Number,
+  aiProcessed: { type: Boolean, default: false },
+  confidence: Number
+}, { timestamps: true });
+
+// Lab Results Schema
+const labResultsSchema = new mongoose.Schema({
+  userId: { type: String, required: true },
+  testDate: { type: Date, default: Date.now },
+  testType: String,
+  results: mongoose.Schema.Types.Mixed,
+  biomarkers: [{
+    name: String,
+    value: mongoose.Schema.Types.Mixed,
+    unit: String,
+    referenceRange: String,
+    status: String
+  }],
+  aiProcessed: { type: Boolean, default: false },
+  confidence: Number,
+  notes: String
+}, { timestamps: true });
+
+// Genetic Data Schema
+const geneticDataSchema = new mongoose.Schema({
+  userId: { type: String, required: true },
+  provider: String,
+  uploadDate: { type: Date, default: Date.now },
+  variants: [{
+    rsid: String,
+    chromosome: String,
+    position: Number,
+    genotype: String,
+    trait: String,
+    significance: String
+  }],
+  rawData: mongoose.Schema.Types.Mixed,
+  aiProcessed: { type: Boolean, default: false },
+  confidence: Number
+}, { timestamps: true });
+
+// Wearable Data Schema
+const wearableDataSchema = new mongoose.Schema({
+  userId: { type: String, required: true },
+  device: String,
+  syncDate: { type: Date, default: Date.now },
+  dataType: String,
+  metrics: mongoose.Schema.Types.Mixed,
+  aiProcessed: { type: Boolean, default: false },
+  confidence: Number
+}, { timestamps: true });
+
+// Medical Reports Schema
+const medicalReportsSchema = new mongoose.Schema({
+  userId: { type: String, required: true },
+  reportType: String,
+  reportDate: { type: Date, default: Date.now },
+  provider: String,
+  content: mongoose.Schema.Types.Mixed,
+  extractedData: mongoose.Schema.Types.Mixed,
+  aiProcessed: { type: Boolean, default: false },
+  confidence: Number,
+  fileName: String
 }, { timestamps: true });
 
 const User = mongoose.model('User', userSchema);
 const ChatSession = mongoose.model('ChatSession', chatSessionSchema);
 const HealthMetrics = mongoose.model('HealthMetrics', healthMetricsSchema);
+const LabResults = mongoose.model('LabResults', labResultsSchema);
+const GeneticData = mongoose.model('GeneticData', geneticDataSchema);
+const WearableData = mongoose.model('WearableData', wearableDataSchema);
+const MedicalReports = mongoose.model('MedicalReports', medicalReportsSchema);
 
 // Routes
 
@@ -252,20 +318,112 @@ app.get('/api/health-metrics/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
     const { startDate, endDate } = req.query;
-    
+
     let query = { userId };
-    
+
     if (startDate || endDate) {
       query.date = {};
       if (startDate) query.date.$gte = new Date(startDate);
       if (endDate) query.date.$lte = new Date(endDate);
     }
-    
+
     const metrics = await HealthMetrics.find(query).sort({ date: -1 });
     res.json(metrics);
   } catch (error) {
     console.error('Error getting health metrics:', error);
     res.status(500).json({ error: 'Failed to get health metrics' });
+  }
+});
+
+// Lab Results routes
+app.post('/api/lab-results', async (req, res) => {
+  try {
+    const labResult = new LabResults(req.body);
+    await labResult.save();
+    res.status(201).json(labResult);
+  } catch (error) {
+    console.error('Error saving lab results:', error);
+    res.status(500).json({ error: 'Failed to save lab results' });
+  }
+});
+
+app.get('/api/lab-results/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const results = await LabResults.find({ userId }).sort({ testDate: -1 });
+    res.json(results);
+  } catch (error) {
+    console.error('Error getting lab results:', error);
+    res.status(500).json({ error: 'Failed to get lab results' });
+  }
+});
+
+// Genetic Data routes
+app.post('/api/genetic-data', async (req, res) => {
+  try {
+    const geneticData = new GeneticData(req.body);
+    await geneticData.save();
+    res.status(201).json(geneticData);
+  } catch (error) {
+    console.error('Error saving genetic data:', error);
+    res.status(500).json({ error: 'Failed to save genetic data' });
+  }
+});
+
+app.get('/api/genetic-data/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const data = await GeneticData.find({ userId }).sort({ uploadDate: -1 });
+    res.json(data);
+  } catch (error) {
+    console.error('Error getting genetic data:', error);
+    res.status(500).json({ error: 'Failed to get genetic data' });
+  }
+});
+
+// Wearable Data routes
+app.post('/api/wearable-data', async (req, res) => {
+  try {
+    const wearableData = new WearableData(req.body);
+    await wearableData.save();
+    res.status(201).json(wearableData);
+  } catch (error) {
+    console.error('Error saving wearable data:', error);
+    res.status(500).json({ error: 'Failed to save wearable data' });
+  }
+});
+
+app.get('/api/wearable-data/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const data = await WearableData.find({ userId }).sort({ syncDate: -1 });
+    res.json(data);
+  } catch (error) {
+    console.error('Error getting wearable data:', error);
+    res.status(500).json({ error: 'Failed to get wearable data' });
+  }
+});
+
+// Medical Reports routes
+app.post('/api/medical-reports', async (req, res) => {
+  try {
+    const report = new MedicalReports(req.body);
+    await report.save();
+    res.status(201).json(report);
+  } catch (error) {
+    console.error('Error saving medical report:', error);
+    res.status(500).json({ error: 'Failed to save medical report' });
+  }
+});
+
+app.get('/api/medical-reports/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const reports = await MedicalReports.find({ userId }).sort({ reportDate: -1 });
+    res.json(reports);
+  } catch (error) {
+    console.error('Error getting medical reports:', error);
+    res.status(500).json({ error: 'Failed to get medical reports' });
   }
 });
 

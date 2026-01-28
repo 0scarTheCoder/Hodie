@@ -187,7 +187,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ user, onComplete }) => 
     switch (step.id) {
       case 'welcome':
         return (
-          <div className="text-center">
+          <div className="text-centre">
             <div className="mb-8">
               <img 
                 src="/hodie_labs_logo.png" 
@@ -201,7 +201,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ user, onComplete }) => 
                 Welcome to Hodie Labs!
               </h2>
               <p className="text-lg text-gray-600 max-w-md mx-auto">
-                Your personalized health companion is here to help you track, 
+                Your personalised health companion is here to help you track, 
                 understand, and improve your wellness journey.
               </p>
             </div>
@@ -209,11 +209,11 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ user, onComplete }) => 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
               {[
                 { icon: '📊', title: 'Track Health', desc: 'Monitor your daily metrics' },
-                { icon: '🤖', title: 'AI Insights', desc: 'Get personalized advice' },
+                { icon: '🤖', title: 'AI Insights', desc: 'Get personalised advice' },
                 { icon: '⌚', title: 'Device Sync', desc: 'Connect your wearables' },
                 { icon: '🎯', title: 'Reach Goals', desc: 'Achieve your targets' }
               ].map((feature, index) => (
-                <div key={index} className="text-center p-4 bg-gray-50 rounded-xl">
+                <div key={index} className="text-centre p-4 bg-gray-50 rounded-xl">
                   <div className="text-2xl mb-2">{feature.icon}</div>
                   <div className="font-semibold text-sm">{feature.title}</div>
                   <div className="text-xs text-gray-600">{feature.desc}</div>
@@ -290,7 +290,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ user, onComplete }) => 
               </label>
               <div className="space-y-3">
                 {activityLevels.map((level) => (
-                  <label key={level.value} className="flex items-center p-3 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50">
+                  <label key={level.value} className="flex items-centre p-3 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50">
                     <input
                       type="radio"
                       value={level.value}
@@ -318,7 +318,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ user, onComplete }) => 
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {healthGoalOptions.map((goal) => (
-                <label key={goal} className="flex items-center p-3 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50">
+                <label key={goal} className="flex items-centre p-3 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50">
                   <input
                     type="checkbox"
                     checked={profile.healthGoals.includes(goal)}
@@ -340,7 +340,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ user, onComplete }) => 
                 Measurement Units
               </label>
               <div className="flex space-x-4">
-                <label className="flex items-center">
+                <label className="flex items-centre">
                   <input
                     type="radio"
                     value="metric"
@@ -350,7 +350,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ user, onComplete }) => 
                   />
                   Metric (kg, cm)
                 </label>
-                <label className="flex items-center">
+                <label className="flex items-centre">
                   <input
                     type="radio"
                     value="imperial"
@@ -364,7 +364,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ user, onComplete }) => 
             </div>
             
             <div>
-              <label className="flex items-center">
+              <label className="flex items-centre">
                 <input
                   type="checkbox"
                   checked={profile.preferences.notifications}
@@ -379,7 +379,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ user, onComplete }) => 
             </div>
             
             <div>
-              <label className="flex items-center">
+              <label className="flex items-centre">
                 <input
                   type="checkbox"
                   checked={profile.preferences.dataSharing}
@@ -397,7 +397,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ user, onComplete }) => 
 
       case 'complete':
         return (
-          <div className="text-center">
+          <div className="text-centre">
             <div className="mb-8">
               <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
@@ -427,12 +427,12 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ user, onComplete }) => 
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-centre justify-centre p-4">
       <div className="max-w-2xl w-full">
         
         {/* Progress bar */}
         <div className="mb-8">
-          <div className="flex justify-between items-center mb-2">
+          <div className="flex justify-between items-centre mb-2">
             <span className="text-sm text-gray-600">
               Step {currentStep + 1} of {steps.length}
             </span>
@@ -459,8 +459,8 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ user, onComplete }) => 
             className="bg-white rounded-2xl shadow-xl p-8"
           >
             {/* Header */}
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-xl mb-4">
+            <div className="text-centre mb-8">
+              <div className="inline-flex items-centre justify-centre w-12 h-12 bg-blue-100 rounded-xl mb-4">
                 {React.createElement(steps[currentStep].icon, { 
                   className: "w-6 h-6 text-blue-600" 
                 })}
@@ -483,7 +483,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ user, onComplete }) => 
               <button
                 onClick={handlePrevious}
                 disabled={currentStep === 0}
-                className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-centre px-4 py-2 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <ChevronLeft className="w-4 h-4 mr-1" />
                 Previous
@@ -492,7 +492,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ user, onComplete }) => 
               {currentStep === steps.length - 1 ? (
                 <button
                   onClick={handleComplete}
-                  className="flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-xl hover:shadow-lg transition-all duration-300"
+                  className="flex items-centre px-6 py-3 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-xl hover:shadow-lg transition-all duration-300"
                 >
                   Get Started
                   <Heart className="w-4 h-4 ml-2" />
@@ -501,7 +501,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ user, onComplete }) => 
                 <button
                   onClick={handleNext}
                   disabled={!canProceed()}
-                  className="flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-centre px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Next
                   <ChevronRight className="w-4 h-4 ml-1" />
