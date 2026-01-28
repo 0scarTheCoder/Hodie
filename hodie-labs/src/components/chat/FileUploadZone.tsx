@@ -24,7 +24,7 @@ interface FileUploadZoneProps {
 const FileUploadZone: React.FC<FileUploadZoneProps> = ({
   onFilesUploaded,
   onFileRemove,
-  acceptedTypes = ['.pdf', '.jpg', '.jpeg', '.png', '.csv', '.txt', '.json', '.xml'],
+  acceptedTypes = ['.pdf', '.jpg', '.jpeg', '.png', '.csv', '.xlsx', '.xls', '.txt', '.json', '.xml', '.rtf'],
   maxSize = 10, // 10MB default
   isVisible
 }) => {
@@ -83,7 +83,7 @@ const FileUploadZone: React.FC<FileUploadZoneProps> = ({
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       const validation = validateFile(file);
-      
+
       const uploadedFile: UploadedFile = {
         id: `${Date.now()}_${i}`,
         file,
@@ -100,33 +100,64 @@ const FileUploadZone: React.FC<FileUploadZoneProps> = ({
 
     setUploadedFiles(prev => [...prev, ...newFiles]);
 
-    // Simulate upload process for valid files
-    for (const uploadFile of newFiles.filter(f => f.status === 'uploading')) {
-      await simulateUpload(uploadFile);
+    // Process valid files and collect successful ones
+    const validFiles = newFiles.filter(f => f.status === 'uploading');
+    const successfulFiles: UploadedFile[] = [];
+
+    for (const uploadFile of validFiles) {
+      const processedFile = await simulateUpload(uploadFile);
+      if (processedFile) {
+        successfulFiles.push(processedFile);
+      }
     }
 
-    onFilesUploaded(newFiles.filter(f => f.status === 'success'));
+    // FIXED: Call onFilesUploaded AFTER all files have been processed successfully
+    console.log(`📁 Calling onFilesUploaded with ${successfulFiles.length} successfully processed files`);
+    if (successfulFiles.length > 0) {
+      onFilesUploaded(successfulFiles);
+    } else {
+      console.warn('⚠️ No files were successfully processed');
+    }
   }, [onFilesUploaded, acceptedTypes, maxSize]);
 
-  const simulateUpload = async (file: UploadedFile) => {
-    // Simulate upload progress
-    for (let progress = 0; progress <= 100; progress += 10) {
-      await new Promise(resolve => setTimeout(resolve, 100));
-      setUploadedFiles(prev => 
-        prev.map(f => f.id === file.id ? { ...f, progress } : f)
-      );
-    }
+  const simulateUpload = async (file: UploadedFile): Promise<UploadedFile | null> => {
+    try {
+      // Simulate upload progress
+      for (let progress = 0; progress <= 100; progress += 10) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        setUploadedFiles(prev =>
+          prev.map(f => f.id === file.id ? { ...f, progress } : f)
+        );
+      }
 
-    // Process file content
-    const previewData = await extractFilePreview(file.file);
-    
-    setUploadedFiles(prev =>
-      prev.map(f => 
-        f.id === file.id 
-          ? { ...f, status: 'success', progress: 100, previewData }
-          : f
-      )
-    );
+      // Process file content
+      const previewData = await extractFilePreview(file.file);
+
+      // Create the successful file object
+      const successfulFile: UploadedFile = {
+        ...file,
+        status: 'success',
+        progress: 100,
+        previewData
+      };
+
+      // Update state
+      setUploadedFiles(prev =>
+        prev.map(f => f.id === file.id ? successfulFile : f)
+      );
+
+      console.log(`✅ File processed successfully: ${file.name}`);
+      return successfulFile;
+    } catch (error) {
+      console.error(`❌ Error processing file ${file.name}:`, error);
+
+      // Update state to error
+      setUploadedFiles(prev =>
+        prev.map(f => f.id === file.id ? { ...f, status: 'error', progress: 100 } : f)
+      );
+
+      return null;
+    }
   };
 
   const extractFilePreview = async (file: File): Promise<any> => {
