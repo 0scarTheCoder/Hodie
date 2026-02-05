@@ -20,7 +20,7 @@ export interface ClaudeMessage {
 class ClaudeService {
   private client: Anthropic | null = null;
   private apiKey: string;
-  private model: string = 'claude-3-5-sonnet-20241022'; // Latest Claude 3.5 Sonnet
+  private model: string = 'claude-3-5-sonnet-20240620'; // Claude 3.5 Sonnet (Stable)
   private maxTokens: number = 4096;
 
   constructor() {
