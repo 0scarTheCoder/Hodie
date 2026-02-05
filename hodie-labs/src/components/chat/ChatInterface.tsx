@@ -173,15 +173,40 @@ What would you like to know about your health today?`,
     );
 
     try {
-      // Get user's recent health data for context
+      // Get user's comprehensive health data for context
       const healthContext = await getUserHealthContext(getUserId());
-      
-      // Generate response using Kimi K2 AI service
-      const responseText = await kimiK2Service.generateHealthResponse(
-        inputValue,
-        healthContext,
-        conversationHistory
-      );
+
+      // Check which AI provider to use
+      const aiProvider = localStorage.getItem('aiProvider') || 'kimi';
+      let responseText: string;
+
+      if (aiProvider === 'claude' && claudeService.isAvailable()) {
+        console.log('🤖 Using Claude AI for response');
+
+        // Add context summary to the query if user has uploaded data
+        let enhancedQuery = inputValue;
+        if (healthContext.availableDataSummary) {
+          enhancedQuery = `${inputValue}\n\n[Context: ${healthContext.availableDataSummary}]`;
+        }
+
+        // Filter conversation history to only include user/assistant messages (exclude system)
+        const claudeHistory = conversationHistory
+          .filter(msg => msg.role === 'user' || msg.role === 'assistant')
+          .map(msg => ({ role: msg.role as 'user' | 'assistant', content: msg.content }));
+
+        responseText = await claudeService.generateHealthResponse(
+          enhancedQuery,
+          claudeHistory,
+          healthContext
+        );
+      } else {
+        console.log('🤖 Using Kimi K2 AI for response');
+        responseText = await kimiK2Service.generateHealthResponse(
+          inputValue,
+          healthContext,
+          conversationHistory
+        );
+      }
       
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -217,32 +242,103 @@ What would you like to know about your health today?`,
 
   const getUserHealthContext = async (userId: string) => {
     try {
-      // Fetch user's recent health data from backend
-      const response = await fetch(
-        `${process.env.REACT_APP_API_BASE_URL}/health-metrics/${userId}?limit=1`
-      );
-      
-      if (response.ok) {
-        const healthData = await response.json();
+      console.log('📊 Fetching comprehensive health context for user:', userId);
+
+      // Fetch data from all collections in parallel
+      const [healthMetricsRes, labResultsRes, geneticDataRes, wearableDataRes, medicalReportsRes] = await Promise.all([
+        fetch(`${process.env.REACT_APP_API_BASE_URL}/health-metrics/${userId}?limit=1`).catch(() => null),
+        fetch(`${process.env.REACT_APP_API_BASE_URL}/lab-results/${userId}`).catch(() => null),
+        fetch(`${process.env.REACT_APP_API_BASE_URL}/genetic-data/${userId}`).catch(() => null),
+        fetch(`${process.env.REACT_APP_API_BASE_URL}/wearable-data/${userId}?limit=7`).catch(() => null),
+        fetch(`${process.env.REACT_APP_API_BASE_URL}/medical-reports/${userId}`).catch(() => null)
+      ]);
+
+      const context: any = { userId };
+
+      // Health metrics
+      if (healthMetricsRes && healthMetricsRes.ok) {
+        const healthData = await healthMetricsRes.json();
         const recentData = healthData[0];
-        
         if (recentData) {
-          // Calculate health score for context
           const healthScore = calculateHealthScore(recentData);
-          
-          return {
-            userId,
-            recentHealthData: {
-              steps: recentData.steps,
-              sleep: recentData.sleepHours,
-              mood: recentData.mood,
-              healthScore
-            }
+          context.recentHealthData = {
+            steps: recentData.steps,
+            sleep: recentData.sleepHours,
+            mood: recentData.mood,
+            healthScore
           };
         }
       }
-      
-      return { userId };
+
+      // Lab results (uploaded files)
+      if (labResultsRes && labResultsRes.ok) {
+        const labResults = await labResultsRes.json();
+        if (labResults.length > 0) {
+          context.labResults = labResults.map((result: any) => ({
+            id: result._id,
+            testType: result.testType,
+            testDate: result.testDate,
+            recordCount: result.results?.length || 0,
+            biomarkersCount: result.biomarkers?.length || 0,
+            uploadDate: result.createdAt,
+            summary: result.notes || 'No summary available'
+          }));
+          console.log(`✅ Found ${labResults.length} lab result datasets`);
+        }
+      }
+
+      // Genetic data
+      if (geneticDataRes && geneticDataRes.ok) {
+        const geneticData = await geneticDataRes.json();
+        if (geneticData.length > 0) {
+          context.geneticData = geneticData.map((data: any) => ({
+            id: data._id,
+            provider: data.provider,
+            uploadDate: data.createdAt,
+            variantsCount: data.variants?.length || 0
+          }));
+          console.log(`✅ Found ${geneticData.length} genetic datasets`);
+        }
+      }
+
+      // Wearable data
+      if (wearableDataRes && wearableDataRes.ok) {
+        const wearableData = await wearableDataRes.json();
+        if (wearableData.length > 0) {
+          context.wearableData = {
+            recentDays: wearableData.length,
+            lastSync: wearableData[0]?.date
+          };
+          console.log(`✅ Found ${wearableData.length} days of wearable data`);
+        }
+      }
+
+      // Medical reports
+      if (medicalReportsRes && medicalReportsRes.ok) {
+        const medicalReports = await medicalReportsRes.json();
+        if (medicalReports.length > 0) {
+          context.medicalReports = medicalReports.map((report: any) => ({
+            id: report._id,
+            reportType: report.reportType,
+            uploadDate: report.createdAt
+          }));
+          console.log(`✅ Found ${medicalReports.length} medical reports`);
+        }
+      }
+
+      // Add summary of available data
+      const availableDataTypes = [];
+      if (context.labResults) availableDataTypes.push(`${context.labResults.length} lab result dataset(s)`);
+      if (context.geneticData) availableDataTypes.push(`${context.geneticData.length} genetic dataset(s)`);
+      if (context.wearableData) availableDataTypes.push('wearable data');
+      if (context.medicalReports) availableDataTypes.push(`${context.medicalReports.length} medical report(s)`);
+
+      if (availableDataTypes.length > 0) {
+        context.availableDataSummary = `You have access to: ${availableDataTypes.join(', ')}`;
+        console.log('📊 Context summary:', context.availableDataSummary);
+      }
+
+      return context;
     } catch (error) {
       console.error('Error fetching health context:', error);
       return { userId };
