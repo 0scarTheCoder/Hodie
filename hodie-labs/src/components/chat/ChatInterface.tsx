@@ -31,6 +31,22 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Helper: Get user ID that works with both Firebase (uid) and Auth0 (sub)
+  const getUserId = (): string => {
+    // Auth0 user object has 'sub' property
+    if ((user as any).sub) {
+      console.log('🔑 Using Auth0 user ID:', (user as any).sub);
+      return (user as any).sub;
+    }
+    // Firebase user object has 'uid' property
+    if (getUserId()) {
+      console.log('🔑 Using Firebase user ID:', getUserId());
+      return getUserId();
+    }
+    console.error('❌ No user ID found in user object:', user);
+    throw new Error('User ID not found in user object');
+  };
+
   // Initialize AI status and load chat history
   useEffect(() => {
     const initialiseChat = async () => {
@@ -40,7 +56,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
       
       try {
         // Load recent conversations for context
-        const recentConversations = await chatStorageService.getUserConversations(user.uid, 5);
+        const recentConversations = await chatStorageService.getUserConversations(getUserId(), 5);
         
         // Check if there's an active conversation
         const activeConversation = recentConversations.find(conv => conv.isActive);
@@ -86,7 +102,7 @@ I use advanced AI with memory of our past discussions to provide contextual heal
           
           // Create new conversation
           const newConversation: ChatConversation = {
-            userId: user.uid,
+            userId: getUserId(),
             title: 'New Health Consultation',
             messages: [welcomeMessage],
             medicalContext: {
@@ -125,7 +141,7 @@ What would you like to know about your health today?`,
     };
 
     initialiseChat();
-  }, [user.uid]);
+  }, [getUserId()]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -152,13 +168,13 @@ What would you like to know about your health today?`,
     const logId = queryLogger.logQuery(
       inputValue,
       'health_query',
-      user.uid,
+      getUserId(),
       { component: 'chat_interface' }
     );
 
     try {
       // Get user's recent health data for context
-      const healthContext = await getUserHealthContext(user.uid);
+      const healthContext = await getUserHealthContext(getUserId());
       
       // Generate response using Kimi K2 AI service
       const responseText = await kimiK2Service.generateHealthResponse(
@@ -309,7 +325,7 @@ What would you like to know about your health today?`,
             parsedData.data,
             file.name,
             file.category,
-            user.uid
+            getUserId()
           );
         } else {
           if (aiProvider === 'claude') {
@@ -320,14 +336,14 @@ What would you like to know about your health today?`,
             parsedData.data,
             file.name,
             file.category,
-            user.uid
+            getUserId()
           );
         }
         console.log('✅ AI interpretation complete:', aiInterpretation);
 
         // Step 3: Save to database based on AI recommendations
         console.log('💾 Step 3: Saving to database...');
-        await saveToDatabaseWithAI(aiInterpretation.databaseMappings, user.uid);
+        await saveToDatabaseWithAI(aiInterpretation.databaseMappings, getUserId());
         console.log('✅ Saved to database successfully');
 
         // Step 4: Create comprehensive message with AI insights
@@ -350,7 +366,7 @@ What would you like to know about your health today?`,
         queryLogger.logQuery(
           `AI File interpretation: ${file.name}`,
           'file_upload',
-          user.uid,
+          getUserId(),
           {
             component: 'chat_interface',
             fileType: file.category,
@@ -654,12 +670,12 @@ What would you like to know about your health today?`,
                   const logId = queryLogger.logQuery(
                     question,
                     'health_query',
-                    user.uid,
+                    getUserId(),
                     { component: 'chat_interface_quick_button' }
                   );
 
                   try {
-                    const healthContext = await getUserHealthContext(user.uid);
+                    const healthContext = await getUserHealthContext(getUserId());
                     const responseText = await kimiK2Service.generateHealthResponse(
                       question,
                       healthContext,
