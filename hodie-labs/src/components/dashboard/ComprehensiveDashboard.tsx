@@ -31,6 +31,7 @@ import LabsScreen from '../screens/LabsScreen';
 import ReportsScreen from '../screens/ReportsScreen';
 import FAQScreen from '../screens/FAQScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import DataVisualizationScreen from '../screens/DataVisualizationScreen';
 import ChatbotTester from '../testing/ChatbotTester';
 import DemoScreen from '../screens/DemoScreen';
 import HealthDataUploadTester from '../testing/HealthDataUploadTester';
@@ -93,7 +94,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
     };
   }, [showChat]);
   const [currentStep, setCurrentStep] = useState<'blood' | 'dna' | 'body' | null>(null);
-  const [currentScreen, setCurrentScreen] = useState<'home' | 'recommendations' | 'dna' | 'labs' | 'reports' | 'faq' | 'settings' | 'testing' | 'demo'>('home');
+  const [currentScreen, setCurrentScreen] = useState<'home' | 'recommendations' | 'dna' | 'labs' | 'reports' | 'data' | 'faq' | 'settings' | 'testing' | 'demo'>('home');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [chatInput, setChatInput] = useState('');
   const [showApiKeySetup, setShowApiKeySetup] = useState(false);
@@ -320,6 +321,8 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
         return <LabsScreen user={user} />;
       case 'reports':
         return <ReportsScreen user={user} />;
+      case 'data':
+        return <DataVisualizationScreen user={user} />;
       case 'faq':
         return <FAQScreen user={user} />;
       case 'settings':
@@ -803,7 +806,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
             >
               Labs
             </button>
-            <button 
+            <button
               onClick={() => {
                 setCurrentScreen('reports');
                 setMobileMenuOpen(false);
@@ -812,7 +815,16 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
             >
               Reports
             </button>
-            <button 
+            <button
+              onClick={() => {
+                setCurrentScreen('data');
+                setMobileMenuOpen(false);
+              }}
+              className={`text-left text-white hover:text-blue-300 ${currentScreen === 'data' ? 'text-blue-300' : ''}`}
+            >
+              Data Visualizations
+            </button>
+            <button
               onClick={() => {
                 setCurrentScreen('faq');
                 setMobileMenuOpen(false);
