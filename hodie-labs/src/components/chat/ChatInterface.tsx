@@ -378,6 +378,11 @@ What would you like to know about your health today?`,
 
 **Issue**: ${error instanceof Error ? error.message : 'Unknown error occurred'}
 
+**Common Causes**:
+• Network connection issue - check if backend is awake
+• Content Security Policy blocking API calls - try hard refresh (Cmd+Shift+R)
+• AI returned empty database mappings - file format not recognized
+
 **What you can try**:
 • Check the file format (PDF, CSV, JSON, TXT supported)
 • Ensure file is not corrupted
@@ -445,8 +450,21 @@ What would you like to know about your health today?`,
 
   // Save data to database based on AI-recommended mappings
   const saveToDatabaseWithAI = async (mappings: any[], userId: string) => {
+    if (!mappings || mappings.length === 0) {
+      console.error('❌ No database mappings provided - AI returned empty mappings array!');
+      throw new Error('AI did not provide any database mappings. The file may not have been interpreted correctly.');
+    }
+
+    console.log(`💾 Attempting to save ${mappings.length} mapping(s) to database...`);
+
+    let successCount = 0;
+    let failCount = 0;
+
     try {
       for (const mapping of mappings) {
+        console.log(`📤 Saving to collection: ${mapping.collection}`);
+        console.log(`📊 Fields to save:`, Object.keys(mapping.fields));
+
         // Prepare the data for storage
         const dataToSave = {
           userId,
@@ -458,7 +476,10 @@ What would you like to know about your health today?`,
         };
 
         // Save to appropriate collection based on AI recommendation
-        const apiUrl = `${process.env.REACT_APP_API_BASE_URL}/${getApiEndpoint(mapping.collection)}`;
+        const endpoint = getApiEndpoint(mapping.collection);
+        const apiUrl = `${process.env.REACT_APP_API_BASE_URL}/${endpoint}`;
+
+        console.log(`🔗 POST to: ${apiUrl}`);
 
         const response = await fetch(apiUrl, {
           method: 'POST',
@@ -469,14 +490,30 @@ What would you like to know about your health today?`,
         });
 
         if (!response.ok) {
-          console.warn(`Failed to save to ${mapping.collection}:`, await response.text());
+          const errorText = await response.text();
+          console.error(`❌ Failed to save to ${mapping.collection} (${response.status}):`, errorText);
+          failCount++;
         } else {
-          console.log(`✅ Successfully saved data to ${mapping.collection}`);
+          const savedData = await response.json();
+          console.log(`✅ Successfully saved to ${mapping.collection}:`, savedData._id);
+          successCount++;
         }
       }
-    } catch (error) {
-      console.error('Error saving to database:', error);
-      // Don't throw - allow the user to still see the interpretation even if saving fails
+
+      console.log(`📊 Save summary: ${successCount} succeeded, ${failCount} failed`);
+
+      if (successCount === 0) {
+        throw new Error(`Failed to save any data to database. Check console for details.`);
+      }
+
+    } catch (error: any) {
+      console.error('❌ Error saving to database:', error);
+      console.error('Error details:', {
+        message: error.message,
+        name: error.name,
+        stack: error.stack
+      });
+      throw error; // Re-throw so the calling code knows it failed
     }
   };
 
