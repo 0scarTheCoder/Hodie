@@ -20,7 +20,7 @@ export interface ClaudeMessage {
 class ClaudeService {
   private client: Anthropic | null = null;
   private apiKey: string;
-  private model: string = 'claude-3-5-sonnet-20240620'; // Claude 3.5 Sonnet (Stable)
+  private model: string = 'claude-3-haiku-20240307'; // Claude 3 Haiku (Available on API key)
   private maxTokens: number = 4096;
 
   constructor() {
@@ -49,7 +49,7 @@ class ClaudeService {
    */
   getModelInfo(): { name: string; contextWindow: number; provider: string } {
     return {
-      name: 'Claude 3.5 Sonnet',
+      name: 'Claude 3 Haiku',
       contextWindow: 200000, // 200K tokens
       provider: 'Anthropic'
     };
