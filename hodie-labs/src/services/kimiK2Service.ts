@@ -1296,42 +1296,85 @@ Format your response with clear sections using markdown headers.`;
    * Map parsed data to database fields
    */
   private mapDataToFields(parsedData: any, fileCategory: string): { [key: string]: any } {
-    const fields: { [key: string]: any } = {
-      uploadDate: new Date(),
-      dataType: fileCategory,
-      rawData: parsedData
-    };
+    const fields: { [key: string]: any } = {};
 
-    // Category-specific field mapping
+    // Category-specific field mapping to match backend schemas
     switch (fileCategory) {
       case 'lab_results':
-        if (parsedData.results && Array.isArray(parsedData.results)) {
-          fields.tests = parsedData.results;
-          fields.testDate = parsedData.testDate || new Date();
-          fields.labName = parsedData.labName || 'Unknown Lab';
+        // Backend expects: testType, testDate, biomarkers, results, etc.
+        fields.testType = parsedData.metadata?.fileName || 'Health Data Upload';
+        fields.testDate = new Date();
+
+        // Convert generic data to biomarkers format
+        if (Array.isArray(parsedData.data) && parsedData.data.length > 0) {
+          // Take first row as example and convert to biomarkers
+          const firstRow = parsedData.data[0];
+          fields.biomarkers = Object.keys(firstRow).map(key => ({
+            name: key,
+            value: firstRow[key],
+            unit: this.inferUnit(key),
+            referenceRange: 'Not specified',
+            status: 'Normal'
+          }));
+          fields.results = parsedData.data; // Store full data
+          fields.rawData = parsedData.data;
+        } else {
+          // No data parsed, store as raw
+          fields.biomarkers = [];
+          fields.results = parsedData;
+          fields.rawData = parsedData;
+          fields.notes = 'Generic health data upload - structure not recognized';
         }
         break;
 
       case 'genetic_data':
+        fields.provider = 'File Upload';
+        fields.uploadDate = new Date();
         if (Array.isArray(parsedData) && parsedData.length > 0) {
           fields.variants = parsedData;
           fields.variantCount = parsedData.length;
-          fields.analysisDate = new Date();
+        } else {
+          fields.variants = [];
+          fields.rawData = parsedData;
         }
         break;
 
       case 'wearable_data':
+        fields.device = 'File Upload';
+        fields.syncDate = new Date();
+        fields.dataType = 'Health Metrics';
         if (Array.isArray(parsedData) && parsedData.length > 0) {
-          fields.activities = parsedData;
+          fields.metrics = parsedData;
           fields.dateRange = {
-            start: parsedData[0]?.date,
-            end: parsedData[parsedData.length - 1]?.date
+            start: parsedData[0]?.date || new Date(),
+            end: parsedData[parsedData.length - 1]?.date || new Date()
           };
+        } else {
+          fields.metrics = parsedData;
         }
+        break;
+
+      default:
+        // For other categories, use generic structure
+        fields.uploadDate = new Date();
+        fields.dataType = fileCategory;
+        fields.rawData = parsedData;
         break;
     }
 
     return fields;
+  }
+
+  /**
+   * Infer unit from field name
+   */
+  private inferUnit(fieldName: string): string {
+    const name = fieldName.toLowerCase();
+    if (name.includes('time') || name.includes('duration')) return 'minutes';
+    if (name.includes('frequency')) return 'count';
+    if (name.includes('monetary') || name.includes('amount')) return 'units';
+    if (name.includes('class') || name.includes('category')) return 'category';
+    return '';
   }
 
   /**

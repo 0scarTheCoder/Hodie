@@ -122,16 +122,32 @@ class HealthDataParsingService {
     const lines = text.trim().split('\n');
     const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
 
+    let parsedData: any[];
+
+    // Try category-specific parser first
     switch (category) {
       case 'lab_results':
-        return this.parseLabResultsCsv(lines, headers);
+        parsedData = this.parseLabResultsCsv(lines, headers);
+        break;
       case 'wearable_data':
-        return this.parseWearableDataCsv(lines, headers);
+        parsedData = this.parseWearableDataCsv(lines, headers);
+        break;
       case 'genetic_data':
-        return this.parseGeneticDataCsv(lines, headers);
+        parsedData = this.parseGeneticDataCsv(lines, headers);
+        break;
       default:
-        return this.parseGenericCsv(lines, headers);
+        parsedData = this.parseGenericCsv(lines, headers);
+        break;
     }
+
+    // Fallback to generic parser if specific parser returned empty data
+    if (!parsedData || parsedData.length === 0) {
+      console.warn(`Category-specific parser returned empty data for ${category}, using generic CSV parser`);
+      parsedData = this.parseGenericCsv(lines, headers);
+    }
+
+    console.log(`CSV parsed: ${parsedData.length} rows from ${lines.length - 1} lines`);
+    return parsedData;
   }
 
   /**
