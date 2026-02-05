@@ -3,6 +3,7 @@ import { User } from 'firebase/auth';
 import { Upload, Paperclip } from 'lucide-react';
 import { queryLogger } from '../../utils/queryLogger';
 import { kimiK2Service, HealthContext, ConversationMessage } from '../../services/kimiK2Service';
+import { claudeService } from '../../services/claudeService';
 import { chatStorageService, ChatConversation, ChatMessage } from '../../services/chatStorageService';
 import FileUploadZone, { UploadedFile } from './FileUploadZone';
 import { healthDataParsingService } from '../../services/healthDataParsingService';
@@ -297,13 +298,31 @@ What would you like to know about your health today?`,
         console.log('✅ File parsed successfully:', parsedData);
 
         // Step 2: Use AI to interpret the file and determine database mappings
-        console.log('🤖 Step 2: AI interpreting file...');
-        const aiInterpretation = await kimiK2Service.interpretHealthFile(
-          parsedData.data,
-          file.name,
-          file.category,
-          user.uid
-        );
+        // Check localStorage for AI provider preference (kimi or claude)
+        const aiProvider = localStorage.getItem('aiProvider') || 'kimi';
+        console.log(`🤖 Step 2: AI interpreting file using ${aiProvider.toUpperCase()}...`);
+
+        let aiInterpretation;
+        if (aiProvider === 'claude' && claudeService.isAvailable()) {
+          console.log('Using Claude AI for file interpretation');
+          aiInterpretation = await claudeService.interpretHealthFile(
+            parsedData.data,
+            file.name,
+            file.category,
+            user.uid
+          );
+        } else {
+          if (aiProvider === 'claude') {
+            console.warn('Claude API not configured, falling back to Kimi K2');
+          }
+          console.log('Using Kimi K2 for file interpretation');
+          aiInterpretation = await kimiK2Service.interpretHealthFile(
+            parsedData.data,
+            file.name,
+            file.category,
+            user.uid
+          );
+        }
         console.log('✅ AI interpretation complete:', aiInterpretation);
 
         // Step 3: Save to database based on AI recommendations
