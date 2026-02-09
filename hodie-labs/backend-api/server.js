@@ -44,8 +44,12 @@ async function connectDB() {
 }
 
 // Middleware
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',')
+  : ['http://localhost:3000', 'https://hodie-labs-webapp.web.app', 'https://hodie-labs-webapp.firebaseapp.com'];
+
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS.split(','),
+  origin: allowedOrigins,
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
