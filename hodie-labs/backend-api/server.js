@@ -23,6 +23,7 @@ const UsageTracker = require('./services/usageTracker');
 const clientRoutes = require('./routes/clientRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const dataRoutes = require('./routes/dataRoutes');
+const visualizationRoutes = require('./routes/visualizationRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -395,6 +396,9 @@ app.get('/api/admin/usage-stats', async (req, res) => {
 app.use('/api/clients', clientRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api', dataRoutes);
+
+// Visualization Routes (JavaScript-based chart generation)
+app.use('/api/visualize', visualizationRoutes);
 
 // Start server
 async function startServer() {

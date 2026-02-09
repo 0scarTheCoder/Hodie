@@ -1,9 +1,11 @@
 /**
  * Visualization Service
- * Calls Python visualization API to generate charts
+ * Calls Node.js backend API to generate charts (JavaScript/Chart.js based)
  */
 
-const VIZ_API_URL = process.env.REACT_APP_VISUALIZATION_API_URL || 'http://localhost:5000';
+// Use the main backend API URL (no separate visualization service needed)
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3001/api';
+const VIZ_API_URL = API_BASE_URL.replace('/api', '') + '/api/visualize';
 
 export interface VisualizationResult {
   filename: string;
