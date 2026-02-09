@@ -35,7 +35,7 @@ router.get('/lab-results/:userId', authenticateUser, async (req, res) => {
     }
 
     // Fetch lab results for this client
-    const labResultsCollection = req.app.locals.db.collection('lab_results');
+    const labResultsCollection = req.app.locals.db.collection('labresults');
     const results = await labResultsCollection
       .find({ clientID: client.clientID })
       .sort({ uploadDate: -1 })
@@ -76,7 +76,7 @@ router.get('/genetic-data/:userId', authenticateUser, async (req, res) => {
       return res.json([]);
     }
 
-    const geneticDataCollection = req.app.locals.db.collection('genetic_data');
+    const geneticDataCollection = req.app.locals.db.collection('geneticdatas');
     const results = await geneticDataCollection
       .find({ clientID: client.clientID })
       .sort({ uploadDate: -1 })
@@ -117,7 +117,7 @@ router.get('/wearable-data/:userId', authenticateUser, async (req, res) => {
       return res.json([]);
     }
 
-    const wearableDataCollection = req.app.locals.db.collection('wearable_data');
+    const wearableDataCollection = req.app.locals.db.collection('wearabledatas');
     const limit = parseInt(req.query.limit) || 30;
 
     const results = await wearableDataCollection
@@ -161,7 +161,7 @@ router.get('/health-metrics/:userId', authenticateUser, async (req, res) => {
       return res.json([]);
     }
 
-    const healthMetricsCollection = req.app.locals.db.collection('health_metrics');
+    const healthMetricsCollection = req.app.locals.db.collection('healthmetrics');
     const limit = parseInt(req.query.limit) || 100;
 
     const results = await healthMetricsCollection
@@ -205,7 +205,7 @@ router.get('/medical-reports/:userId', authenticateUser, async (req, res) => {
       return res.json([]);
     }
 
-    const medicalReportsCollection = req.app.locals.db.collection('medical_reports');
+    const medicalReportsCollection = req.app.locals.db.collection('medicalreports');
     const results = await medicalReportsCollection
       .find({ clientID: client.clientID })
       .sort({ uploadDate: -1 })
@@ -233,11 +233,11 @@ router.delete('/:collection/:recordId', authenticateUser, async (req, res) => {
 
     // Validate collection name
     const allowedCollections = [
-      'lab_results',
-      'genetic_data',
-      'wearable_data',
-      'health_metrics',
-      'medical_reports'
+      'labresults',
+      'geneticdatas',
+      'wearabledatas',
+      'healthmetrics',
+      'medicalreports'
     ];
 
     if (!allowedCollections.includes(collection)) {
