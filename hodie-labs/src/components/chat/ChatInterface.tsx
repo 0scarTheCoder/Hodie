@@ -1,6 +1,7 @@
 // ChatInterface with Visualization Integration - Updated Feb 9, 2026
 import React, { useState, useRef, useEffect } from 'react';
 import { User } from 'firebase/auth';
+import { useAuth0 } from '@auth0/auth0-react';
 import { Upload, Paperclip } from 'lucide-react';
 import { queryLogger } from '../../utils/queryLogger';
 import { kimiK2Service, HealthContext, ConversationMessage } from '../../services/kimiK2Service';
@@ -41,6 +42,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
   const [showFileUpload, setShowFileUpload] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Get Auth0 token function for authenticated API calls
+  const { getAccessTokenSilently } = useAuth0();
 
   // Helper: Get user ID that works with both Firebase (uid) and Auth0 (sub)
   const getUserId = (): string => {
@@ -326,13 +330,28 @@ What would you like to know about your health today?`,
     try {
       console.log('📊 Fetching comprehensive health context for user:', userId);
 
-      // Fetch data from all collections in parallel
+      // Get JWT token for authenticated API calls
+      const token = await getAccessTokenSilently().catch((error) => {
+        console.warn('⚠️ Could not get Auth0 token:', error);
+        return null;
+      });
+
+      // Prepare headers with authorization
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json'
+      };
+
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      // Fetch data from all collections in parallel with authentication
       const [healthMetricsRes, labResultsRes, geneticDataRes, wearableDataRes, medicalReportsRes] = await Promise.all([
-        fetch(`${process.env.REACT_APP_API_BASE_URL}/health-metrics/${userId}?limit=1`).catch(() => null),
-        fetch(`${process.env.REACT_APP_API_BASE_URL}/lab-results/${userId}`).catch(() => null),
-        fetch(`${process.env.REACT_APP_API_BASE_URL}/genetic-data/${userId}`).catch(() => null),
-        fetch(`${process.env.REACT_APP_API_BASE_URL}/wearable-data/${userId}?limit=7`).catch(() => null),
-        fetch(`${process.env.REACT_APP_API_BASE_URL}/medical-reports/${userId}`).catch(() => null)
+        fetch(`${process.env.REACT_APP_API_BASE_URL}/health-metrics/${userId}?limit=1`, { headers }).catch(() => null),
+        fetch(`${process.env.REACT_APP_API_BASE_URL}/lab-results/${userId}`, { headers }).catch(() => null),
+        fetch(`${process.env.REACT_APP_API_BASE_URL}/genetic-data/${userId}`, { headers }).catch(() => null),
+        fetch(`${process.env.REACT_APP_API_BASE_URL}/wearable-data/${userId}?limit=7`, { headers }).catch(() => null),
+        fetch(`${process.env.REACT_APP_API_BASE_URL}/medical-reports/${userId}`, { headers }).catch(() => null)
       ]);
 
       const context: any = { userId };
