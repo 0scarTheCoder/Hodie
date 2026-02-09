@@ -80,7 +80,7 @@ class Auth0Service {
       authorizationParams: {
         redirect_uri: this.config.redirectUri,
         audience: this.config.audience,
-        scope: 'openid profile email read:current_user update:current_user_metadata'
+        scope: 'openid profile email read:current_user update:current_user_metadata offline_access'
       },
       useRefreshTokens: true,
       cacheLocation: 'localstorage' as const

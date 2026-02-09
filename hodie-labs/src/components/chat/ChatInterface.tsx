@@ -42,6 +42,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
   const [showFileUpload, setShowFileUpload] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const lastProcessedMessageRef = useRef<string | null>(null);
 
   // Get Auth0 token function for authenticated API calls
   const { getAccessTokenSilently } = useAuth0();
@@ -50,17 +51,23 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
   const getUserId = (): string => {
     // Auth0 user object has 'sub' property
     if ((user as any).sub) {
-      console.log('🔑 Using Auth0 user ID:', (user as any).sub);
       return (user as any).sub;
     }
     // Firebase user object has 'uid' property
-    if (getUserId()) {
-      console.log('🔑 Using Firebase user ID:', getUserId());
-      return getUserId();
+    if ((user as any).uid) {
+      return (user as any).uid;
     }
     console.error('❌ No user ID found in user object:', user);
     throw new Error('User ID not found in user object');
   };
+
+  // Log user ID once when available (prevents spam)
+  useEffect(() => {
+    const userId = (user as any).sub || (user as any).uid;
+    if (userId) {
+      console.log('🔑 Using Auth0 user ID:', userId);
+    }
+  }, [(user as any).sub || (user as any).uid]);
 
   // Initialize AI status and load chat history
   useEffect(() => {
@@ -171,8 +178,17 @@ What would you like to know about your health today?`,
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
 
+    const messageId = Date.now().toString();
+
+    // Prevent duplicate processing of the same message
+    if (lastProcessedMessageRef.current === messageId) {
+      console.warn('⚠️ Skipping duplicate message processing');
+      return;
+    }
+    lastProcessedMessageRef.current = messageId;
+
     const userMessage: Message = {
-      id: Date.now().toString(),
+      id: messageId,
       text: inputValue,
       sender: 'user',
       timestamp: new Date()
@@ -206,9 +222,21 @@ What would you like to know about your health today?`,
         console.log('📊 Visualization request detected');
 
         try {
+          // Get Auth0 token for authenticated API calls
+          const token = await getAccessTokenSilently().catch((error) => {
+            console.warn('⚠️ Could not get Auth0 token for visualization:', error);
+            return null;
+          });
+
+          const headers: HeadersInit = { 'Content-Type': 'application/json' };
+          if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+          }
+
           // Fetch blood donation data from lab results
           const labResultsResponse = await fetch(
-            `${process.env.REACT_APP_API_BASE_URL}/lab-results/${getUserId()}`
+            `${process.env.REACT_APP_API_BASE_URL}/lab-results/${getUserId()}`,
+            { headers }
           );
 
           if (labResultsResponse.ok) {
@@ -780,10 +808,16 @@ What would you like to know about your health today?`,
         {messages.map((message) => (
           <div
             key={message.id}
-            className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+            className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} ${
+              message.bloodData && message.bloodData.length > 0 ? 'w-full' : ''
+            }`}
           >
             <div
-              className={`max-w-xs lg:max-w-2xl px-4 py-3 rounded-xl ${
+              className={`${
+                message.bloodData && message.bloodData.length > 0
+                  ? 'w-full'
+                  : 'max-w-xs lg:max-w-2xl'
+              } px-4 py-3 rounded-xl ${
                 message.sender === 'user'
                   ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
                   : 'bg-white shadow-lg border border-gray-200 text-gray-900'

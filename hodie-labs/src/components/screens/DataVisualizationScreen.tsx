@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { User } from 'firebase/auth';
+import { useAuth0 } from '@auth0/auth0-react';
 import {
   BarChart,
   Bar,
@@ -56,6 +57,7 @@ interface LabResult {
 }
 
 const DataVisualizationScreen: React.FC<DataVisualizationScreenProps> = ({ user }) => {
+  const { getAccessTokenSilently } = useAuth0();
   const [labResults, setLabResults] = useState<LabResult[]>([]);
   const [selectedDataset, setSelectedDataset] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -80,7 +82,18 @@ const DataVisualizationScreen: React.FC<DataVisualizationScreenProps> = ({ user 
 
         console.log('📊 Fetching lab results from:', apiUrl);
 
-        const response = await fetch(apiUrl);
+        // Get Auth0 token for API authentication
+        const token = await getAccessTokenSilently().catch((error) => {
+          console.warn('⚠️ Could not get Auth0 token for data visualization:', error);
+          return null;
+        });
+
+        const headers: HeadersInit = { 'Content-Type': 'application/json' };
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const response = await fetch(apiUrl, { headers });
 
         if (!response.ok) {
           throw new Error(`Failed to fetch lab results: ${response.status}`);

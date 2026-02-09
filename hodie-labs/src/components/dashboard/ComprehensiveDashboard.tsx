@@ -114,14 +114,22 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
   useEffect(() => {
     const initialiseUserMetrics = async () => {
       try {
-        console.log('📊 Initializing user metrics for:', user.uid);
+        // Get user ID (works for both Auth0 'sub' and Firebase 'uid')
+        const userId = (user as any).sub || (user as any).uid;
+        console.log('📊 Initializing user metrics for:', userId);
+
+        if (!userId) {
+          console.warn('⚠️ No user ID available, skipping metrics initialization');
+          setLoading(false);
+          return;
+        }
 
         // Track this login and get streak data
-        const loginInfo = await userMetricsService.trackUserLogin(user.uid);
+        const loginInfo = await userMetricsService.trackUserLogin(userId);
         setLoginData(loginInfo);
 
         // Get calculated health score (assumes user age 42 for demo)
-        const scoreMetrics = await userMetricsService.getUserHealthScore(user.uid, 42);
+        const scoreMetrics = await userMetricsService.getUserHealthScore(userId, 42);
         setHealthScore(scoreMetrics);
 
         // Show confetti for any login streak (including day 1)
@@ -139,7 +147,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
     };
 
     initialiseUserMetrics();
-  }, [user.uid]);
+  }, [(user as any).sub || (user as any).uid]);
 
   const handleChatKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
