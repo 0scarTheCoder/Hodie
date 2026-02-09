@@ -29,9 +29,11 @@ interface Message {
 
 interface ChatInterfaceProps {
   user: User;
+  initialQuery?: string;
+  onQueryProcessed?: () => void;
 }
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
+const ChatInterface: React.FC<ChatInterfaceProps> = ({ user, initialQuery, onQueryProcessed }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -43,6 +45,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user }) => {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const lastProcessedMessageRef = useRef<string | null>(null);
+  const initialQueryProcessedRef = useRef<boolean>(false);
 
   // Get Auth0 token function for authenticated API calls
   const { getAccessTokenSilently } = useAuth0();
@@ -175,8 +178,21 @@ What would you like to know about your health today?`,
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = async () => {
-    if (!inputValue.trim() || isLoading) return;
+  // Process initial query if provided
+  useEffect(() => {
+    if (initialQuery && !initialQueryProcessedRef.current && !isLoading && messages.length > 0) {
+      console.log('📨 Processing initial query:', initialQuery);
+      initialQueryProcessedRef.current = true;
+      processQuery(initialQuery);
+      if (onQueryProcessed) {
+        onQueryProcessed();
+      }
+    }
+  }, [initialQuery, isLoading, messages.length]);
+
+  // Core function to process a query (used by both manual input and initial query)
+  const processQuery = async (query: string) => {
+    if (!query.trim() || isLoading) return;
 
     const messageId = Date.now().toString();
 
@@ -189,17 +205,16 @@ What would you like to know about your health today?`,
 
     const userMessage: Message = {
       id: messageId,
-      text: inputValue,
+      text: query,
       sender: 'user',
       timestamp: new Date()
     };
 
     setMessages(prev => [...prev, userMessage]);
-    setInputValue('');
     setIsLoading(true);
 
     const logId = queryLogger.logQuery(
-      inputValue,
+      query,
       'health_query',
       getUserId(),
       { component: 'chat_interface' }
@@ -213,7 +228,7 @@ What would you like to know about your health today?`,
         'distribution', 'bar chart', 'line chart'
       ];
       const isVizRequest = visualizationKeywords.some(keyword =>
-        inputValue.toLowerCase().includes(keyword)
+        query.toLowerCase().includes(keyword)
       );
 
       let bloodData: BloodRecord[] | undefined;
@@ -285,9 +300,9 @@ What would you like to know about your health today?`,
         console.log('🤖 Using Claude AI for response');
 
         // Add context summary to the query if user has uploaded data
-        let enhancedQuery = inputValue;
+        let enhancedQuery = query;
         if (healthContext.availableDataSummary) {
-          enhancedQuery = `${inputValue}\n\n[Context: ${healthContext.availableDataSummary}]`;
+          enhancedQuery = `${query}\n\n[Context: ${healthContext.availableDataSummary}]`;
         }
 
         // If we have blood data for visualization, let AI know
@@ -309,9 +324,9 @@ What would you like to know about your health today?`,
         console.log('🤖 Using Kimi K2 AI for response');
 
         // If we have blood data for visualization, modify the query for Kimi K2
-        let queryForAI = inputValue;
+        let queryForAI = query;
         if (bloodData && bloodData.length > 0) {
-          queryForAI = `${inputValue}\n\n[Note: Interactive data visualizations (histograms, scatter plots) have been generated from ${bloodData.length} records and displayed. Please provide textual analysis and interpretation of the blood donation data.]`;
+          queryForAI = `${query}\n\n[Note: Interactive data visualizations (histograms, scatter plots) have been generated from ${bloodData.length} records and displayed. Please provide textual analysis and interpretation of the blood donation data.]`;
         }
 
         responseText = await kimiK2Service.generateHealthResponse(
@@ -330,11 +345,11 @@ What would you like to know about your health today?`,
       };
 
       setMessages(prev => [...prev, assistantMessage]);
-      
+
       // Update conversation history
       setConversationHistory(prev => [
         ...prev,
-        { role: 'user', content: inputValue },
+        { role: 'user', content: query },
         { role: 'assistant', content: responseText }
       ]);
       
@@ -352,6 +367,14 @@ What would you like to know about your health today?`,
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Wrapper function for handling manual message sends
+  const handleSendMessage = async () => {
+    if (!inputValue.trim() || isLoading) return;
+    const query = inputValue;
+    setInputValue(''); // Clear input immediately
+    await processQuery(query);
   };
 
   const getUserHealthContext = async (userId: string) => {

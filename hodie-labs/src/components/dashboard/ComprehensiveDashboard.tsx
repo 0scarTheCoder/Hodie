@@ -71,6 +71,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
   const [loginData, setLoginData] = useState<UserLoginData | null>(null);
   const [loading, setLoading] = useState(true);
   const [showChat, setShowChat] = useState(false);
+  const [initialChatQuery, setInitialChatQuery] = useState<string>('');
 
   // Lock body scroll when chat is open
   useEffect(() => {
@@ -825,10 +826,11 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
             </button>
             <button
               onClick={() => {
-                setCurrentScreen('data');
+                setInitialChatQuery('Show me a graphical representation of all my health data');
+                setShowChat(true);
                 setMobileMenuOpen(false);
               }}
-              className={`text-left text-white hover:text-blue-300 ${currentScreen === 'data' ? 'text-blue-300' : ''}`}
+              className="text-left text-white hover:text-blue-300"
             >
               Data Visualizations
             </button>
@@ -890,7 +892,11 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
               </button>
             </div>
             <div className="flex-1 overflow-hidden">
-              <ChatInterface user={user} />
+              <ChatInterface
+                user={user}
+                initialQuery={initialChatQuery}
+                onQueryProcessed={() => setInitialChatQuery('')}
+              />
             </div>
           </div>
         </div>
