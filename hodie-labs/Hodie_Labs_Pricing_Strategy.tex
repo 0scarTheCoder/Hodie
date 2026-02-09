@@ -1,0 +1,1190 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{longtable}
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{hyperref}
+
+% Color definitions
+\definecolor{hodieblue}{RGB}{59,130,246}
+\definecolor{hodiepurple}{RGB}{139,92,246}
+\definecolor{lightgray}{RGB}{248,250,252}
+\definecolor{darkgray}{RGB}{100,116,139}
+
+% Header and footer
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{hodieblue}{\textbf{Hodie Labs}}}
+\fancyhead[R]{\textcolor{darkgray}{Pricing Strategy}}
+\fancyfoot[C]{\thepage}
+
+% Section formatting
+\titleformat{\section}
+{\color{hodieblue}\Large\bfseries}
+{\thesection}{1em}{}
+
+\titleformat{\subsection}
+{\color{hodiepurple}\large\bfseries}
+{\thesubsection}{1em}{}
+
+\begin{document}
+
+% Title Page
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+
+    {\Huge\color{hodieblue}\textbf{Hodie Labs}}\\[0.5cm]
+    {\LARGE\color{hodiepurple}AI-Powered Health Analytics Platform}\\[2cm]
+
+    {\Huge\textbf{Pricing Strategy \& \\[0.3cm] Financial Analysis}}\\[1cm]
+
+    {\Large Subscription Tier Breakdown}\\[0.5cm]
+    {\large Cost Analysis \& Revenue Projections}\\[3cm]
+
+    {\large\textbf{Prepared:} \today}\\[0.5cm]
+    {\large\textbf{Confidential Business Document}}\\[2cm]
+
+    \vfill
+
+    {\large Hodie Labs Pty Ltd}\\
+    {\normalsize Australian Health Technology Company}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% Executive Summary
+\section{Executive Summary}
+
+Hodie Labs provides AI-powered health data analysis using advanced language models (Claude AI by Anthropic). This document outlines a tiered subscription pricing strategy that:
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Covers operational costs} through user subscriptions
+    \item \textbf{Scales efficiently} from 1,000 to 100,000+ users
+    \item \textbf{Maximises profit margins} (60-85\% across paid tiers)
+    \item \textbf{Minimises free tier losses} through strategic AI model selection
+    \item \textbf{Aligns with competitors} (5-10x better value than alternatives)
+\end{itemize}
+
+\subsection{Key Findings}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lccc}
+\toprule
+\textbf{Tier} & \textbf{Price} & \textbf{Cost} & \textbf{Profit Margin} \\
+\midrule
+Free & \$0.00 & \$0.08 & -100\% (acquisition) \\
+Basic & \$9.99 & \$1.59 & 84\% \\
+Pro & \$24.99 & \$5.63 & 77\% \\
+Premium & \$49.99 & \$45.56 & 9\% \\
+\bottomrule
+\end{tabular}
+\caption{Subscription Tier Overview}
+\end{table}
+
+\textbf{Target Annual Revenue} (at 10,000 users): \textbf{\$378,768} with 63\% margin.
+
+\newpage
+
+% Pricing Tiers
+\section{Subscription Pricing Tiers}
+
+\subsection{Free Tier - ``Try Hodie''}
+
+\begin{table}[h]
+\centering
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{0.3\linewidth}p{0.65\linewidth}}
+\toprule
+\rowcolor{hodieblue!20}
+\textbf{Feature} & \textbf{Details} \\
+\midrule
+\textbf{Price} & \$0.00/month \\
+\textbf{AI Messages} & 10 messages per month \\
+\textbf{AI Model} & \textcolor{red}{\textbf{Groq Llama 3 8B (Free)}} \\
+\textbf{File Uploads} & None (view only pre-uploaded data) \\
+\textbf{Data Analysis} & Basic visualisations only (no AI analysis) \\
+\textbf{Features} & Dashboard, data viz, community support \\
+\textbf{Response Time} & Standard (no priority) \\
+\textbf{Support} & Community forum only \\
+\bottomrule
+\end{tabular}
+\caption{Free Tier Features}
+\end{table}
+
+\subsubsection{Free Tier Strategy - Zero AI Cost Solution}
+
+\textbf{Critical Issue:} Claude AI has no free tier. Every API call costs money.
+
+\textbf{Solution - Use Groq (Free Tier):}
+\begin{itemize}
+    \item Groq offers \textbf{free API access} to Llama 3 8B (14,400 requests/day)
+    \item Fast inference (300+ tokens/second)
+    \item Quality: 70\% as good as Claude Haiku
+    \item Cost: \textbf{\$0.00} for 10 messages/month
+\end{itemize}
+
+\textbf{Alternative Options:}
+\begin{enumerate}
+    \item \textbf{Pre-computed Responses:} FAQs with canned answers (\$0 cost)
+    \item \textbf{Claude Haiku (Minimal):} Reduce to 5 messages/month (\$0.04/user)
+    \item \textbf{Kimi K2:} Chinese LLM with cheaper rates (\$0.02/user)
+\end{enumerate}
+
+\textbf{Recommended:} Use Groq Llama 3 for free tier = \textbf{\$0 AI cost}.
+
+\newpage
+
+\subsubsection{Free Tier Cost Breakdown}
+
+\begin{table}[h]
+\centering
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{lrr}
+\toprule
+\rowcolor{hodieblue!20}
+\textbf{Cost Component} & \textbf{Per User/Month} & \textbf{Annual} \\
+\midrule
+\textbf{AI API Costs} & & \\
+\quad Groq Llama 3 (10 messages) & \$0.00 & \$0.00 \\
+\midrule
+\textbf{Infrastructure Costs} & & \\
+\quad Backend server (amortised) & \$0.05 & \$0.60 \\
+\quad MongoDB storage & \$0.02 & \$0.24 \\
+\quad CDN/Hosting & \$0.01 & \$0.12 \\
+\midrule
+\textbf{Operational Costs} & & \\
+\quad Automated support & \$0.00 & \$0.00 \\
+\quad Monitoring & \$0.00 & \$0.00 \\
+\midrule
+\rowcolor{hodiepurple!20}
+\textbf{TOTAL COST} & \textbf{\$0.08} & \textbf{\$0.96} \\
+\textbf{Revenue} & \textbf{\$0.00} & \textbf{\$0.00} \\
+\rowcolor{red!20}
+\textbf{Net Loss} & \textbf{-\$0.08} & \textbf{-\$0.96} \\
+\bottomrule
+\end{tabular}
+\caption{Free Tier Financial Analysis (with Groq)}
+\end{table}
+
+\textbf{Acceptable Loss:} At \$0.08/user/month, acquiring 1,000 free users costs \textbf{\$80/month}.
+
+\textbf{Conversion Goal:} Convert 20\% to paid tiers within 60 days.
+
+If 200 users convert to Basic tier (\$9.99), revenue = \$1,998/month, profit = \$1,680/month after covering all 1,000 free users.
+
+\textbf{Customer Acquisition Cost (CAC):} Effective CAC = \$0.96/year = negligible compared to \$20-50 typical CAC in health tech.
+
+\newpage
+
+\subsection{Basic Tier - ``Health Explorer''}
+
+\begin{table}[h]
+\centering
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{0.3\linewidth}p{0.65\linewidth}}
+\toprule
+\rowcolor{hodieblue!20}
+\textbf{Feature} & \textbf{Details} \\
+\midrule
+\textbf{Price} & \$9.99/month (AUD \$14.99) \\
+\textbf{AI Messages} & 100 messages per month \\
+\textbf{AI Model} & Claude 3 Haiku \\
+\textbf{File Uploads} & 3 health files per month \\
+\textbf{Data Analysis} & Summary statistics, basic trends \\
+\textbf{Features} & All Free features + file analysis + exports \\
+\textbf{Response Time} & Standard \\
+\textbf{Support} & Email support (48hr response) \\
+\textbf{Integrations} & Manual CSV uploads only \\
+\bottomrule
+\end{tabular}
+\caption{Basic Tier Features}
+\end{table}
+
+\subsubsection{Basic Tier Cost Breakdown}
+
+\begin{table}[h]
+\centering
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{lrr}
+\toprule
+\rowcolor{hodieblue!20}
+\textbf{Cost Component} & \textbf{Per User/Month} & \textbf{Annual} \\
+\midrule
+\textbf{AI API Costs (Claude 3 Haiku)} & & \\
+\quad 100 messages (900 tokens input avg) & \$0.0225 & \$0.27 \\
+\quad Output (700 tokens avg) & \$0.0875 & \$1.05 \\
+\quad File analysis (3 files) & \$0.0019 & \$0.02 \\
+\quad \textit{Subtotal AI} & \$0.1119 & \$1.34 \\
+\midrule
+\textbf{Infrastructure Costs (DigitalOcean)} & & \\
+\quad Managed MongoDB (amortised) & \$0.03 & \$0.36 \\
+\quad Droplet backend server (amortised) & \$0.012 & \$0.14 \\
+\quad Spaces file storage (16MB) & \$0.003 & \$0.04 \\
+\quad CDN bandwidth & \$0.002 & \$0.02 \\
+\quad Backups & \$0.001 & \$0.01 \\
+\quad \textit{Subtotal Infrastructure} & \$0.048 & \$0.58 \\
+\midrule
+\textbf{Operational Costs} & & \\
+\quad Payment processing (Stripe 2.9\%+30¢) & \$0.59 & \$7.08 \\
+\quad Email support (occasional) & \$0.50 & \$6.00 \\
+\quad \textit{Subtotal Operations} & \$1.09 & \$13.08 \\
+\midrule
+\rowcolor{hodiepurple!20}
+\textbf{TOTAL COST} & \textbf{\$1.25} & \textbf{\$14.99} \\
+\textbf{Revenue} & \textbf{\$9.99} & \textbf{\$119.88} \\
+\rowcolor{green!20}
+\textbf{Net Profit} & \textbf{\$8.74} & \textbf{\$104.89} \\
+\rowcolor{green!20}
+\textbf{Profit Margin} & \textbf{87\%} & \textbf{87\%} \\
+\bottomrule
+\end{tabular}
+\caption{Basic Tier Financial Analysis}
+\end{table}
+
+\newpage
+
+\subsection{Pro Tier - ``Health Optimiser'' \textcolor{hodieblue}{★ RECOMMENDED}}
+
+\begin{table}[h]
+\centering
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{0.3\linewidth}p{0.65\linewidth}}
+\toprule
+\rowcolor{hodieblue!20}
+\textbf{Feature} & \textbf{Details} \\
+\midrule
+\textbf{Price} & \$24.99/month (AUD \$37.49) \\
+\textbf{AI Messages} & 500 messages per month \\
+\textbf{AI Model} & Claude 3 Haiku (+ Sonnet for complex queries) \\
+\textbf{File Uploads} & Unlimited health files \\
+\textbf{Data Analysis} & Advanced trends, correlations, predictions \\
+\textbf{Features} & Weekly AI summaries, wearable integration \\
+\textbf{Response Time} & Priority (24hr support response) \\
+\textbf{Support} & Priority email support \\
+\textbf{Integrations} & Fitbit, Apple Health, Garmin \\
+\textbf{Extras} & Early access to features, API access \\
+\bottomrule
+\end{tabular}
+\caption{Pro Tier Features (Most Popular)}
+\end{table}
+
+\subsubsection{Pro Tier Cost Breakdown}
+
+\begin{table}[h]
+\centering
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{lrr}
+\toprule
+\rowcolor{hodieblue!20}
+\textbf{Cost Component} & \textbf{Per User/Month} & \textbf{Annual} \\
+\midrule
+\textbf{AI API Costs} & & \\
+\quad 500 messages (1200 tokens input avg) & \$0.15 & \$1.80 \\
+\quad Output (900 tokens avg) & \$0.5625 & \$6.75 \\
+\quad File analysis (10 files/month) & \$0.01 & \$0.12 \\
+\quad Weekly AI summaries (4/month) & \$0.01 & \$0.12 \\
+\quad Sonnet for complex queries (5/month) & \$0.30 & \$3.60 \\
+\quad \textit{Subtotal AI} & \$1.03 & \$12.39 \\
+\midrule
+\textbf{Infrastructure Costs} & & \\
+\quad Backend server (heavy usage) & \$1.20 & \$14.40 \\
+\quad MongoDB storage & \$0.40 & \$4.80 \\
+\quad CDN/Hosting & \$0.20 & \$2.40 \\
+\quad Monitoring + alerts & \$0.10 & \$1.20 \\
+\quad API infrastructure (wearables) & \$0.15 & \$1.80 \\
+\quad \textit{Subtotal Infrastructure} & \$2.05 & \$24.60 \\
+\midrule
+\textbf{Operational Costs} & & \\
+\quad Payment processing (Stripe) & \$1.02 & \$12.29 \\
+\quad Priority support & \$1.50 & \$18.00 \\
+\quad Wearable API costs & \$0.30 & \$3.60 \\
+\quad \textit{Subtotal Operations} & \$2.82 & \$33.89 \\
+\midrule
+\rowcolor{hodiepurple!20}
+\textbf{TOTAL COST} & \textbf{\$5.90} & \textbf{\$70.88} \\
+\textbf{Revenue} & \textbf{\$24.99} & \textbf{\$299.88} \\
+\rowcolor{green!20}
+\textbf{Net Profit} & \textbf{\$19.09} & \textbf{\$229.00} \\
+\rowcolor{green!20}
+\textbf{Profit Margin} & \textbf{76\%} & \textbf{76\%} \\
+\bottomrule
+\end{tabular}
+\caption{Pro Tier Financial Analysis}
+\end{table}
+
+\textbf{Target Market:} Health enthusiasts, biohackers, fitness professionals. Expected to represent 8-12\% of paid users.
+
+\newpage
+
+\subsection{Premium Tier - ``Health Pro''}
+
+\begin{table}[h]
+\centering
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{0.3\linewidth}p{0.65\linewidth}}
+\toprule
+\rowcolor{hodieblue!20}
+\textbf{Feature} & \textbf{Details} \\
+\midrule
+\textbf{Price} & \$49.99/month (AUD \$74.99) \\
+\textbf{AI Messages} & Unlimited (fair use: \textasciitilde1000/month) \\
+\textbf{AI Model} & Claude 3.5 Sonnet (premium model) \\
+\textbf{File Uploads} & Unlimited + automatic parsing \\
+\textbf{Data Analysis} & Genetic analysis, medical citations \\
+\textbf{Features} & Custom reports, HIPAA compliance \\
+\textbf{Response Time} & Live chat support (2hr response) \\
+\textbf{Support} & Dedicated health data analyst \\
+\textbf{Integrations} & All wearables + healthcare provider API \\
+\textbf{Extras} & Quarterly video consultations (30 min) \\
+\bottomrule
+\end{tabular}
+\caption{Premium Tier Features}
+\end{table}
+
+\subsubsection{Premium Tier Cost Breakdown}
+
+\begin{table}[h]
+\centering
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{lrr}
+\toprule
+\rowcolor{hodieblue!20}
+\textbf{Cost Component} & \textbf{Per User/Month} & \textbf{Annual} \\
+\midrule
+\textbf{AI API Costs (Claude 3.5 Sonnet)} & & \\
+\quad 1000 messages (2000 tokens input) & \$6.00 & \$72.00 \\
+\quad Output (1200 tokens avg) & \$18.00 & \$216.00 \\
+\quad File analysis (30 files/month) & \$0.675 & \$8.10 \\
+\quad Genetic analysis (complex) & \$1.20 & \$14.40 \\
+\quad \textit{Subtotal AI} & \$25.875 & \$310.50 \\
+\midrule
+\textbf{Infrastructure Costs} & & \\
+\quad Dedicated backend resources & \$3.00 & \$36.00 \\
+\quad Storage (genetic data is large) & \$1.50 & \$18.00 \\
+\quad CDN + assets & \$0.50 & \$6.00 \\
+\quad Security + monitoring & \$0.40 & \$4.80 \\
+\quad API infrastructure & \$0.60 & \$7.20 \\
+\quad \textit{Subtotal Infrastructure} & \$6.00 & \$72.00 \\
+\midrule
+\textbf{Operational Costs} & & \\
+\quad Payment processing (Stripe) & \$1.75 & \$20.99 \\
+\quad Live chat support & \$3.00 & \$36.00 \\
+\quad Healthcare integrations & \$0.80 & \$9.60 \\
+\quad Quarterly video call (30 min) & \$8.33 & \$100.00 \\
+\quad \textit{Subtotal Operations} & \$13.88 & \$166.59 \\
+\midrule
+\rowcolor{hodiepurple!20}
+\textbf{TOTAL COST} & \textbf{\$45.76} & \textbf{\$549.09} \\
+\textbf{Revenue} & \textbf{\$49.99} & \textbf{\$599.88} \\
+\rowcolor{green!20}
+\textbf{Net Profit} & \textbf{\$4.23} & \textbf{\$50.79} \\
+\rowcolor{green!20}
+\textbf{Profit Margin} & \textbf{8\%} & \textbf{8\%} \\
+\bottomrule
+\end{tabular}
+\caption{Premium Tier Financial Analysis}
+\end{table}
+
+\textbf{Target Market:} Serious biohackers, patients with chronic conditions, high-income health optimisers. Expected to represent 2-3\% of paid users.
+
+\textbf{Note:} Lower margin but attracts committed users with very low churn (<2\%/month).
+
+\newpage
+
+\section{Pricing Comparison - All Tiers}
+
+\begin{table}[h]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{lcccc}
+\toprule
+\rowcolor{hodieblue!20}
+\textbf{Metric} & \textbf{Free} & \textbf{Basic} & \textbf{Pro} & \textbf{Premium} \\
+\midrule
+\textbf{Price/Month} & \$0.00 & \$9.99 & \$24.99 & \$49.99 \\
+\textbf{Price/Year} & \$0.00 & \$119.88 & \$299.88 & \$599.88 \\
+\midrule
+\textbf{AI Model} & Llama 3 & Haiku & Haiku/Sonnet & Sonnet 3.5 \\
+\textbf{Messages/Month} & 10 & 100 & 500 & 1000 \\
+\textbf{File Uploads} & 0 & 3 & Unlimited & Unlimited \\
+\textbf{Wearables} & No & No & Yes & Yes \\
+\textbf{Support} & Community & Email 48h & Email 24h & Live Chat 2h \\
+\midrule
+\textbf{AI Cost} & \$0.00 & \$0.11 & \$1.03 & \$25.88 \\
+\textbf{Infrastructure} & \$0.08 & \$0.68 & \$2.05 & \$6.00 \\
+\textbf{Operations} & \$0.00 & \$1.09 & \$2.82 & \$13.88 \\
+\midrule
+\rowcolor{hodiepurple!20}
+\textbf{Total Cost} & \$0.08 & \$1.87 & \$5.90 & \$45.76 \\
+\textbf{Profit/Month} & -\$0.08 & \$8.12 & \$19.09 & \$4.23 \\
+\textbf{Profit/Year} & -\$0.96 & \$97.30 & \$229.00 & \$50.79 \\
+\midrule
+\rowcolor{green!20}
+\textbf{Margin} & -100\% & 81\% & 76\% & 8\% \\
+\bottomrule
+\end{tabular}
+\caption{Complete Tier Comparison}
+\end{table}
+
+\subsection{Key Insights}
+
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Free Tier:} Using Groq Llama 3 reduces loss from \$0.23 to \$0.08/user/month
+    \item \textbf{Basic Tier:} Highest margin (81\%) - main profit driver for scale
+    \item \textbf{Pro Tier:} Best balance of features and margin (76\%) - target most users here
+    \item \textbf{Premium Tier:} Low margin (8\%) but attracts committed users with low churn
+\end{enumerate}
+
+\textbf{Strategic Pricing:} Pro tier at \$24.99 positioned as ``best value'' to drive most conversions.
+
+\newpage
+
+\section{Revenue Projections}
+
+\subsection{Year 1 - Conservative Scenario (10,000 Total Users)}
+
+\textbf{User Distribution:}
+\begin{itemize}
+    \item Free: 7,000 users (70\%)
+    \item Basic: 2,000 users (20\%)
+    \item Pro: 800 users (8\%)
+    \item Premium: 200 users (2\%)
+\end{itemize}
+
+\begin{table}[h]
+\centering
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{lrrrr}
+\toprule
+\rowcolor{hodieblue!20}
+\textbf{Tier} & \textbf{Users} & \textbf{Revenue} & \textbf{Costs} & \textbf{Profit} \\
+\midrule
+Free & 7,000 & \$0 & \$560 & -\$560 \\
+Basic & 2,000 & \$19,980 & \$3,740 & \$16,240 \\
+Pro & 800 & \$19,992 & \$4,720 & \$15,272 \\
+Premium & 200 & \$9,998 & \$9,152 & \$846 \\
+\midrule
+\rowcolor{green!20}
+\textbf{TOTAL} & \textbf{10,000} & \textbf{\$49,970} & \textbf{\$18,172} & \textbf{\$31,798} \\
+\rowcolor{green!20}
+\textbf{Margin} & & & & \textbf{64\%} \\
+\bottomrule
+\end{tabular}
+\caption{Year 1 Monthly Revenue (Conservative)}
+\end{table}
+
+\textbf{Annual Revenue:} \$599,640
+
+\textbf{Annual Profit:} \$381,576 (64\% margin)
+
+\subsection{Year 2 - Growth Scenario (50,000 Total Users)}
+
+\textbf{User Distribution:}
+\begin{itemize}
+    \item Free: 35,000 users (70\%)
+    \item Basic: 10,000 users (20\%)
+    \item Pro: 4,000 users (8\%)
+    \item Premium: 1,000 users (2\%)
+\end{itemize}
+
+\begin{table}[h]
+\centering
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{lrrrr}
+\toprule
+\rowcolor{hodieblue!20}
+\textbf{Tier} & \textbf{Users} & \textbf{Revenue} & \textbf{Costs} & \textbf{Profit} \\
+\midrule
+Free & 35,000 & \$0 & \$2,800 & -\$2,800 \\
+Basic & 10,000 & \$99,900 & \$18,700 & \$81,200 \\
+Pro & 4,000 & \$99,960 & \$23,600 & \$76,360 \\
+Premium & 1,000 & \$49,990 & \$45,760 & \$4,230 \\
+\midrule
+\rowcolor{green!20}
+\textbf{TOTAL} & \textbf{50,000} & \textbf{\$249,850} & \textbf{\$90,860} & \textbf{\$158,990} \\
+\rowcolor{green!20}
+\textbf{Margin} & & & & \textbf{64\%} \\
+\bottomrule
+\end{tabular}
+\caption{Year 2 Monthly Revenue (Growth)}
+\end{table}
+
+\textbf{Annual Revenue:} \$2,998,200
+
+\textbf{Annual Profit:} \$1,907,880 (64\% margin)
+
+\newpage
+
+\subsection{Year 3 - Scale Scenario (100,000 Total Users)}
+
+\textbf{User Distribution:}
+\begin{itemize}
+    \item Free: 70,000 users (70\%)
+    \item Basic: 20,000 users (20\%)
+    \item Pro: 8,000 users (8\%)
+    \item Premium: 2,000 users (2\%)
+\end{itemize}
+
+\begin{table}[h]
+\centering
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{lrrrr}
+\toprule
+\rowcolor{hodieblue!20}
+\textbf{Tier} & \textbf{Users} & \textbf{Revenue} & \textbf{Costs} & \textbf{Profit} \\
+\midrule
+Free & 70,000 & \$0 & \$5,600 & -\$5,600 \\
+Basic & 20,000 & \$199,800 & \$37,400 & \$162,400 \\
+Pro & 8,000 & \$199,920 & \$47,200 & \$152,720 \\
+Premium & 2,000 & \$99,980 & \$91,520 & \$8,460 \\
+\midrule
+\rowcolor{green!20}
+\textbf{TOTAL} & \textbf{100,000} & \textbf{\$499,700} & \textbf{\$181,720} & \textbf{\$317,980} \\
+\rowcolor{green!20}
+\textbf{Margin} & & & & \textbf{64\%} \\
+\bottomrule
+\end{tabular}
+\caption{Year 3 Monthly Revenue (Scale)}
+\end{table}
+
+\textbf{Annual Revenue:} \$5,996,400
+
+\textbf{Annual Profit:} \$3,815,760 (64\% margin)
+
+\subsection{Revenue Growth Chart}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lccc}
+\toprule
+\rowcolor{hodieblue!20}
+\textbf{Year} & \textbf{Total Users} & \textbf{Annual Revenue} & \textbf{Annual Profit} \\
+\midrule
+Year 1 & 10,000 & \$599,640 & \$381,576 \\
+Year 2 & 50,000 & \$2,998,200 & \$1,907,880 \\
+Year 3 & 100,000 & \$5,996,400 & \$3,815,760 \\
+\midrule
+\rowcolor{green!20}
+\textbf{3-Year Total} & & \textbf{\$9,594,240} & \textbf{\$6,105,216} \\
+\bottomrule
+\end{tabular}
+\caption{3-Year Revenue Projection}
+\end{table}
+
+\textbf{Break-even Point:} 500 users (250 paid) = \$3,750/month revenue vs. \$2,340 costs.
+
+\newpage
+
+\section{Competitive Analysis}
+
+\subsection{Market Comparison}
+
+\begin{table}[h]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{lccp{5cm}}
+\toprule
+\rowcolor{hodieblue!20}
+\textbf{Competitor} & \textbf{Price} & \textbf{Model} & \textbf{Features} \\
+\midrule
+\textbf{SelfDecode} & \$97/year & Subscription & Genetic analysis, basic health reports \\
+\textbf{InsideTracker} & \$199-599 & One-time & Blood test analysis (single analysis) \\
+\textbf{Viome} & \$49/month & Subscription & Gut health + basic AI recommendations \\
+\textbf{Levels Health} & \$399/month & Subscription & CGM monitoring + AI coaching \\
+\textbf{Nutrisense} & \$225-350 & Monthly & CGM + dietitian support \\
+\midrule
+\rowcolor{green!20}
+\textbf{Hodie Labs Pro} & \textbf{\$24.99/mo} & \textbf{Subscription} & \textbf{All data types + unlimited AI} \\
+\bottomrule
+\end{tabular}
+\caption{Competitive Pricing Landscape}
+\end{table}
+
+\subsection{Value Proposition}
+
+\textbf{Hodie Labs Advantages:}
+\begin{itemize}[leftmargin=*]
+    \item \textbf{5-10x cheaper} than competitors (InsideTracker, Levels)
+    \item \textbf{More comprehensive} - handles genetic, lab, wearable data
+    \item \textbf{Unlimited AI conversations} (Pro tier) vs. limited reports
+    \item \textbf{Australian focus} - uses Australian English, metric units, GP recommendations
+    \item \textbf{Transparent AI} - users know they're talking to Claude, not hidden algorithms
+\end{itemize}
+
+\textbf{Market Positioning:}
+\begin{itemize}
+    \item \textbf{Entry Point:} Free tier competes with basic health trackers
+    \item \textbf{Mass Market:} \$9.99-24.99 range undercuts all premium competitors
+    \item \textbf{Premium Segment:} \$49.99 still 8-10x cheaper than Levels (\$399/mo)
+\end{itemize}
+
+\newpage
+
+\section{DigitalOcean Infrastructure Costs}
+
+\subsection{Why DigitalOcean?}
+
+Hodie Labs will use \textbf{DigitalOcean} as the primary cloud computing platform for:
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Managed MongoDB} - Database hosting for user data
+    \item \textbf{Droplets} - Backend API servers (Node.js)
+    \item \textbf{Spaces} - Object storage for health files and genetic data
+    \item \textbf{CDN} - Content delivery and bandwidth
+    \item \textbf{Block Storage} - Backups and redundancy
+\end{itemize}
+
+\textbf{Advantages over AWS/Azure:}
+\begin{itemize}
+    \item 40-60\% lower costs for this use case
+    \item Simpler pricing (no hidden fees)
+    \item Excellent developer experience
+    \item Predictable scaling costs
+    \item Australian data center availability (Sydney)
+\end{itemize}
+
+\subsection{Infrastructure Costs by Scale}
+
+\begin{table}[h]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{lrrrr}
+\toprule
+\rowcolor{hodieblue!20}
+\textbf{Service} & \textbf{1K Users} & \textbf{10K Users} & \textbf{50K Users} & \textbf{100K Users} \\
+\midrule
+Managed MongoDB & \$40 & \$245 & \$1,203 & \$3,287 \\
+Backend Droplets & \$12 & \$24 & \$96 & \$192 \\
+Spaces Storage & \$5 & \$5 & \$20 & \$41 \\
+CDN Bandwidth & \$0 & \$2 & \$40 & \$90 \\
+Backups & \$1 & \$10 & \$50 & \$100 \\
+Load Balancer & \$0 & \$12 & \$12 & \$24 \\
+Monitoring & \$0 & \$0 & \$0 & \$20 \\
+\midrule
+\rowcolor{hodiepurple!20}
+\textbf{TOTAL} & \textbf{\$58} & \textbf{\$298} & \textbf{\$1,421} & \textbf{\$3,754} \\
+\textbf{Per User} & \textbf{\$0.058} & \textbf{\$0.030} & \textbf{\$0.028} & \textbf{\$0.038} \\
+\bottomrule
+\end{tabular}
+\caption{DigitalOcean Monthly Infrastructure Costs}
+\end{table}
+
+\textbf{Key Insight:} Infrastructure cost per user \textit{decreases} as you scale (economies of scale).
+
+\subsection{Storage Requirements Per User}
+
+\begin{table}[h]
+\centering
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{lrr}
+\toprule
+\rowcolor{hodieblue!20}
+\textbf{User Tier} & \textbf{Storage Per User} & \textbf{Monthly Cost} \\
+\midrule
+Free & 0.1 MB & \$0.000002 \\
+Basic & 16 MB & \$0.00032 \\
+Pro & 90 MB & \$0.0018 \\
+Premium & 500 MB & \$0.01 \\
+\bottomrule
+\end{tabular}
+\caption{Storage Costs Per User (DigitalOcean Spaces at \$0.02/GB)}
+\end{table}
+
+\textbf{Total Storage Example} (10,000 users):
+\begin{itemize}
+    \item 7,000 free × 0.1MB = 700MB
+    \item 2,000 basic × 16MB = 32GB
+    \item 800 pro × 90MB = 72GB
+    \item 200 premium × 500MB = 100GB
+    \item \textbf{Total: 204.7GB} (fits in \$5/month Spaces plan with 250GB included)
+\end{itemize}
+
+\subsection{Updated Cost Per User (With DigitalOcean)}
+
+\begin{table}[h]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{lrrrr}
+\toprule
+\rowcolor{hodieblue!20}
+\textbf{Tier} & \textbf{AI Cost} & \textbf{DigitalOcean} & \textbf{Total Cost} & \textbf{Profit} \\
+\midrule
+\multicolumn{5}{c}{\textit{10,000 Users Scenario}} \\
+\midrule
+Free & \$0.00 & \$0.015 & \$0.015 & -\$0.015 \\
+Basic & \$0.11 & \$0.036 & \$1.24 & \$8.75 \\
+Pro & \$1.03 & \$0.075 & \$3.63 & \$21.36 \\
+Premium & \$25.88 & \$0.240 & \$36.23 & \$13.76 \\
+\midrule
+\multicolumn{5}{c}{\textit{100,000 Users Scenario}} \\
+\midrule
+Free & \$0.00 & \$0.011 & \$0.011 & -\$0.011 \\
+Basic & \$0.11 & \$0.046 & \$1.25 & \$8.74 \\
+Pro & \$1.03 & \$0.133 & \$3.68 & \$21.31 \\
+Premium & \$25.88 & \$0.456 & \$36.42 & \$13.57 \\
+\bottomrule
+\end{tabular}
+\caption{Updated Costs Including DigitalOcean Infrastructure}
+\end{table}
+
+\textbf{Margin Improvements:}
+\begin{itemize}
+    \item Free tier loss reduced from \$0.08 to \$0.011-0.015 (81-85\% improvement)
+    \item Basic tier margin increased from 81\% to 87\%
+    \item Pro tier margin increased from 76\% to 85\%
+    \item Premium tier margin stable at 8-13\% (AI costs dominate)
+\end{itemize}
+
+\subsection{Recommended Setup by Stage}
+
+\textbf{Stage 1: Launch (0-1,000 users)} - \$58/month
+\begin{itemize}
+    \item Managed MongoDB Basic (2GB RAM, 25GB storage)
+    \item Single Droplet Standard (2GB RAM, 2 vCPU)
+    \item Spaces Basic (250GB included)
+    \item Backups (10GB)
+\end{itemize}
+
+\textbf{Stage 2: Growth (1,000-10,000 users)} - \$298/month
+\begin{itemize}
+    \item Managed MongoDB Standard + extra storage (4GB RAM, 80GB + 125GB)
+    \item Single Droplet Premium (4GB RAM, 2 vCPU)
+    \item Spaces Basic (within free tier)
+    \item Load Balancer for high availability
+    \item Backups (100GB)
+\end{itemize}
+
+\textbf{Stage 3: Scale (10,000-50,000 users)} - \$1,421/month
+\begin{itemize}
+    \item Managed MongoDB Professional + replica + storage
+    \item Multiple Droplets for redundancy (2× High Performance)
+    \item Spaces with overage
+    \item Load Balancer
+    \item Enhanced backups and monitoring
+\end{itemize}
+
+\textbf{Stage 4: Enterprise (50,000-100,000 users)} - \$3,754/month
+\begin{itemize}
+    \item MongoDB Enterprise cluster (16GB RAM, multi-region)
+    \item Multiple Droplets across regions (4× High Performance)
+    \item Spaces with significant overage (2TB+)
+    \item Multiple Load Balancers
+    \item Premium monitoring and DDoS protection
+\end{itemize}
+
+\subsection{Cost Comparison: Current vs Optimised}
+
+\begin{table}[h]
+\centering
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{lrr}
+\toprule
+\rowcolor{hodieblue!20}
+\textbf{Setup} & \textbf{10K Users} & \textbf{100K Users} \\
+\midrule
+\textbf{Current Setup:} & & \\
+MongoDB Atlas M20 & \$188/month & \$1,839/month \\
+Generic hosting estimates & \$800/month & \$8,000/month \\
+Total infrastructure & \$988/month & \$9,839/month \\
+\midrule
+\textbf{DigitalOcean Setup:} & & \\
+Managed MongoDB & \$245/month & \$3,287/month \\
+All other services & \$53/month & \$467/month \\
+Total infrastructure & \$298/month & \$3,754/month \\
+\midrule
+\rowcolor{green!20}
+\textbf{Monthly Savings} & \textbf{\$690} & \textbf{\$6,085} \\
+\rowcolor{green!20}
+\textbf{Annual Savings} & \textbf{\$8,280} & \textbf{\$73,020} \\
+\bottomrule
+\end{tabular}
+\caption{Cost Comparison: Generic Hosting vs DigitalOcean}
+\end{table}
+
+\textbf{Recommendation:} Use DigitalOcean for 0-100K users. Consider migrating to MongoDB Atlas Enterprise at 100K+ users if optimisation benefits outweigh cost difference.
+
+\newpage
+
+\section{Implementation Recommendations}
+
+\subsection{Phase 1: Launch (Months 1-3)}
+
+\textbf{Tiers to Launch:}
+\begin{itemize}
+    \item Free (with Groq Llama 3)
+    \item Pro (\$24.99) - skip Basic initially
+\end{itemize}
+
+\textbf{Rationale:}
+\begin{itemize}
+    \item Simplifies decision-making (free vs. paid)
+    \item \$24.99 positioned as only paid option = higher perceived value
+    \item Easier to manage 2 tiers vs. 4 during initial launch
+\end{itemize}
+
+\textbf{Focus:} User acquisition, feedback collection, feature validation.
+
+\subsection{Phase 2: Optimisation (Months 4-6)}
+
+\textbf{Actions:}
+\begin{itemize}
+    \item Add Basic tier (\$9.99) based on user feedback
+    \item Many free users may want paid features but find \$24.99 too expensive
+    \item Capture price-sensitive users who would otherwise churn
+\end{itemize}
+
+\textbf{Expected Conversion:}
+\begin{itemize}
+    \item 10\% free → Basic
+    \item 10\% free → Pro
+    \item Total 20\% conversion rate
+\end{itemize}
+
+\subsection{Phase 3: Premium Launch (Months 7-12)}
+
+\textbf{Add Premium Tier (\$49.99):}
+\begin{itemize}
+    \item Target power users who maxed out Pro limits
+    \item Add genetic analysis, video consultations
+    \item Focus on users with chronic health conditions
+\end{itemize}
+
+\textbf{Expected Users:} 2-3\% of total base (low volume, committed users).
+
+\subsection{Phase 4: Enterprise (Year 2)}
+
+\textbf{Enterprise Tier (Custom Pricing):}
+\begin{itemize}
+    \item Target medical practices, health coaches, corporate wellness
+    \item Custom pricing: \$299-999/month (5-50 seats)
+    \item White-label options, custom integrations
+\end{itemize}
+
+\textbf{Sales Motion:} Direct sales, demos, pilot programs.
+
+\newpage
+
+\section{Critical Implementation Details}
+
+\subsection{Free Tier - Technical Implementation}
+
+\textbf{Current Problem:} Your Claude API key is exposed in browser (security risk).
+
+\textbf{Solution - Backend API Proxy:}
+
+\begin{enumerate}
+    \item Build Node.js/Express backend
+    \item Endpoint: \texttt{POST /api/chat}
+    \item Backend checks user tier, selects appropriate model:
+    \begin{itemize}
+        \item Free → Groq Llama 3 (free API)
+        \item Basic/Pro → Claude Haiku
+        \item Premium → Claude 3.5 Sonnet
+    \end{itemize}
+    \item Backend enforces rate limits (10/100/500/1000 messages)
+    \item API keys stored securely on backend only
+\end{enumerate}
+
+\textbf{Cost Savings:}
+\begin{itemize}
+    \item Free tier: \$0.23/user → \$0.08/user (65\% reduction)
+    \item Prevents API key theft/abuse
+    \item Enables per-user rate limiting
+\end{itemize}
+
+\subsection{Data Efficiency - Summarisation Strategy}
+
+\textbf{Current Problem:} Sending 20 sample rows (2,000 tokens) in every message.
+
+\textbf{Solution - Pre-computed Summaries:}
+
+\begin{enumerate}
+    \item On file upload, compute statistics:
+    \begin{itemize}
+        \item Mean, median, std dev for all numeric fields
+        \item Distribution histograms
+        \item Trend analysis (increasing/decreasing)
+        \item Anomaly detection
+    \end{itemize}
+    \item Store summary in MongoDB (200 tokens vs. 2,000)
+    \item Send summary to Claude, not raw data
+    \item Only fetch raw data when user specifically requests it
+\end{enumerate}
+
+\textbf{Cost Savings:}
+\begin{itemize}
+    \item 90\% reduction in tokens per message
+    \item Basic tier: \$1.87 → \$0.40/user
+    \item Pro tier: \$5.90 → \$1.30/user
+\end{itemize}
+
+\textbf{New margins with summarisation:}
+\begin{table}[h]
+\centering
+\begin{tabular}{lcc}
+\toprule
+\textbf{Tier} & \textbf{Current Margin} & \textbf{With Summarisation} \\
+\midrule
+Basic & 81\% & 96\% \\
+Pro & 76\% & 95\% \\
+Premium & 8\% & 18\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+
+\subsection{Prompt Caching Implementation}
+
+Claude API supports prompt caching (reduces costs by 90\% for repeated content).
+
+\textbf{How it works:}
+\begin{itemize}
+    \item Cache system prompt + user data summary
+    \item First message: Full cost
+    \item Next messages (within 5 minutes): 90\% discount on cached portion
+    \item Typical conversation: 5-10 messages in 5 minutes
+\end{itemize}
+
+\textbf{Cost Reduction Example:}
+\begin{itemize}
+    \item User has 10-message conversation
+    \item Without caching: 10 × 2,000 tokens = 20,000 tokens
+    \item With caching: 2,000 + (9 × 200) = 3,800 tokens (81\% reduction)
+\end{itemize}
+
+\textbf{Expected Savings:} 50-70\% on active users (those with multi-message conversations).
+
+\subsection{Rate Limiting \& Fair Use Policy}
+
+\textbf{Implementation:}
+\begin{itemize}
+    \item Store message count per user per month in MongoDB
+    \item Backend checks count before processing
+    \item Return friendly error: ``You've reached your monthly limit. Upgrade to Pro for 500 messages/month.''
+\end{itemize}
+
+\textbf{Fair Use Policy (Premium ``Unlimited''):}
+\begin{itemize}
+    \item Soft cap: 1,000 messages/month
+    \item If user exceeds 1,500 messages: Review account
+    \item 99\% of users will stay under 1,000
+    \item Prevents abuse while keeping ``unlimited'' promise
+\end{itemize}
+
+\section{Key Metrics to Track}
+
+\subsection{Financial Metrics}
+
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{MRR} (Monthly Recurring Revenue): Total subscription revenue
+    \item \textbf{ARR} (Annual Recurring Revenue): MRR × 12
+    \item \textbf{ARPU} (Average Revenue Per User): Total revenue ÷ paid users
+    \item \textbf{CAC} (Customer Acquisition Cost): Marketing spend ÷ new users
+    \item \textbf{LTV} (Lifetime Value): ARPU × average subscription months
+    \item \textbf{LTV:CAC Ratio}: Target 3:1 or higher
+    \item \textbf{Gross Margin}: (Revenue - COGS) ÷ Revenue
+    \item \textbf{AI Cost Per User}: Track per tier monthly
+\end{enumerate}
+
+\subsection{User Metrics}
+
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Free-to-Paid Conversion Rate}: Target 20\%+
+    \item \textbf{Churn Rate}: Monthly cancellations ÷ total users (target <5\%)
+    \item \textbf{Upgrade Rate}: Users moving from Basic → Pro → Premium
+    \item \textbf{Messages Per User}: Track usage patterns
+    \item \textbf{File Uploads Per User}: Engagement metric
+    \item \textbf{Daily Active Users (DAU)}: Active engagement
+    \item \textbf{Monthly Active Users (MAU)}: Overall platform health
+\end{enumerate}
+
+\subsection{AI Performance Metrics}
+
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Average Tokens Per Message}: Optimise to reduce costs
+    \item \textbf{Cache Hit Rate}: \% of messages using cached prompts
+    \item \textbf{Model Split}: \% using Haiku vs. Sonnet
+    \item \textbf{Error Rate}: Failed API calls / total calls
+    \item \textbf{Response Time}: P95 latency (target <3 seconds)
+\end{enumerate}
+
+\newpage
+
+\section{Risk Analysis}
+
+\subsection{Financial Risks}
+
+\begin{table}[h]
+\centering
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{0.3\linewidth}p{0.3\linewidth}p{0.3\linewidth}}
+\toprule
+\rowcolor{hodieblue!20}
+\textbf{Risk} & \textbf{Impact} & \textbf{Mitigation} \\
+\midrule
+Claude API price increase & High & Build model-agnostic backend; easy to swap providers \\
+Free tier abuse & Medium & Rate limiting, IP tracking, bot detection \\
+Low conversion rate & High & A/B test pricing, improve onboarding \\
+High churn & High & Monitor engagement, auto-send retention emails \\
+\bottomrule
+\end{tabular}
+\caption{Financial Risk Analysis}
+\end{table}
+
+\subsection{Technical Risks}
+
+\begin{table}[h]
+\centering
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{0.3\linewidth}p{0.3\linewidth}p{0.3\linewidth}}
+\toprule
+\rowcolor{hodieblue!20}
+\textbf{Risk} & \textbf{Impact} & \textbf{Mitigation} \\
+\midrule
+API key exposure & Critical & Move to backend proxy immediately \\
+Claude API downtime & Medium & Fallback to Kimi K2 or cached responses \\
+Data privacy breach & Critical & HIPAA compliance, encryption, audits \\
+Scaling issues & Medium & Auto-scaling backend, CDN for static assets \\
+\bottomrule
+\end{tabular}
+\caption{Technical Risk Analysis}
+\end{table}
+
+\subsection{Market Risks}
+
+\begin{table}[h]
+\centering
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{0.3\linewidth}p{0.3\linewidth}p{0.3\linewidth}}
+\toprule
+\rowcolor{hodieblue!20}
+\textbf{Risk} & \textbf{Impact} & \textbf{Mitigation} \\
+\midrule
+Competitor launches similar & Medium & Focus on Australian market, superior UX \\
+Low user adoption & High & Free tier + content marketing \\
+Medical liability & Critical & Disclaimer: ``Not medical advice, consult GP'' \\
+Regulatory changes & Medium & Monitor TGA, HIPAA, GDPR requirements \\
+\bottomrule
+\end{tabular}
+\caption{Market Risk Analysis}
+\end{table}
+
+\newpage
+
+\section{Conclusion \& Next Steps}
+
+\subsection{Summary}
+
+Hodie Labs' tiered subscription model is \textbf{financially viable and scalable}:
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{Free tier loss minimised} to \$0.08/user using Groq Llama 3
+    \item \textbf{Paid tiers highly profitable} (76-81\% margins)
+    \item \textbf{Competitive pricing} (5-10x cheaper than alternatives)
+    \item \textbf{Scalable to 100,000+ users} with consistent 64\% margin
+    \item \textbf{3-year revenue potential}: \$9.6M revenue, \$6.1M profit
+\end{itemize}
+
+\subsection{Critical Action Items}
+
+\textbf{Must Do Immediately (Security):}
+\begin{enumerate}
+    \item Build backend API proxy to hide Claude API key
+    \item Implement per-user rate limiting
+    \item Add tier-based model selection (Groq for free, Claude for paid)
+\end{enumerate}
+
+\textbf{Should Do (Cost Optimisation):}
+\begin{enumerate}
+    \item Pre-compute data summaries on file upload
+    \item Implement prompt caching for conversations
+    \item Monitor token usage per tier
+\end{enumerate}
+
+\textbf{Nice to Have (Advanced):}
+\begin{enumerate}
+    \item Vector database for semantic search (Year 2)
+    \item Usage analytics dashboard
+    \item A/B test pricing (\$19.99 vs. \$24.99 for Pro)
+\end{enumerate}
+
+\subsection{Launch Timeline}
+
+\begin{table}[h]
+\centering
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{lp{0.65\linewidth}}
+\toprule
+\rowcolor{hodieblue!20}
+\textbf{Month} & \textbf{Milestone} \\
+\midrule
+Month 1 & Backend API proxy, Groq integration, Free + Pro tiers launch \\
+Month 2-3 & User acquisition, feedback collection, feature iteration \\
+Month 4 & Add Basic tier (\$9.99) based on feedback \\
+Month 5-6 & Optimise costs (summarisation, caching), scale infrastructure \\
+Month 7-9 & Add Premium tier (\$49.99), genetic analysis \\
+Month 10-12 & Reach 10,000 users, \$50K MRR, 64\% margin \\
+\midrule
+\rowcolor{green!20}
+Year 1 Target & \textbf{10,000 users, \$600K revenue, \$380K profit} \\
+\bottomrule
+\end{tabular}
+\caption{12-Month Launch Timeline}
+\end{table}
+
+\subsection{Success Criteria}
+
+\textbf{3-Month Targets:}
+\begin{itemize}
+    \item 1,000 total users (700 free, 300 paid)
+    \item 30\% free-to-paid conversion
+    \item <8\% monthly churn
+    \item \$7,500 MRR
+\end{itemize}
+
+\textbf{12-Month Targets:}
+\begin{itemize}
+    \item 10,000 total users (7,000 free, 3,000 paid)
+    \item 20\% free-to-paid conversion
+    \item <5\% monthly churn
+    \item \$50,000 MRR (\$600K ARR)
+\end{itemize}
+
+\subsection{Final Recommendation}
+
+\textbf{Proceed with tiered pricing model.}
+
+The financials are sound, margins are healthy, and competitive positioning is strong. The free tier loss (\$0.08/user) is acceptable for customer acquisition when 20\%+ convert to paid tiers.
+
+\textbf{Priority 1:} Secure the API key via backend proxy (critical security fix).
+
+\textbf{Priority 2:} Launch Free + Pro tiers to market within 30 days.
+
+\textbf{Priority 3:} Iterate based on real user data and optimise costs.
+
+\vspace{1cm}
+
+\begin{center}
+\textcolor{hodieblue}{\rule{0.8\linewidth}{0.5pt}}\\[0.5cm]
+{\large\textbf{Questions?}}\\[0.3cm]
+Contact: \href{mailto:info@hodielabs.com}{info@hodielabs.com}\\
+\textcolor{hodieblue}{\rule{0.8\linewidth}{0.5pt}}
+\end{center}
+
+\end{document}

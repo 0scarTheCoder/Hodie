@@ -62,6 +62,12 @@ const DataVisualizationScreen: React.FC<DataVisualizationScreenProps> = ({ user 
   const [error, setError] = useState<string | null>(null);
   const [showTable, setShowTable] = useState(false);
 
+  // Filter states
+  const [recencyRange, setRecencyRange] = useState<[number, number]>([0, 100]);
+  const [frequencyRange, setFrequencyRange] = useState<[number, number]>([0, 50]);
+  const [monetaryRange, setMonetaryRange] = useState<[number, number]>([0, 15000]);
+  const [showFilters, setShowFilters] = useState(false);
+
   // Fetch data from MongoDB
   useEffect(() => {
     const fetchLabResults = async () => {
@@ -101,7 +107,39 @@ const DataVisualizationScreen: React.FC<DataVisualizationScreenProps> = ({ user 
 
   // Get current selected dataset
   const currentData = labResults.find(result => result._id === selectedDataset);
-  const bloodData = currentData?.results || [];
+  const allBloodData = currentData?.results || [];
+
+  // Initialize filter ranges based on actual data
+  useEffect(() => {
+    if (allBloodData.length > 0) {
+      const recencies = allBloodData.map((d: BloodDonationData) => d.recency);
+      const frequencies = allBloodData.map((d: BloodDonationData) => d.frequency);
+      const monetaries = allBloodData.map((d: BloodDonationData) => d.monetary);
+
+      const minRecency = Math.min(...recencies);
+      const maxRecency = Math.max(...recencies);
+      const minFrequency = Math.min(...frequencies);
+      const maxFrequency = Math.max(...frequencies);
+      const minMonetary = Math.min(...monetaries);
+      const maxMonetary = Math.max(...monetaries);
+
+      setRecencyRange([minRecency, maxRecency]);
+      setFrequencyRange([minFrequency, maxFrequency]);
+      setMonetaryRange([minMonetary, maxMonetary]);
+    }
+  }, [allBloodData]);
+
+  // Apply filters to data
+  const bloodData = allBloodData.filter((item: BloodDonationData) => {
+    return (
+      item.recency >= recencyRange[0] &&
+      item.recency <= recencyRange[1] &&
+      item.frequency >= frequencyRange[0] &&
+      item.frequency <= frequencyRange[1] &&
+      item.monetary >= monetaryRange[0] &&
+      item.monetary <= monetaryRange[1]
+    );
+  });
 
   // Prepare data for different chart types
   const frequencyDistribution = bloodData.reduce((acc: any[], item: BloodDonationData) => {
@@ -240,6 +278,144 @@ const DataVisualizationScreen: React.FC<DataVisualizationScreenProps> = ({ user 
           </select>
         </div>
       )}
+
+      {/* Interactive Filters */}
+      <div className="mb-6">
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg text-sm font-medium transition-all"
+        >
+          <Activity className="w-4 h-4" />
+          <span>{showFilters ? 'Hide' : 'Show'} Interactive Filters</span>
+        </button>
+
+        {showFilters && allBloodData.length > 0 && (
+          <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Recency Filter */}
+              <div>
+                <label className="block text-white font-medium mb-3">
+                  Recency (Days): {recencyRange[0]} - {recencyRange[1]}
+                </label>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-white/70 text-sm mb-1">Min: {recencyRange[0]}</label>
+                    <input
+                      type="range"
+                      min={Math.min(...allBloodData.map((d: BloodDonationData) => d.recency))}
+                      max={Math.max(...allBloodData.map((d: BloodDonationData) => d.recency))}
+                      value={recencyRange[0]}
+                      onChange={(e) => setRecencyRange([Number(e.target.value), recencyRange[1]])}
+                      className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer slider-thumb"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-white/70 text-sm mb-1">Max: {recencyRange[1]}</label>
+                    <input
+                      type="range"
+                      min={Math.min(...allBloodData.map((d: BloodDonationData) => d.recency))}
+                      max={Math.max(...allBloodData.map((d: BloodDonationData) => d.recency))}
+                      value={recencyRange[1]}
+                      onChange={(e) => setRecencyRange([recencyRange[0], Number(e.target.value)])}
+                      className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer slider-thumb"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Frequency Filter */}
+              <div>
+                <label className="block text-white font-medium mb-3">
+                  Frequency: {frequencyRange[0]} - {frequencyRange[1]}
+                </label>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-white/70 text-sm mb-1">Min: {frequencyRange[0]}</label>
+                    <input
+                      type="range"
+                      min={Math.min(...allBloodData.map((d: BloodDonationData) => d.frequency))}
+                      max={Math.max(...allBloodData.map((d: BloodDonationData) => d.frequency))}
+                      value={frequencyRange[0]}
+                      onChange={(e) => setFrequencyRange([Number(e.target.value), frequencyRange[1]])}
+                      className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer slider-thumb"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-white/70 text-sm mb-1">Max: {frequencyRange[1]}</label>
+                    <input
+                      type="range"
+                      min={Math.min(...allBloodData.map((d: BloodDonationData) => d.frequency))}
+                      max={Math.max(...allBloodData.map((d: BloodDonationData) => d.frequency))}
+                      value={frequencyRange[1]}
+                      onChange={(e) => setFrequencyRange([frequencyRange[0], Number(e.target.value)])}
+                      className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer slider-thumb"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Monetary Filter */}
+              <div>
+                <label className="block text-white font-medium mb-3">
+                  Monetary: {monetaryRange[0]} - {monetaryRange[1]}
+                </label>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-white/70 text-sm mb-1">Min: {monetaryRange[0]}</label>
+                    <input
+                      type="range"
+                      min={Math.min(...allBloodData.map((d: BloodDonationData) => d.monetary))}
+                      max={Math.max(...allBloodData.map((d: BloodDonationData) => d.monetary))}
+                      value={monetaryRange[0]}
+                      onChange={(e) => setMonetaryRange([Number(e.target.value), monetaryRange[1]])}
+                      className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer slider-thumb"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-white/70 text-sm mb-1">Max: {monetaryRange[1]}</label>
+                    <input
+                      type="range"
+                      min={Math.min(...allBloodData.map((d: BloodDonationData) => d.monetary))}
+                      max={Math.max(...allBloodData.map((d: BloodDonationData) => d.monetary))}
+                      value={monetaryRange[1]}
+                      onChange={(e) => setMonetaryRange([monetaryRange[0], Number(e.target.value)])}
+                      className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer slider-thumb"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Filter Stats */}
+            <div className="mt-4 pt-4 border-t border-white/20">
+              <div className="flex items-center justify-between text-white/90">
+                <span className="text-sm">
+                  Showing <strong>{bloodData.length}</strong> of <strong>{allBloodData.length}</strong> records
+                  {bloodData.length < allBloodData.length && (
+                    <span className="text-yellow-400 ml-2">
+                      ({Math.round((bloodData.length / allBloodData.length) * 100)}% filtered)
+                    </span>
+                  )}
+                </span>
+                <button
+                  onClick={() => {
+                    // Reset filters to show all data
+                    const recencies = allBloodData.map((d: BloodDonationData) => d.recency);
+                    const frequencies = allBloodData.map((d: BloodDonationData) => d.frequency);
+                    const monetaries = allBloodData.map((d: BloodDonationData) => d.monetary);
+                    setRecencyRange([Math.min(...recencies), Math.max(...recencies)]);
+                    setFrequencyRange([Math.min(...frequencies), Math.max(...frequencies)]);
+                    setMonetaryRange([Math.min(...monetaries), Math.max(...monetaries)]);
+                  }}
+                  className="px-3 py-1 bg-white/10 hover:bg-white/20 rounded text-sm transition-colors"
+                >
+                  Reset Filters
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -466,6 +642,72 @@ const DataVisualizationScreen: React.FC<DataVisualizationScreenProps> = ({ user 
               Relationship between donation recency and frequency (showing 200 samples)
             </p>
           </div>
+        </div>
+
+        {/* Frequency vs Monetary Scatter Plot */}
+        <div className="bg-gray-50 rounded-xl p-6 shadow-lg border border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <TrendingUp className="w-5 h-5 mr-2 text-orange-600" />
+            Frequency vs. Monetary Value Analysis
+          </h3>
+          <ResponsiveContainer width="100%" height={400}>
+            <ScatterChart>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                type="number"
+                dataKey="frequency"
+                name="Frequency"
+                label={{ value: 'Frequency (donations)', position: 'insideBottom', offset: -5 }}
+              />
+              <YAxis
+                type="number"
+                dataKey="monetary"
+                name="Monetary"
+                label={{ value: 'Monetary Value', angle: -90, position: 'insideLeft' }}
+              />
+              <Tooltip
+                cursor={{ strokeDasharray: '3 3' }}
+                content={({ payload }: any) => {
+                  if (payload && payload.length > 0) {
+                    const data = payload[0].payload;
+                    return (
+                      <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
+                        <p className="text-sm font-semibold">Frequency: {data.frequency}</p>
+                        <p className="text-sm font-semibold">Monetary: {data.monetary}</p>
+                        <p className="text-sm">
+                          <span className={`font-medium ${data.class === 1 ? 'text-green-600' : 'text-red-600'}`}>
+                            {data.class === 1 ? 'Return Donor' : 'Non-Return Donor'}
+                          </span>
+                        </p>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+              />
+              <Scatter
+                name="Return Donors"
+                data={scatterData.filter((d: any) => d.class === 1).slice(0, 200)}
+                fill="#10b981"
+                opacity={0.7}
+              />
+              <Scatter
+                name="Non-Return Donors"
+                data={scatterData.filter((d: any) => d.class === 0).slice(0, 200)}
+                fill="#ef4444"
+                opacity={0.7}
+              />
+            </ScatterChart>
+          </ResponsiveContainer>
+          <p className="text-sm text-gray-600 mt-4">
+            Relationship between donation frequency and monetary value, color-coded by donor type
+            <span className="ml-2">
+              <span className="inline-block w-3 h-3 bg-green-500 rounded-full mr-1"></span>
+              <span className="text-xs">Return Donors</span>
+              <span className="inline-block w-3 h-3 bg-red-500 rounded-full ml-3 mr-1"></span>
+              <span className="text-xs">Non-Return Donors</span>
+            </span>
+          </p>
         </div>
 
         {/* Monetary Trend Line Chart */}

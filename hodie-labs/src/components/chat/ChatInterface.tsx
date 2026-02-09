@@ -1,3 +1,4 @@
+// ChatInterface with Visualization Integration - Updated Feb 9, 2026
 import React, { useState, useRef, useEffect } from 'react';
 import { User } from 'firebase/auth';
 import { Upload, Paperclip } from 'lucide-react';
@@ -7,12 +8,22 @@ import { claudeService } from '../../services/claudeService';
 import { chatStorageService, ChatConversation, ChatMessage } from '../../services/chatStorageService';
 import FileUploadZone, { UploadedFile } from './FileUploadZone';
 import { healthDataParsingService } from '../../services/healthDataParsingService';
+import BloodDataVisualizations from './BloodDataVisualizations';
+
+interface BloodRecord {
+  recency: number;
+  frequency: number;
+  monetary: number;
+  time: number;
+  class: number;
+}
 
 interface Message {
   id: string;
   text: string;
   sender: 'user' | 'assistant';
   timestamp: Date;
+  bloodData?: BloodRecord[];
 }
 
 interface ChatInterfaceProps {
@@ -92,8 +103,9 @@ I can help you with:
 🧬 **DNA Insights**: Genetic-based health recommendations
 📊 **Biomarker Analysis**: Health metrics interpretation
 📁 **File Analysis**: Upload lab results, DNA data, or health reports for AI interpretation
+📈 **Data Visualizations**: Generate charts and graphs of your health data
 
-💡 **Tip**: Click the pulsing 📎 button to upload health files for instant AI analysis!
+💡 **Tip**: Click the pulsing 📎 button to upload health files, or ask to "visualize my data" for interactive charts!
 
 I use advanced AI with memory of our past discussions to provide contextual health guidance. What would you like to know?`,
             sender: 'assistant',
@@ -129,6 +141,7 @@ I use advanced AI with memory of our past discussions to provide contextual heal
           text: `G'day! I'm your Hodie Labs AI health assistant, powered by Kimi K2 advanced AI! 🚀
 
 💡 **Tip**: Click the pulsing 📎 button to upload health files for instant AI analysis!
+📈 **Visualizations**: Ask me to "visualize my data" to see interactive charts and graphs!
 
 What would you like to know about your health today?`,
           sender: 'assistant',
@@ -173,6 +186,62 @@ What would you like to know about your health today?`,
     );
 
     try {
+      // Check if user is requesting visualization
+      const visualizationKeywords = [
+        'histogram', 'graph', 'chart', 'plot', 'scatter',
+        'visuali', 'show me', 'display', 'graphical',
+        'distribution', 'bar chart', 'line chart'
+      ];
+      const isVizRequest = visualizationKeywords.some(keyword =>
+        inputValue.toLowerCase().includes(keyword)
+      );
+
+      let bloodData: BloodRecord[] | undefined;
+
+      if (isVizRequest) {
+        console.log('📊 Visualization request detected');
+
+        try {
+          // Fetch blood donation data from lab results
+          const labResultsResponse = await fetch(
+            `${process.env.REACT_APP_API_BASE_URL}/lab-results/${getUserId()}`
+          );
+
+          if (labResultsResponse.ok) {
+            const labResults = await labResultsResponse.json();
+
+            // Find blood donation data (look for the dataset with 748 records)
+            const bloodDataset = labResults.find((result: any) =>
+              result.testType?.toLowerCase().includes('blood') ||
+              result.results?.length > 100 // Blood donation dataset is large
+            );
+
+            if (bloodDataset && bloodDataset.results && bloodDataset.results.length > 0) {
+              console.log(`📊 Found blood dataset with ${bloodDataset.results.length} records`);
+
+              // Convert string values to numbers (data from MongoDB is stored as strings)
+              bloodData = bloodDataset.results.map((record: any) => ({
+                recency: parseFloat(record.recency) || 0,
+                frequency: parseFloat(record.frequency) || 0,
+                monetary: parseFloat(record.monetary) || 0,
+                time: parseFloat(record.time) || 0,
+                class: parseInt(record.class) || 0
+              }));
+
+              if (bloodData) {
+                console.log(`🔢 Converted ${bloodData.length} records to numeric format`);
+                console.log(`✅ Ready to display interactive visualizations`);
+              }
+            } else {
+              console.warn('⚠️ No blood donation data found in lab results');
+            }
+          }
+        } catch (vizError) {
+          console.error('❌ Error fetching blood data:', vizError);
+          // Continue with text response even if data fetch fails
+        }
+      }
+
       // Get user's comprehensive health data for context
       const healthContext = await getUserHealthContext(getUserId());
 
@@ -189,6 +258,11 @@ What would you like to know about your health today?`,
           enhancedQuery = `${inputValue}\n\n[Context: ${healthContext.availableDataSummary}]`;
         }
 
+        // If we have blood data for visualization, let AI know
+        if (bloodData && bloodData.length > 0) {
+          enhancedQuery += `\n\n[Note: Interactive data visualizations (histograms, scatter plots) have been generated from ${bloodData.length} records and will be displayed to the user. Please provide textual analysis and interpretation of the blood donation data.]`;
+        }
+
         // Filter conversation history to only include user/assistant messages (exclude system)
         const claudeHistory = conversationHistory
           .filter(msg => msg.role === 'user' || msg.role === 'assistant')
@@ -201,18 +275,26 @@ What would you like to know about your health today?`,
         );
       } else {
         console.log('🤖 Using Kimi K2 AI for response');
+
+        // If we have blood data for visualization, modify the query for Kimi K2
+        let queryForAI = inputValue;
+        if (bloodData && bloodData.length > 0) {
+          queryForAI = `${inputValue}\n\n[Note: Interactive data visualizations (histograms, scatter plots) have been generated from ${bloodData.length} records and displayed. Please provide textual analysis and interpretation of the blood donation data.]`;
+        }
+
         responseText = await kimiK2Service.generateHealthResponse(
-          inputValue,
+          queryForAI,
           healthContext,
           conversationHistory
         );
       }
-      
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: responseText,
         sender: 'assistant',
-        timestamp: new Date()
+        timestamp: new Date(),
+        bloodData: bloodData // Add blood data for visualization if available
       };
 
       setMessages(prev => [...prev, assistantMessage]);
@@ -281,9 +363,12 @@ What would you like to know about your health today?`,
             recordCount: result.results?.length || 0,
             biomarkersCount: result.biomarkers?.length || 0,
             uploadDate: result.createdAt,
-            summary: result.notes || 'No summary available'
+            summary: result.notes || 'No summary available',
+            // Include actual data rows (not just metadata)
+            results: result.results || [],
+            biomarkers: result.biomarkers || []
           }));
-          console.log(`✅ Found ${labResults.length} lab result datasets`);
+          console.log(`✅ Found ${labResults.length} lab result datasets with ${context.labResults.reduce((sum: number, r: any) => sum + r.recordCount, 0)} total records`);
         }
       }
 
@@ -704,6 +789,14 @@ What would you like to know about your health today?`,
                   return <div key={index} className={line.trim() === '' ? 'mb-2' : 'mb-1'}>{line}</div>;
                 })}
               </div>
+
+              {/* Display blood data visualizations if present */}
+              {message.bloodData && message.bloodData.length > 0 && (
+                <div className="mt-4">
+                  <BloodDataVisualizations data={message.bloodData} />
+                </div>
+              )}
+
               <p className={`text-xs mt-1 ${
                 message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
               }`}>
@@ -740,6 +833,7 @@ What would you like to know about your health today?`,
             {[
               { topic: 'DNA Insights', question: 'Explain my genetic fitness and nutrition profile', emoji: '🧬' },
               { topic: 'Health Analysis', question: 'Analyze my current health metrics and provide recommendations', emoji: '📊' },
+              { topic: 'Data Visualizations', question: 'Show me a graphical representation of all my health data', emoji: '📈' },
               { topic: 'Nutrition', question: 'What foods should I eat for optimal health based on my data?', emoji: '🍎' },
               { topic: 'Exercise', question: 'What exercise routine should I start with based on my genetics?', emoji: '🏃' },
               { topic: 'Sleep', question: 'How can I improve my sleep quality and duration?', emoji: '😴' },

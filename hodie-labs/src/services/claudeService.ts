@@ -10,6 +10,21 @@ export interface ClaudeHealthContext {
   userId: string;
   recentHealthData?: any;
   previousConversations?: any[];
+  labResults?: Array<{
+    id: string;
+    testType: string;
+    testDate: string;
+    recordCount: number;
+    biomarkersCount: number;
+    uploadDate: string;
+    summary: string;
+    results: any[];
+    biomarkers: any[];
+  }>;
+  geneticData?: any[];
+  wearableData?: any;
+  medicalReports?: any[];
+  availableDataSummary?: string;
 }
 
 export interface ClaudeMessage {
@@ -222,8 +237,50 @@ RESPONSE FORMAT:
 - Cite scientific evidence when relevant
 - Provide specific examples and numbers`;
 
-    if (healthContext?.recentHealthData) {
-      systemPrompt += `\n\nUSER CONTEXT:\nRecent health metrics: ${JSON.stringify(healthContext.recentHealthData)}`;
+    // Add user health context if available
+    if (healthContext) {
+      let contextSection = '\n\nUSER HEALTH DATA:';
+
+      // Recent health metrics
+      if (healthContext.recentHealthData) {
+        contextSection += `\n\nRecent Metrics: ${JSON.stringify(healthContext.recentHealthData)}`;
+      }
+
+      // Lab results with actual data
+      if ((healthContext as any).labResults && (healthContext as any).labResults.length > 0) {
+        const labResults = (healthContext as any).labResults;
+        contextSection += `\n\nLab Results Available: ${labResults.length} dataset(s)`;
+
+        // Include details for each dataset
+        labResults.forEach((dataset: any, index: number) => {
+          contextSection += `\n\nDataset ${index + 1}:`;
+          contextSection += `\n- Type: ${dataset.testType || 'Health Data'}`;
+          contextSection += `\n- Date: ${dataset.testDate || 'Unknown'}`;
+          contextSection += `\n- Total Records: ${dataset.recordCount}`;
+
+          // Include actual data (first 20 rows as sample, then mention full dataset is available)
+          if (dataset.results && dataset.results.length > 0) {
+            const sampleSize = Math.min(20, dataset.results.length);
+            const sample = dataset.results.slice(0, sampleSize);
+            contextSection += `\n- Sample Data (first ${sampleSize} of ${dataset.results.length} records):`;
+            contextSection += `\n${JSON.stringify(sample, null, 2)}`;
+
+            if (dataset.results.length > sampleSize) {
+              contextSection += `\n- Note: ${dataset.results.length - sampleSize} additional records available in full dataset`;
+            }
+          }
+
+          // Include biomarkers if available
+          if (dataset.biomarkers && dataset.biomarkers.length > 0) {
+            contextSection += `\n- Biomarkers: ${dataset.biomarkers.length} available`;
+            contextSection += `\n${JSON.stringify(dataset.biomarkers.slice(0, 10), null, 2)}`;
+          }
+        });
+
+        contextSection += `\n\nYou have access to all this data. When the user asks about their data, provide specific insights, trends, and recommendations based on these actual values.`;
+      }
+
+      systemPrompt += contextSection;
     }
 
     return systemPrompt;
@@ -233,12 +290,16 @@ RESPONSE FORMAT:
    * Build prompt for file analysis
    */
   private buildFileAnalysisPrompt(parsedData: any, fileName: string, fileCategory: string): string {
+    // Handle different data structures
+    const dataToAnalyze = parsedData.data || parsedData || [];
+    const dataPreview = JSON.stringify(dataToAnalyze).substring(0, 3000);
+
     return `Analyze this health data file and provide structured interpretation.
 
 **File Information:**
 - Name: ${fileName}
 - Category: ${fileCategory}
-- Data Preview: ${JSON.stringify(parsedData.data).substring(0, 3000)}
+- Data Preview: ${dataPreview}
 
 **Your Tasks:**
 1. Identify what type of health data this is
@@ -248,8 +309,8 @@ RESPONSE FORMAT:
 5. Ask any clarifying questions
 
 **Data Structure:**
-Rows: ${parsedData.data.length}
-Columns: ${JSON.stringify(parsedData.metadata?.headers || Object.keys(parsedData.data[0] || {}))}
+Rows: ${dataToAnalyze.length}
+Columns: ${JSON.stringify(parsedData.metadata?.headers || Object.keys(dataToAnalyze[0] || {}))}
 
 Respond with valid JSON only (no markdown, no extra text).`;
   }

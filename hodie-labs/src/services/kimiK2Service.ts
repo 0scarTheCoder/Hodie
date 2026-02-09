@@ -948,23 +948,45 @@ This analysis covers 200+ genetic variants for comprehensive health optimisation
   }
 
   // Format lab results response
-  private formatLabResultsResponse(labPanel: ComprehensiveLabPanel, query: string): string {
+  private formatLabResultsResponse(labPanel: any, query: string): string {
+    // Handle raw lab data that doesn't have interpretation structure
+    if (!labPanel.interpretation || !labPanel.interpretation.overallStatus) {
+      // Raw lab data from MongoDB - return simple summary
+      const recordCount = labPanel.results?.length || 0;
+      const testType = labPanel.testType || 'Lab Results';
+
+      return `📊 **${testType} Data Available**:
+
+I found your uploaded ${testType.toLowerCase()} with ${recordCount} records.
+
+**Data fields**: ${labPanel.results?.[0] ? Object.keys(labPanel.results[0]).join(', ') : 'Loading...'}
+
+To analyse this data, I can:
+• Generate visualizations (just ask for "show me a graph")
+• Calculate statistical summaries
+• Identify patterns and trends
+• Compare values across time periods
+
+What would you like to know about your data?`;
+    }
+
+    // Structured lab panel with interpretation
     const interpretation = labPanel.interpretation;
-    const flaggedResults = labPanel.results.filter(r => r.flagged);
-    
+    const flaggedResults = labPanel.results.filter((r: any) => r.flagged);
+
     return `🔬 **Lab Analysis Summary**:
 
 **Overall Status**: ${interpretation.overallStatus.toUpperCase()}
 **Confidence**: ${interpretation.confidence}%
 
 ${interpretation.keyFindings.length > 0 ? `**Key Findings**:
-${interpretation.keyFindings.map(finding => `• ${finding}`).join('\n')}` : ''}
+${interpretation.keyFindings.map((finding: string) => `• ${finding}`).join('\n')}` : ''}
 
 ${flaggedResults.length > 0 ? `**Values Needing Attention**:
-${flaggedResults.slice(0, 3).map(result => `• ${result.testName}: ${result.value} ${result.unit} (${result.status})`).join('\n')}` : ''}
+${flaggedResults.slice(0, 3).map((result: any) => `• ${result.testName}: ${result.value} ${result.unit} (${result.status})`).join('\n')}` : ''}
 
 ${labPanel.recommendations.length > 0 ? `**Recommendations**:
-${labPanel.recommendations.slice(0, 3).map(rec => `• ${rec.recommendation} (${rec.timeframe})`).join('\n')}` : ''}
+${labPanel.recommendations.slice(0, 3).map((rec: any) => `• ${rec.recommendation} (${rec.timeframe})`).join('\n')}` : ''}
 
 ${interpretation.riskFactors.length > 0 ? `⚠️ **Risk Factors**: ${interpretation.riskFactors.join(', ')}` : ''}
 
