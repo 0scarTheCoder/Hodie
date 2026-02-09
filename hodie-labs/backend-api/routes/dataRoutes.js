@@ -24,20 +24,10 @@ router.get('/lab-results/:userId', authenticateUser, async (req, res) => {
       });
     }
 
-    // Find client by auth provider user ID
-    const client = await Client.findByAuthProviderUserId(
-      req.app.locals.db,
-      userId
-    );
-
-    if (!client) {
-      return res.json([]);  // Return empty array if no client found
-    }
-
-    // Fetch lab results for this client
+    // Fetch lab results for this user (query by userId directly)
     const labResultsCollection = req.app.locals.db.collection('labresults');
     const results = await labResultsCollection
-      .find({ clientID: client.clientID })
+      .find({ userId: userId })
       .sort({ uploadDate: -1 })
       .toArray();
 
@@ -67,18 +57,9 @@ router.get('/genetic-data/:userId', authenticateUser, async (req, res) => {
       });
     }
 
-    const client = await Client.findByAuthProviderUserId(
-      req.app.locals.db,
-      userId
-    );
-
-    if (!client) {
-      return res.json([]);
-    }
-
     const geneticDataCollection = req.app.locals.db.collection('geneticdatas');
     const results = await geneticDataCollection
-      .find({ clientID: client.clientID })
+      .find({ userId: userId })
       .sort({ uploadDate: -1 })
       .toArray();
 
@@ -108,20 +89,11 @@ router.get('/wearable-data/:userId', authenticateUser, async (req, res) => {
       });
     }
 
-    const client = await Client.findByAuthProviderUserId(
-      req.app.locals.db,
-      userId
-    );
-
-    if (!client) {
-      return res.json([]);
-    }
-
     const wearableDataCollection = req.app.locals.db.collection('wearabledatas');
     const limit = parseInt(req.query.limit) || 30;
 
     const results = await wearableDataCollection
-      .find({ clientID: client.clientID })
+      .find({ userId: userId })
       .sort({ uploadDate: -1 })
       .limit(limit)
       .toArray();
@@ -152,20 +124,11 @@ router.get('/health-metrics/:userId', authenticateUser, async (req, res) => {
       });
     }
 
-    const client = await Client.findByAuthProviderUserId(
-      req.app.locals.db,
-      userId
-    );
-
-    if (!client) {
-      return res.json([]);
-    }
-
     const healthMetricsCollection = req.app.locals.db.collection('healthmetrics');
     const limit = parseInt(req.query.limit) || 100;
 
     const results = await healthMetricsCollection
-      .find({ clientID: client.clientID })
+      .find({ userId: userId })
       .sort({ timestamp: -1 })
       .limit(limit)
       .toArray();
@@ -196,18 +159,9 @@ router.get('/medical-reports/:userId', authenticateUser, async (req, res) => {
       });
     }
 
-    const client = await Client.findByAuthProviderUserId(
-      req.app.locals.db,
-      userId
-    );
-
-    if (!client) {
-      return res.json([]);
-    }
-
     const medicalReportsCollection = req.app.locals.db.collection('medicalreports');
     const results = await medicalReportsCollection
-      .find({ clientID: client.clientID })
+      .find({ userId: userId })
       .sort({ uploadDate: -1 })
       .toArray();
 
