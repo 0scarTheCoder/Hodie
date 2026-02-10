@@ -920,63 +920,9 @@ What would you like to know about your health today?`,
               <button
                 key={topic}
                 onClick={async () => {
-                  setInputValue(question);
-                  // Automatically send the message for better mobile UX
-                  const userMessage = {
-                    id: Date.now().toString(),
-                    text: question,
-                    sender: 'user' as const,
-                    timestamp: new Date()
-                  };
-
-                  setMessages(prev => [...prev, userMessage]);
-                  setInputValue('');
-                  setIsLoading(true);
-
-                  const logId = queryLogger.logQuery(
-                    question,
-                    'health_query',
-                    getUserId(),
-                    { component: 'chat_interface_quick_button' }
-                  );
-
-                  try {
-                    const healthContext = await getUserHealthContext(getUserId());
-                    const responseText = await kimiK2Service.generateHealthResponse(
-                      question,
-                      healthContext,
-                      conversationHistory
-                    );
-                    
-                    const assistantMessage = {
-                      id: (Date.now() + 1).toString(),
-                      text: responseText,
-                      sender: 'assistant' as const,
-                      timestamp: new Date()
-                    };
-
-                    setMessages(prev => [...prev, assistantMessage]);
-                    
-                    setConversationHistory(prev => [
-                      ...prev,
-                      { role: 'user', content: question },
-                      { role: 'assistant', content: responseText }
-                    ]);
-                    
-                    queryLogger.logResponse(logId, responseText);
-                  } catch (error) {
-                    console.error('Quick button chat error:', error);
-                    const errorMessage = {
-                      id: (Date.now() + 1).toString(),
-                      text: 'I apologise, but I encountered an error processing your request. Please try again.',
-                      sender: 'assistant' as const,
-                      timestamp: new Date()
-                    };
-                    setMessages(prev => [...prev, errorMessage]);
-                    queryLogger.logResponse(logId, `Error: ${error}`);
-                  } finally {
-                    setIsLoading(false);
-                  }
+                  // Use processQuery to handle all quick button clicks
+                  // This ensures visualization detection works for all queries
+                  await processQuery(question);
                 }}
                 className="px-2 py-3 md:px-3 md:py-2 bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 text-gray-700 rounded-lg text-xs md:text-sm transition-all duration-200 flex flex-col md:flex-row items-centre space-y-1 md:space-y-0 md:space-x-1 border border-gray-200 hover:border-blue-300 touch-manipulation min-h-[60px] md:min-h-[auto]"
                 disabled={isLoading}
