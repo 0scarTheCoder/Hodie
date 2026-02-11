@@ -748,11 +748,15 @@ What would you like to know about your health today?`,
 
         console.log(`🔗 POST to: ${apiUrl}`);
 
+        const token = await getAccessToken().catch(() => null);
+        const headers: HeadersInit = { 'Content-Type': 'application/json' };
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+
         const response = await fetch(apiUrl, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers,
           body: JSON.stringify(dataToSave)
         });
 

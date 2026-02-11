@@ -420,6 +420,24 @@ app.use('/api/health-metrics', dataFetchLimiter);
 app.use('/api', dataRoutes); // General data routes
 app.use('/api/recommendations', recommendationsLimiter, recommendationsRoutes);
 
+// User profile route (for onboarding)
+app.post('/api/users/:userId/profile', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const profileData = req.body;
+    const usersCollection = db.collection('user_profiles');
+    await usersCollection.updateOne(
+      { userId },
+      { $set: { ...profileData, userId, updatedAt: new Date() } },
+      { upsert: true }
+    );
+    res.json({ success: true, userId });
+  } catch (error) {
+    console.error('Error saving user profile:', error);
+    res.status(500).json({ error: 'Failed to save profile' });
+  }
+});
+
 // Visualization Routes (JavaScript-based chart generation)
 app.use('/api/visualize', generalLimiter, visualizationRoutes);
 
