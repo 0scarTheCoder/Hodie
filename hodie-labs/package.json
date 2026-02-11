@@ -4,7 +4,6 @@
   "private": true,
   "dependencies": {
     "@anthropic-ai/sdk": "^0.68.0",
-    "@auth0/auth0-react": "^2.9.0",
     "@headlessui/react": "^2.2.9",
     "@heroicons/react": "^2.2.0",
     "@testing-library/dom": "^10.4.1",

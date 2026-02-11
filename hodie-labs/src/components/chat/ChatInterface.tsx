@@ -1,7 +1,7 @@
 // ChatInterface with Visualization Integration - Updated Feb 9, 2026
 import React, { useState, useRef, useEffect } from 'react';
 import { User } from 'firebase/auth';
-import { useAuth0 } from '@auth0/auth0-react';
+import { useAuth } from '../../contexts/AuthContext';
 import { Upload, Paperclip } from 'lucide-react';
 import { queryLogger } from '../../utils/queryLogger';
 import { kimiK2Service, HealthContext, ConversationMessage } from '../../services/kimiK2Service';
@@ -48,7 +48,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user, initialQuery, onQue
   const initialQueryProcessedRef = useRef<boolean>(false);
 
   // Get Auth0 token function for authenticated API calls
-  const { getAccessTokenSilently } = useAuth0();
+  const { getAccessToken } = useAuth();
 
   // Helper: Get user ID that works with both Firebase (uid) and Auth0 (sub)
   const getUserId = (): string => {
@@ -238,7 +238,7 @@ What would you like to know about your health today?`,
 
         try {
           // Get Auth0 token for authenticated API calls
-          const token = await getAccessTokenSilently().catch((error) => {
+          const token = await getAccessToken().catch((error) => {
             console.warn('⚠️ Could not get Auth0 token for visualization:', error);
             return null;
           });
@@ -382,7 +382,7 @@ What would you like to know about your health today?`,
       console.log('📊 Fetching comprehensive health context for user:', userId);
 
       // Get JWT token for authenticated API calls
-      const token = await getAccessTokenSilently().catch((error) => {
+      const token = await getAccessToken().catch((error) => {
         console.warn('⚠️ Could not get Auth0 token:', error);
         return null;
       });

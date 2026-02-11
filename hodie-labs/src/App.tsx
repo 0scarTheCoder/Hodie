@@ -1,55 +1,52 @@
 import React, { useEffect, useState } from 'react';
-import { Auth0Provider, useAuth0 } from '@auth0/auth0-react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { auth0Service } from './services/auth0Service';
-import Auth0LoginPage from './components/auth/Auth0LoginPage';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import ExactHodieLogin from './components/auth/ExactHodieLogin';
 import ComprehensiveDashboard from './components/dashboard/ComprehensiveDashboard';
 import OnboardingFlow from './components/onboarding/OnboardingFlow';
-import PasswordResetPage from './components/auth/PasswordResetPage';
+import FirebasePasswordReset from './components/auth/FirebasePasswordReset';
 import { queryLogger } from './utils/queryLogger';
 import { Loader2 } from 'lucide-react';
 
-// Auth0 App Content Component
-const Auth0AppContent: React.FC = () => {
-  const { user, isAuthenticated, isLoading, error } = useAuth0();
+// Firebase App Content Component
+const FirebaseAppContent: React.FC = () => {
+  const { user, isAuthenticated, isLoading, error } = useAuth();
   const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated && user) {
       // Check for comprehensive signup data
       const comprehensiveSignupData = localStorage.getItem('hodie_comprehensive_signup_data');
-      
+
       if (comprehensiveSignupData) {
         try {
           const signupData = JSON.parse(comprehensiveSignupData);
-          // TODO: Send this data to backend to store in user profile
           console.log('Comprehensive signup data found:', signupData);
-          
+
           // Clear the signup data since we've processed it
           localStorage.removeItem('hodie_comprehensive_signup_data');
-          
+
           // Mark onboarding as complete since they filled comprehensive form
-          localStorage.setItem(`hodie_onboarding_${user.sub}`, 'true');
+          localStorage.setItem(`hodie_onboarding_${user.uid}`, 'true');
           setShowOnboarding(false);
         } catch (error) {
           console.error('Error processing comprehensive signup data:', error);
         }
       } else {
         // Check if user has completed onboarding
-        const onboardingComplete = localStorage.getItem(`hodie_onboarding_${user.sub}`);
+        const onboardingComplete = localStorage.getItem(`hodie_onboarding_${user.uid}`);
         setShowOnboarding(!onboardingComplete);
       }
-      
+
       queryLogger.logQuery(
-        `Auth0 user authenticated: ${user.email}`,
+        `Firebase user authenticated: ${user.email}`,
         'general_query',
-        user.sub,
-        { 
-          action: 'auth0_state_changed',
-          auth_provider: 'auth0',
+        user.uid,
+        {
+          action: 'firebase_state_changed',
+          auth_provider: 'firebase',
           deployment_status: 'production',
           backend_url: process.env.REACT_APP_API_BASE_URL,
-          user_metadata: user.user_metadata,
           comprehensive_signup: !!comprehensiveSignupData,
           timestamp: new Date().toISOString()
         }
@@ -60,11 +57,11 @@ const Auth0AppContent: React.FC = () => {
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#2a1e5c] via-[#1a0f3a] to-[#0f0622] flex items-centre justify-centre">
-        <div className="text-centre">
+      <div className="min-h-screen bg-gradient-to-b from-[#2a1e5c] via-[#1a0f3a] to-[#0f0622] flex items-center justify-center">
+        <div className="text-center">
           <Loader2 className="w-16 h-16 text-white animate-spin mx-auto mb-4" />
           <div className="text-white text-lg font-medium">Securing your session...</div>
-          <div className="text-white/60 text-sm mt-2">Powered by Auth0</div>
+          <div className="text-white/60 text-sm mt-2">Powered by Firebase</div>
         </div>
       </div>
     );
@@ -73,12 +70,12 @@ const Auth0AppContent: React.FC = () => {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#2a1e5c] via-[#1a0f3a] to-[#0f0622] flex items-centre justify-centre">
-        <div className="text-centre max-w-md mx-auto px-4">
+      <div className="min-h-screen bg-gradient-to-b from-[#2a1e5c] via-[#1a0f3a] to-[#0f0622] flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto px-4">
           <div className="text-red-400 text-6xl mb-4">⚠️</div>
           <h1 className="text-white text-2xl font-bold mb-4">Authentication Error</h1>
           <p className="text-white/70 mb-6">{error.message}</p>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className="px-6 py-3 bg-gradient-to-r from-[#8b5cf6] via-[#ec4899] to-[#f97316] text-white font-semibold rounded-xl hover:shadow-lg transition-all duration-300"
           >
@@ -94,71 +91,36 @@ const Auth0AppContent: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       {isAuthenticated && user ? (
         showOnboarding ? (
-          <OnboardingFlow 
-            user={user as any} // Type compatibility with existing Firebase User interface
+          <OnboardingFlow
+            user={user}
             onComplete={() => {
-              localStorage.setItem(`hodie_onboarding_${user.sub}`, 'true');
+              localStorage.setItem(`hodie_onboarding_${user.uid}`, 'true');
               setShowOnboarding(false);
-            }} 
+            }}
           />
         ) : (
-          <ComprehensiveDashboard user={user as any} />
+          <ComprehensiveDashboard user={user} />
         )
       ) : (
-        <Auth0LoginPage />
+        <ExactHodieLogin />
       )}
     </div>
   );
 };
 
-// Main Auth0 App Component
-function Auth0App() {
-  const isAuth0Configured = auth0Service.isConfigured();
-
-  // Fallback if Auth0 is not configured
-  if (!isAuth0Configured) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-[#2a1e5c] via-[#1a0f3a] to-[#0f0622] flex items-centre justify-centre">
-        <div className="text-centre max-w-md mx-auto px-4">
-          <div className="text-yellow-400 text-6xl mb-4">🔧</div>
-          <h1 className="text-white text-2xl font-bold mb-4">Auth0 Configuration Required</h1>
-          <p className="text-white/70 mb-6">
-            Please configure your Auth0 credentials in the .env file to enable secure authentication.
-          </p>
-          <div className="bg-[#1e1548]/80 rounded-xl p-4 text-left">
-            <p className="text-white/80 text-sm mb-2">Required environment variables:</p>
-            <code className="text-[#8b7ed8] text-xs block">
-              REACT_APP_AUTH0_DOMAIN=your-tenant.auth0.com<br/>
-              REACT_APP_AUTH0_CLIENT_ID=your_client_id
-            </code>
-          </div>
-          <div className="mt-6">
-            <a 
-              href="https://manage.auth0.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block px-6 py-3 bg-gradient-to-r from-[#8b5cf6] via-[#ec4899] to-[#f97316] text-white font-semibold rounded-xl hover:shadow-lg transition-all duration-300"
-            >
-              Get Auth0 Credentials
-            </a>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  const auth0Props = auth0Service.getProviderProps();
-
+// Main Firebase App Component
+function App() {
   return (
     <Router>
-      <Auth0Provider {...auth0Props}>
+      <AuthProvider>
         <Routes>
-          <Route path="/reset-password" element={<PasswordResetPage />} />
-          <Route path="/*" element={<Auth0AppContent />} />
+          <Route path="/reset-password" element={<FirebasePasswordReset />} />
+          <Route path="/login" element={<ExactHodieLogin />} />
+          <Route path="/*" element={<FirebaseAppContent />} />
         </Routes>
-      </Auth0Provider>
+      </AuthProvider>
     </Router>
   );
 }
 
-export default Auth0App;
+export default App;

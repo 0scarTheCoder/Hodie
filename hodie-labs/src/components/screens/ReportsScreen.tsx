@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User } from 'firebase/auth';
-import { 
-  FileText, 
-  Download, 
-  Calendar, 
+import { useAuth } from '../../contexts/AuthContext';
+import FileUpload from '../common/FileUpload';
+import {
+  FileText,
+  Download,
+  Calendar,
   TrendingUp,
   Heart,
   Activity,
@@ -13,17 +15,253 @@ import {
   Clock,
   Share2,
   Printer,
-  Eye
+  Eye,
+  Loader2,
+  AlertCircle,
+  Upload
 } from 'lucide-react';
 
 interface ReportsScreenProps {
   user: User;
 }
 
-const ReportsScreen: React.FC<ReportsScreenProps> = ({ user }) => {
-  const [selectedReport, setSelectedReport] = useState<string | null>(null);
+interface Report {
+  id: string;
+  title: string;
+  type: string;
+  date: string;
+  size: string;
+  pages: number;
+  description: string;
+  icon: any;
+  color: string;
+  status: string;
+}
 
-  const reports = [
+interface HealthMetric {
+  metric: string;
+  current: number;
+  change: string;
+  period: string;
+}
+
+interface Achievement {
+  title: string;
+  desc: string;
+  date: string;
+  icon: string;
+}
+
+interface UpcomingReport {
+  title: string;
+  dueDate: string;
+  type: string;
+}
+
+const ReportsScreen: React.FC<ReportsScreenProps> = ({ user }) => {
+  const { getAccessToken } = useAuth();
+  const [selectedReport, setSelectedReport] = useState<string | null>(null);
+  const [isLoadingReports, setIsLoadingReports] = useState<boolean>(true);
+  const [reportsError, setReportsError] = useState<string | null>(null);
+  const [reports, setReports] = useState<Report[]>([]);
+  const [healthMetrics, setHealthMetrics] = useState<HealthMetric[]>([]);
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [upcomingReports, setUpcomingReports] = useState<UpcomingReport[]>([]);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+
+  // Fetch medical reports from MongoDB on mount
+  useEffect(() => {
+    const fetchMedicalReports = async () => {
+      setIsLoadingReports(true);
+      setReportsError(null);
+
+      try {
+        const userId = (user as any).sub || user.uid;
+
+        // Get Auth0 token
+        const token = await getAccessToken().catch((error) => {
+          console.warn('⚠️ Could not get Auth0 token for reports:', error);
+          return null;
+        });
+
+        const headers: HeadersInit = { 'Content-Type': 'application/json' };
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        // Fetch medical reports from backend
+        const response = await fetch(
+          `${process.env.REACT_APP_API_BASE_URL}/medical-reports/${userId}`,
+          { headers }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch medical reports: ${response.status}`);
+        }
+
+        const medicalReportsData = await response.json();
+        console.log('📋 Fetched medical reports:', medicalReportsData);
+
+        // Process medical reports data
+        if (medicalReportsData && medicalReportsData.length > 0) {
+          const extractedReports = extractReports(medicalReportsData);
+          const extractedMetrics = extractHealthMetrics(medicalReportsData);
+          const extractedAchievements = extractAchievements(medicalReportsData);
+          const extractedUpcoming = extractUpcomingReports(medicalReportsData);
+
+          setReports(extractedReports);
+          setHealthMetrics(extractedMetrics);
+          setAchievements(extractedAchievements);
+          setUpcomingReports(extractedUpcoming);
+        } else {
+          // Use default data if no reports available
+          setReports(getDefaultReports());
+          setHealthMetrics(getDefaultHealthMetrics());
+          setAchievements(getDefaultAchievements());
+          setUpcomingReports(getDefaultUpcomingReports());
+        }
+
+      } catch (err) {
+        console.error('Error fetching medical reports:', err);
+        setReportsError(err instanceof Error ? err.message : 'Failed to load medical reports');
+        // Use default data on error
+        setReports(getDefaultReports());
+        setHealthMetrics(getDefaultHealthMetrics());
+        setAchievements(getDefaultAchievements());
+        setUpcomingReports(getDefaultUpcomingReports());
+      } finally {
+        setIsLoadingReports(false);
+      }
+    };
+
+    fetchMedicalReports();
+  }, [user, getAccessToken]);
+
+  // Extract reports from medical reports data
+  const extractReports = (reportsData: any[]): Report[] => {
+    const reportsList: Report[] = [];
+
+    reportsData.forEach((data) => {
+      if (data.reports && Array.isArray(data.reports)) {
+        data.reports.forEach((report: any) => {
+          reportsList.push({
+            id: report.id || report._id || String(reportsList.length + 1),
+            title: report.title || report.name || 'Health Report',
+            type: report.type || report.category || 'General',
+            date: report.date || report.createdAt || new Date().toISOString().split('T')[0],
+            size: report.size || report.fileSize || '0 MB',
+            pages: parseInt(report.pages) || 0,
+            description: report.description || report.summary || 'Health report summary',
+            icon: getReportIcon(report.type || report.category),
+            color: getReportColor(report.type || report.category),
+            status: report.status || 'ready'
+          });
+        });
+      } else if (data.reportType) {
+        // Handle single report object
+        reportsList.push({
+          id: data.id || data._id || String(reportsList.length + 1),
+          title: data.title || data.reportType || 'Health Report',
+          type: data.reportType || 'General',
+          date: data.uploadDate || data.createdAt || new Date().toISOString().split('T')[0],
+          size: data.fileSize || '0 MB',
+          pages: 0,
+          description: data.summary || 'Health report summary',
+          icon: getReportIcon(data.reportType),
+          color: getReportColor(data.reportType),
+          status: 'ready'
+        });
+      }
+    });
+
+    return reportsList.length > 0 ? reportsList : getDefaultReports();
+  };
+
+  // Extract health metrics from data
+  const extractHealthMetrics = (reportsData: any[]): HealthMetric[] => {
+    // Try to extract health metrics from reports data
+    const metrics: HealthMetric[] = [];
+
+    reportsData.forEach((data) => {
+      if (data.healthMetrics && Array.isArray(data.healthMetrics)) {
+        data.healthMetrics.forEach((metric: any) => {
+          metrics.push({
+            metric: metric.name || metric.metric || 'Health Metric',
+            current: parseFloat(metric.value || metric.current) || 0,
+            change: metric.change || '+0',
+            period: metric.period || metric.timeframe || '3 months'
+          });
+        });
+      }
+    });
+
+    return metrics.length > 0 ? metrics : getDefaultHealthMetrics();
+  };
+
+  // Extract achievements from data
+  const extractAchievements = (reportsData: any[]): Achievement[] => {
+    const achievementsList: Achievement[] = [];
+
+    reportsData.forEach((data) => {
+      if (data.achievements && Array.isArray(data.achievements)) {
+        data.achievements.forEach((achievement: any) => {
+          achievementsList.push({
+            title: achievement.title || achievement.name || 'Achievement',
+            desc: achievement.description || achievement.desc || 'Health achievement',
+            date: achievement.date || achievement.earnedAt || new Date().toISOString().split('T')[0],
+            icon: achievement.icon || '🏆'
+          });
+        });
+      }
+    });
+
+    return achievementsList.length > 0 ? achievementsList : getDefaultAchievements();
+  };
+
+  // Extract upcoming reports
+  const extractUpcomingReports = (reportsData: any[]): UpcomingReport[] => {
+    const upcoming: UpcomingReport[] = [];
+
+    reportsData.forEach((data) => {
+      if (data.upcomingReports && Array.isArray(data.upcomingReports)) {
+        data.upcomingReports.forEach((report: any) => {
+          upcoming.push({
+            title: report.title || report.name || 'Upcoming Report',
+            dueDate: report.dueDate || report.scheduledDate || '2025-01-01',
+            type: report.type || 'General'
+          });
+        });
+      }
+    });
+
+    return upcoming.length > 0 ? upcoming : getDefaultUpcomingReports();
+  };
+
+  // Helper functions
+  const getReportIcon = (type: string) => {
+    const typeLower = type?.toLowerCase() || '';
+    if (typeLower.includes('genetic') || typeLower.includes('dna')) return Brain;
+    if (typeLower.includes('lab') || typeLower.includes('blood')) return Activity;
+    if (typeLower.includes('body') || typeLower.includes('physical')) return TrendingUp;
+    if (typeLower.includes('progress') || typeLower.includes('quarterly')) return Star;
+    if (typeLower.includes('recommendation') || typeLower.includes('action')) return Shield;
+    if (typeLower.includes('annual') || typeLower.includes('yearly')) return Calendar;
+    return Heart;
+  };
+
+  const getReportColor = (type: string) => {
+    const typeLower = type?.toLowerCase() || '';
+    if (typeLower.includes('genetic') || typeLower.includes('dna')) return 'bg-purple-500';
+    if (typeLower.includes('lab') || typeLower.includes('blood')) return 'bg-blue-500';
+    if (typeLower.includes('body') || typeLower.includes('physical')) return 'bg-green-500';
+    if (typeLower.includes('progress') || typeLower.includes('quarterly')) return 'bg-yellow-500';
+    if (typeLower.includes('recommendation') || typeLower.includes('action')) return 'bg-indigo-500';
+    if (typeLower.includes('annual') || typeLower.includes('yearly')) return 'bg-gray-500';
+    return 'bg-red-500';
+  };
+
+  // Default data functions
+  const getDefaultReports = (): Report[] => [
     {
       id: '1',
       title: 'Comprehensive Health Summary',
@@ -110,25 +348,111 @@ const ReportsScreen: React.FC<ReportsScreenProps> = ({ user }) => {
     }
   ];
 
-  const healthMetrics = [
+  const getDefaultHealthMetrics = (): HealthMetric[] => [
     { metric: 'Health Score', current: 72, change: '+8', period: '3 months' },
     { metric: 'Biological Age', current: 38, change: '-2', period: '6 months' },
-    { metric: 'Fitness Level', current: 85, change: '+12', period: '3 months' },
-    { metric: 'Biomarker Rating', current: 91, change: '+5', period: '3 months' }
+    { metric: 'Fitness Level', current: 85, change: '+12', period: '3 months' }
   ];
 
-  const achievements = [
+  const getDefaultAchievements = (): Achievement[] => [
     { title: 'Cholesterol Champion', desc: 'Improved cholesterol by 15%', date: 'Oct 2024', icon: '🏆' },
     { title: 'Consistency King', desc: '30-day login streak', date: 'Nov 2024', icon: '🔥' },
-    { title: 'Inflammation Fighter', desc: 'CRP levels in optimal range', date: 'Oct 2024', icon: '⚡' },
-    { title: 'Vitamin D Optimizer', desc: 'Achieved optimal vitamin D levels', date: 'Sep 2024', icon: '☀️' }
+    { title: 'Inflammation Fighter', desc: 'CRP levels in optimal range', date: 'Oct 2024', icon: '⚡' }
   ];
 
-  const upcomingReports = [
+  const getDefaultUpcomingReports = (): UpcomingReport[] => [
     { title: 'Quarterly Blood Panel', dueDate: '2025-01-15', type: 'Lab Analysis' },
-    { title: 'Body Composition Scan', dueDate: '2024-12-20', type: 'Physical Assessment' },
-    { title: 'Annual Health Summary', dueDate: '2025-01-01', type: 'Yearly Review' }
+    { title: 'Body Composition Scan', dueDate: '2024-12-20', type: 'Physical Assessment' }
   ];
+
+  // Loading state
+  if (isLoadingReports) {
+    return (
+      <div className="px-6 pb-6">
+        <div className="flex items-center justify-center h-96">
+          <div className="text-center">
+            <Loader2 className="w-12 h-12 text-blue-500 animate-spin mx-auto mb-4" />
+            <p className="text-white/70">Loading medical reports...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error banner (non-blocking - show warning but still render with default data)
+  const renderErrorBanner = () => {
+    if (!reportsError) return null;
+
+    return (
+      <div className="mb-6 bg-yellow-500/20 border border-yellow-500/50 rounded-xl p-4">
+        <div className="flex items-start space-x-3">
+          <AlertCircle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+          <div>
+            <h3 className="text-sm font-semibold text-white">Using Default Report Data</h3>
+            <p className="text-white/70 text-sm">{reportsError}</p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Empty state (no reports available)
+  if (reports.length === 0 && !reportsError && !showUploadModal) {
+    return (
+      <div className="px-6 pb-6">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-white mb-2">Health Reports</h1>
+          <p className="text-white/70">Download and share your comprehensive health reports and progress summaries</p>
+        </div>
+        <div className="bg-blue-500/20 border border-blue-500/50 rounded-xl p-8 text-center">
+          <FileText className="w-16 h-16 text-blue-400 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-white mb-2">No Reports Available</h3>
+          <p className="text-white/70 mb-6">
+            Complete health assessments to generate comprehensive reports and track your progress.
+          </p>
+          <button
+            onClick={() => setShowUploadModal(true)}
+            className="flex items-center space-x-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg mx-auto"
+          >
+            <Upload className="w-5 h-5" />
+            <span>Upload Health Data</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show upload modal in empty state
+  if (showUploadModal && reports.length === 0 && !reportsError) {
+    return (
+      <div className="px-6 pb-6">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-white mb-2">Health Reports</h1>
+          <p className="text-white/70">Download and share your comprehensive health reports and progress summaries</p>
+        </div>
+        <div className="bg-gradient-to-r from-blue-600/20 to-green-600/20 rounded-xl p-6 border border-white/10">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-white">Upload Medical Report</h3>
+            <button
+              onClick={() => setShowUploadModal(false)}
+              className="text-white/70 hover:text-white"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <FileUpload
+            category="medical_reports"
+            onUploadSuccess={() => {
+              setShowUploadModal(false);
+              window.location.reload();
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-6 pb-6">
@@ -137,6 +461,9 @@ const ReportsScreen: React.FC<ReportsScreenProps> = ({ user }) => {
         <h1 className="text-3xl font-bold text-white mb-2">Health Reports</h1>
         <p className="text-white/70">Download and share your comprehensive health reports and progress summaries</p>
       </div>
+
+      {/* Error banner (if any) */}
+      {renderErrorBanner()}
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -154,9 +481,42 @@ const ReportsScreen: React.FC<ReportsScreenProps> = ({ user }) => {
         ))}
       </div>
 
+      {/* Upload Modal */}
+      {showUploadModal && (
+        <div className="mb-6 bg-gradient-to-r from-blue-600/20 to-green-600/20 rounded-xl p-6 border border-white/10">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-white">Upload Medical Report</h3>
+            <button
+              onClick={() => setShowUploadModal(false)}
+              className="text-white/70 hover:text-white"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <FileUpload
+            category="medical_reports"
+            onUploadSuccess={() => {
+              setShowUploadModal(false);
+              window.location.reload();
+            }}
+          />
+        </div>
+      )}
+
       {/* Available Reports */}
       <div className="mb-8">
-        <h2 className="text-xl font-bold text-white mb-4">Available Reports</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold text-white">Available Reports</h2>
+          <button
+            onClick={() => setShowUploadModal(!showUploadModal)}
+            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+          >
+            <Upload className="w-4 h-4" />
+            <span>Upload Report</span>
+          </button>
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {reports.map((report) => (
             <div 

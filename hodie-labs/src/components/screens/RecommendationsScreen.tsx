@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { User } from 'firebase/auth';
-import { 
-  Activity, 
-  Target, 
-  Shield, 
-  Heart, 
-  Zap, 
-  CheckCircle, 
+import { useAuth } from '../../contexts/AuthContext';
+import {
+  Activity,
+  Target,
+  Shield,
+  Heart,
+  Zap,
+  CheckCircle,
   Clock,
   Star,
   TrendingUp,
-  Loader2
+  Loader2,
+  AlertCircle,
+  Upload
 } from 'lucide-react';
 import { kimiK2Service, HealthRecommendation, HealthContext } from '../../services/kimiK2Service';
 
@@ -20,10 +23,13 @@ interface RecommendationsScreenProps {
 }
 
 const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, healthScore }) => {
+  const { getAccessToken } = useAuth();
   const [selectedFilter, setSelectedFilter] = useState<string>('All');
   const [recommendations, setRecommendations] = useState<HealthRecommendation[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [aiEnabled, setAiEnabled] = useState<boolean>(false);
+  const [isLoadingFromDB, setIsLoadingFromDB] = useState<boolean>(true);
+  const [dbError, setDbError] = useState<string | null>(null);
 
   // Check if user has configured their own API key
   const checkUserApiKey = (): boolean => {
@@ -39,23 +45,79 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
     }
   };
 
+  // Fetch saved recommendations from MongoDB on mount
+  useEffect(() => {
+    const fetchSavedRecommendations = async () => {
+      setIsLoadingFromDB(true);
+      setDbError(null);
+
+      try {
+        const userId = (user as any).sub || user.uid;
+
+        // Get Auth0 token
+        const token = await getAccessToken().catch((error) => {
+          console.warn('⚠️ Could not get Auth0 token for recommendations:', error);
+          return null;
+        });
+
+        const headers: HeadersInit = { 'Content-Type': 'application/json' };
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        // Fetch recommendations from backend
+        const response = await fetch(
+          `${process.env.REACT_APP_API_BASE_URL}/recommendations/${userId}`,
+          { headers }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch recommendations: ${response.status}`);
+        }
+
+        const savedRecommendations = await response.json();
+        console.log('💡 Fetched saved recommendations:', savedRecommendations);
+
+        // Use saved recommendations if available
+        if (savedRecommendations && savedRecommendations.length > 0) {
+          setRecommendations(savedRecommendations);
+        }
+
+      } catch (err) {
+        console.error('Error fetching recommendations:', err);
+        setDbError(err instanceof Error ? err.message : 'Failed to load recommendations');
+      } finally {
+        setIsLoadingFromDB(false);
+      }
+    };
+
+    fetchSavedRecommendations();
+  }, [user, getAccessToken]);
+
   // Initialize AI and load recommendations
   useEffect(() => {
     const initialiseAI = async () => {
+      // Don't load AI recommendations while still loading from DB
+      if (isLoadingFromDB) return;
+
       // Check API status for this specific user (includes auto-assigned keys)
       const userApiEnabled = await kimiK2Service.checkApiStatus(user.uid);
-      
+
       setAiEnabled(userApiEnabled);
-      loadRecommendations();
+
+      // Only load AI recommendations if we don't have saved ones
+      if (recommendations.length === 0) {
+        loadRecommendations();
+      }
     };
 
     initialiseAI();
-  }, [user.uid, healthScore]);
+  }, [user.uid, healthScore, isLoadingFromDB]);
 
   // Load AI-generated recommendations
   const loadRecommendations = async () => {
     setLoading(true);
-    
+
     const healthContext: HealthContext = {
       userId: user.uid,
       recentHealthData: {
@@ -71,10 +133,87 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
     try {
       const aiRecommendations = await kimiK2Service.generateHealthRecommendations(healthContext);
       setRecommendations(aiRecommendations);
+
+      // Save AI-generated recommendations to MongoDB
+      await saveRecommendationsToMongoDB(aiRecommendations);
     } catch (error) {
       console.error('Error loading recommendations:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Save recommendations to MongoDB
+  const saveRecommendationsToMongoDB = async (recs: HealthRecommendation[]) => {
+    try {
+      const userId = (user as any).sub || user.uid;
+
+      // Get Auth0 token
+      const token = await getAccessToken().catch((error) => {
+        console.warn('⚠️ Could not get Auth0 token for saving recommendations:', error);
+        return null;
+      });
+
+      const headers: HeadersInit = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      // Save recommendations to backend
+      const response = await fetch(
+        `${process.env.REACT_APP_API_BASE_URL}/recommendations/${userId}`,
+        {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ recommendations: recs })
+        }
+      );
+
+      if (!response.ok) {
+        console.warn('Failed to save recommendations to MongoDB');
+      }
+    } catch (error) {
+      console.error('Error saving recommendations:', error);
+    }
+  };
+
+  // Mark recommendation as complete
+  const markComplete = async (recId: string) => {
+    try {
+      // Update local state
+      setRecommendations(prevRecs =>
+        prevRecs.map(rec =>
+          rec.id === recId ? { ...rec, completed: true } : rec
+        )
+      );
+
+      // Update in MongoDB
+      const userId = (user as any).sub || user.uid;
+
+      const token = await getAccessToken().catch((error) => {
+        console.warn('⚠️ Could not get Auth0 token for updating recommendation:', error);
+        return null;
+      });
+
+      const headers: HeadersInit = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(
+        `${process.env.REACT_APP_API_BASE_URL}/recommendations/${userId}/${recId}`,
+        {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify({ completed: true })
+        }
+      );
+
+      if (!response.ok) {
+        console.warn('Failed to update recommendation completion status');
+      }
+    } catch (error) {
+      console.error('Error marking recommendation as complete:', error);
     }
   };
 
@@ -200,8 +339,68 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
   const totalCount = filteredRecommendations.length;
   const completionRate = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
+  // Loading state (initial DB load)
+  if (isLoadingFromDB) {
+    return (
+      <div className="px-6 pb-6">
+        <div className="flex items-center justify-center h-96">
+          <div className="text-center">
+            <Loader2 className="w-12 h-12 text-blue-500 animate-spin mx-auto mb-4" />
+            <p className="text-white/70">Loading recommendations...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error banner (non-blocking - show warning but still render)
+  const renderErrorBanner = () => {
+    if (!dbError) return null;
+
+    return (
+      <div className="mb-6 bg-yellow-500/20 border border-yellow-500/50 rounded-xl p-4">
+        <div className="flex items-start space-x-3">
+          <AlertCircle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+          <div>
+            <h3 className="text-sm font-semibold text-white">Using Default Recommendations</h3>
+            <p className="text-white/70 text-sm">{dbError}</p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Empty state (no recommendations available)
+  if (displayRecommendations.length === 0 && !loading) {
+    return (
+      <div className="px-6 pb-6">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-white mb-2">Your Health Recommendations</h1>
+          <p className="text-white/70">AI-powered personalized recommendations based on your health data</p>
+        </div>
+        <div className="bg-blue-500/20 border border-blue-500/50 rounded-xl p-8 text-center">
+          <Target className="w-16 h-16 text-blue-400 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-white mb-2">No Recommendations Available</h3>
+          <p className="text-white/70 mb-6">
+            Complete health assessments and upload data to receive personalized AI-powered health recommendations.
+          </p>
+          <button
+            onClick={loadRecommendations}
+            className="flex items-center space-x-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg mx-auto"
+          >
+            <Zap className="w-5 h-5" />
+            <span>Generate Recommendations</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="px-6 pb-6">
+      {/* Error banner (if any) */}
+      {renderErrorBanner()}
+
       {/* Header Stats */}
       <div className="mb-8">
         <div className="flex items-centre justify-between mb-4">
@@ -332,7 +531,10 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
               
               <div className="flex flex-col space-y-2 ml-4">
                 {!rec.completed ? (
-                  <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium">
+                  <button
+                    onClick={() => markComplete(rec.id)}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium"
+                  >
                     Mark Complete
                   </button>
                 ) : (

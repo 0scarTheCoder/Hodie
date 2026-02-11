@@ -1,447 +1,459 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
+/**
+ * Hodie Labs Backend API Server
+ *
+ * Purpose: Secure AI API proxy with tiered subscription access
+ * - Hides API keys from frontend (security)
+ * - Routes to different AI models based on user tier
+ * - Implements rate limiting per subscription level
+ * - Tracks usage for billing
+ */
+
 require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const rateLimit = require('express-rate-limit');
+const { MongoClient } = require('mongodb');
+
+// Import AI service handlers
+const ClaudeService = require('./services/claudeService');
+const GroqService = require('./services/groqService');
+const UsageTracker = require('./services/usageTracker');
+
+// Import routes
+const clientRoutes = require('./routes/clientRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
+const dataRoutes = require('./routes/dataRoutes');
+const visualizationRoutes = require('./routes/visualizationRoutes');
+const recommendationsRoutes = require('./routes/recommendationsRoutes');
+
+// Import rate limiters
+const {
+  generalLimiter,
+  uploadLimiter,
+  chatLimiter,
+  recommendationsLimiter,
+  dataFetchLimiter
+} = require('./middleware/rateLimitMiddleware');
+
+// Import error handlers
+const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Security middleware
-app.use(helmet());
+// MongoDB Connection
+let db;
+const mongoClient = new MongoClient(process.env.MONGODB_URI);
 
-// CORS configuration for production
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:3005', 
-  'https://hodie-labs-webapp.web.app',
-  'https://hodie-labs-webapp.firebaseapp.com'
-];
+async function connectDB() {
+  try {
+    await mongoClient.connect();
+    db = mongoClient.db('hodie_app');
+    console.log('✅ Connected to MongoDB');
+  } catch (error) {
+    console.error('❌ MongoDB connection error:', error);
+    process.exit(1);
+  }
+}
+
+// Middleware
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',')
+  : ['http://localhost:3000', 'https://hodie-labs-webapp.web.app', 'https://hodie-labs-webapp.firebaseapp.com'];
 
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: allowedOrigins,
   credentials: true
 }));
-
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
-});
-app.use(limiter);
-
-// Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
 
-// MongoDB connection
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => {
-  console.log('✅ Connected to MongoDB Atlas');
-})
-.catch((error) => {
-  console.error('❌ MongoDB connection error:', error);
-  process.exit(1);
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    service: 'Hodie Labs Backend API'
+  });
 });
 
-// User Schema
-const userSchema = new mongoose.Schema({
-  uid: { type: String, required: true, unique: true },
-  email: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now },
-  lastLoginAt: { type: Date, default: Date.now },
-  preferences: { type: Object, default: {} },
-  healthData: {
-    weight: Number,
-    height: Number,
-    age: Number,
-    activityLevel: String,
-    goals: [String]
-  }
-}, { timestamps: true });
-
-// Chat Session Schema
-const chatSessionSchema = new mongoose.Schema({
-  userId: { type: String, required: true },
-  messages: [{
-    id: String,
-    text: String,
-    sender: { type: String, enum: ['user', 'assistant'] },
-    timestamp: { type: Date, default: Date.now }
-  }],
-  title: String,
-  category: String
-}, { timestamps: true });
-
-// Health Metrics Schema
-const healthMetricsSchema = new mongoose.Schema({
-  userId: { type: String, required: true },
-  date: { type: Date, default: Date.now },
-  steps: Number,
-  calories: Number,
-  distance: Number,
-  sleepHours: Number,
-  sleepQuality: String,
-  mood: String,
-  weight: Number,
-  bloodPressure: {
-    systolic: Number,
-    diastolic: Number
-  },
-  heartRate: Number,
-  aiProcessed: { type: Boolean, default: false },
-  confidence: Number
-}, { timestamps: true });
-
-// Lab Results Schema
-const labResultsSchema = new mongoose.Schema({
-  userId: { type: String, required: true },
-  testDate: { type: Date, default: Date.now },
-  testType: String,
-  results: mongoose.Schema.Types.Mixed,
-  biomarkers: [{
-    name: String,
-    value: mongoose.Schema.Types.Mixed,
-    unit: String,
-    referenceRange: String,
-    status: String
-  }],
-  aiProcessed: { type: Boolean, default: false },
-  confidence: Number,
-  notes: String
-}, { timestamps: true });
-
-// Genetic Data Schema
-const geneticDataSchema = new mongoose.Schema({
-  userId: { type: String, required: true },
-  provider: String,
-  uploadDate: { type: Date, default: Date.now },
-  variants: [{
-    rsid: String,
-    chromosome: String,
-    position: Number,
-    genotype: String,
-    trait: String,
-    significance: String
-  }],
-  rawData: mongoose.Schema.Types.Mixed,
-  aiProcessed: { type: Boolean, default: false },
-  confidence: Number
-}, { timestamps: true });
-
-// Wearable Data Schema
-const wearableDataSchema = new mongoose.Schema({
-  userId: { type: String, required: true },
-  device: String,
-  syncDate: { type: Date, default: Date.now },
-  dataType: String,
-  metrics: mongoose.Schema.Types.Mixed,
-  aiProcessed: { type: Boolean, default: false },
-  confidence: Number
-}, { timestamps: true });
-
-// Medical Reports Schema
-const medicalReportsSchema = new mongoose.Schema({
-  userId: { type: String, required: true },
-  reportType: String,
-  reportDate: { type: Date, default: Date.now },
-  provider: String,
-  content: mongoose.Schema.Types.Mixed,
-  extractedData: mongoose.Schema.Types.Mixed,
-  aiProcessed: { type: Boolean, default: false },
-  confidence: Number,
-  fileName: String
-}, { timestamps: true });
-
-const User = mongoose.model('User', userSchema);
-const ChatSession = mongoose.model('ChatSession', chatSessionSchema);
-const HealthMetrics = mongoose.model('HealthMetrics', healthMetricsSchema);
-const LabResults = mongoose.model('LabResults', labResultsSchema);
-const GeneticData = mongoose.model('GeneticData', geneticDataSchema);
-const WearableData = mongoose.model('WearableData', wearableDataSchema);
-const MedicalReports = mongoose.model('MedicalReports', medicalReportsSchema);
-
-// Routes
-
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Hodie API is running', timestamp: new Date() });
-});
-
-// User routes
-app.post('/api/users', async (req, res) => {
+// Middleware to get user subscription tier
+async function getUserTier(req, res, next) {
   try {
-    const { uid, email, preferences } = req.body;
-    
-    const existingUser = await User.findOne({ uid });
-    if (existingUser) {
-      return res.status(200).json(existingUser);
+    const userId = req.body.userId || req.headers['x-user-id'];
+
+    if (!userId) {
+      return res.status(401).json({
+        error: 'User ID required',
+        message: 'Please provide userId in request body or x-user-id header'
+      });
     }
-    
-    const user = new User({
-      uid,
-      email,
-      preferences: preferences || {},
-      createdAt: new Date(),
-      lastLoginAt: new Date()
+
+    // Fetch user subscription from MongoDB
+    const usersCollection = db.collection('users');
+    const user = await usersCollection.findOne({
+      $or: [
+        { uid: userId },
+        { sub: userId },
+        { _id: userId }
+      ]
     });
-    
-    await user.save();
-    res.status(201).json(user);
-  } catch (error) {
-    console.error('Error creating user:', error);
-    res.status(500).json({ error: 'Failed to create user' });
-  }
-});
 
-app.get('/api/users/:uid', async (req, res) => {
-  try {
-    const { uid } = req.params;
-    const user = await User.findOne({ uid });
-    
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    
-    res.json(user);
-  } catch (error) {
-    console.error('Error getting user:', error);
-    res.status(500).json({ error: 'Failed to get user' });
-  }
-});
+    // Determine tier (default to free if not found or no subscription)
+    const tier = user?.subscription?.tier || 'free';
 
-app.patch('/api/users/:uid/login', async (req, res) => {
-  try {
-    const { uid } = req.params;
-    const user = await User.findOneAndUpdate(
-      { uid },
-      { lastLoginAt: new Date() },
-      { new: true }
-    );
-    
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    
-    res.json(user);
-  } catch (error) {
-    console.error('Error updating login time:', error);
-    res.status(500).json({ error: 'Failed to update login time' });
-  }
-});
+    req.user = {
+      id: userId,
+      tier: tier,
+      subscription: user?.subscription || { tier: 'free', messagesUsed: 0 }
+    };
 
-// Chat session routes
-app.post('/api/chat-sessions', async (req, res) => {
+    next();
+  } catch (error) {
+    console.error('Error fetching user tier:', error);
+    // Default to free tier on error
+    req.user = {
+      id: req.body.userId || req.headers['x-user-id'],
+      tier: 'free',
+      subscription: { tier: 'free', messagesUsed: 0 }
+    };
+    next();
+  }
+}
+
+// Middleware to check message limits
+async function checkMessageLimit(req, res, next) {
   try {
-    const { userId, messages, title, category } = req.body;
-    
-    const chatSession = new ChatSession({
-      userId,
-      messages,
-      title: title || 'Health Chat',
-      category: category || 'general'
+    const { tier } = req.user;
+    const userId = req.user.id;
+
+    // Get message limits per tier (monthly)
+    const TIER_LIMITS = {
+      free: 10,
+      basic: 100,
+      pro: 500,
+      premium: 1000
+    };
+
+    const limit = TIER_LIMITS[tier];
+
+    // Get current month's usage from MongoDB
+    const usageCollection = db.collection('ai_usage');
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const usage = await usageCollection.findOne({
+      userId: userId,
+      month: startOfMonth
     });
-    
-    await chatSession.save();
-    res.status(201).json(chatSession);
-  } catch (error) {
-    console.error('Error creating chat session:', error);
-    res.status(500).json({ error: 'Failed to create chat session' });
-  }
-});
 
-app.get('/api/chat-sessions/user/:userId', async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const sessions = await ChatSession.find({ userId }).sort({ createdAt: -1 });
-    res.json(sessions);
-  } catch (error) {
-    console.error('Error getting chat sessions:', error);
-    res.status(500).json({ error: 'Failed to get chat sessions' });
-  }
-});
+    const messagesUsed = usage?.messagesUsed || 0;
 
-app.patch('/api/chat-sessions/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { messages } = req.body;
-    
-    const session = await ChatSession.findByIdAndUpdate(
-      id,
-      { messages, updatedAt: new Date() },
-      { new: true }
-    );
-    
-    if (!session) {
-      return res.status(404).json({ error: 'Chat session not found' });
+    if (messagesUsed >= limit) {
+      return res.status(429).json({
+        error: 'Message limit reached',
+        message: `You've reached your monthly limit of ${limit} messages. Upgrade your plan for more messages.`,
+        messagesUsed: messagesUsed,
+        limit: limit,
+        tier: tier,
+        upgradeUrl: 'https://hodielabs.com/pricing'
+      });
     }
-    
-    res.json(session);
-  } catch (error) {
-    console.error('Error updating chat session:', error);
-    res.status(500).json({ error: 'Failed to update chat session' });
-  }
-});
 
-// Health metrics routes
-app.post('/api/health-metrics', async (req, res) => {
+    // Store usage info in request for later tracking
+    req.usage = {
+      messagesUsed: messagesUsed,
+      limit: limit,
+      remaining: limit - messagesUsed
+    };
+
+    next();
+  } catch (error) {
+    console.error('Error checking message limit:', error);
+    // Allow request on error (fail open for better UX)
+    next();
+  }
+}
+
+// Rate limiter factory - creates rate limiters per tier
+function createRateLimiter(tier) {
+  const limits = {
+    free: parseInt(process.env.FREE_TIER_RATE_LIMIT) || 5,
+    basic: parseInt(process.env.BASIC_TIER_RATE_LIMIT) || 20,
+    pro: parseInt(process.env.PRO_TIER_RATE_LIMIT) || 100,
+    premium: parseInt(process.env.PREMIUM_TIER_RATE_LIMIT) || 200
+  };
+
+  return rateLimit({
+    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 60000, // 1 minute
+    max: limits[tier],
+    message: {
+      error: 'Too many requests',
+      message: `Rate limit exceeded for ${tier} tier. Please wait a moment.`
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+}
+
+// Main AI chat endpoint (with rate limiting)
+app.post('/api/chat', chatLimiter, getUserTier, checkMessageLimit, async (req, res) => {
   try {
-    const { userId, ...metricsData } = req.body;
-    
-    const metrics = new HealthMetrics({
-      userId,
-      ...metricsData
+    const { tier } = req.user;
+    const { message, conversationHistory, healthContext } = req.body;
+
+    if (!message) {
+      return res.status(400).json({
+        error: 'Message required',
+        message: 'Please provide a message in the request body'
+      });
+    }
+
+    console.log(`🤖 Processing chat request for user ${req.user.id} (${tier} tier)`);
+
+    let response;
+    let modelUsed;
+    let tokensUsed = 0;
+
+    // Route to appropriate AI model based on tier
+    switch (tier) {
+      case 'free':
+        // Use Groq (free) for free tier
+        console.log('📱 Routing to Groq Llama 3 (free tier)');
+        const groqService = new GroqService();
+        response = await groqService.generateResponse(message, conversationHistory, healthContext);
+        modelUsed = 'groq-llama-3-8b';
+        tokensUsed = response.tokensUsed || 800;
+        break;
+
+      case 'basic':
+      case 'pro':
+        // Use Claude Haiku for basic/pro tiers
+        console.log('📱 Routing to Claude 3 Haiku');
+        const claudeService = new ClaudeService('haiku');
+        response = await claudeService.generateResponse(message, conversationHistory, healthContext);
+        modelUsed = 'claude-3-haiku';
+        tokensUsed = response.tokensUsed || 1200;
+        break;
+
+      case 'premium':
+        // Use Claude 3.5 Sonnet for premium tier
+        console.log('📱 Routing to Claude 3.5 Sonnet');
+        const claudeSonnetService = new ClaudeService('sonnet');
+        response = await claudeSonnetService.generateResponse(message, conversationHistory, healthContext);
+        modelUsed = 'claude-3.5-sonnet';
+        tokensUsed = response.tokensUsed || 2000;
+        break;
+
+      default:
+        // Default to free tier
+        console.log('📱 Routing to Groq Llama 3 (default)');
+        const defaultGroqService = new GroqService();
+        response = await defaultGroqService.generateResponse(message, conversationHistory, healthContext);
+        modelUsed = 'groq-llama-3-8b';
+        tokensUsed = response.tokensUsed || 800;
+    }
+
+    // Track usage in MongoDB
+    const usageTracker = new UsageTracker(db);
+    await usageTracker.trackMessage(req.user.id, tier, modelUsed, tokensUsed);
+
+    // Return response with usage metadata
+    res.json({
+      response: response.text || response,
+      metadata: {
+        tier: tier,
+        model: modelUsed,
+        tokensUsed: tokensUsed,
+        messagesRemaining: req.usage.remaining - 1,
+        messagesUsed: req.usage.messagesUsed + 1,
+        limit: req.usage.limit
+      }
     });
-    
-    await metrics.save();
-    res.status(201).json(metrics);
+
   } catch (error) {
-    console.error('Error saving health metrics:', error);
-    res.status(500).json({ error: 'Failed to save health metrics' });
+    console.error('❌ Chat error:', error);
+    res.status(500).json({
+      error: 'AI processing failed',
+      message: error.message,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 });
 
-app.get('/api/health-metrics/:userId', async (req, res) => {
+// File analysis endpoint (paid tiers only)
+app.post('/api/analyze-file', getUserTier, checkMessageLimit, async (req, res) => {
   try {
-    const { userId } = req.params;
-    const { startDate, endDate } = req.query;
+    const { tier } = req.user;
+    const { fileData, fileName, fileCategory } = req.body;
 
-    let query = { userId };
-
-    if (startDate || endDate) {
-      query.date = {};
-      if (startDate) query.date.$gte = new Date(startDate);
-      if (endDate) query.date.$lte = new Date(endDate);
+    // Check if user has access to file analysis
+    if (tier === 'free') {
+      return res.status(403).json({
+        error: 'Feature not available',
+        message: 'File analysis is only available for paid subscribers. Upgrade to Basic tier or higher.',
+        upgradeUrl: 'https://hodielabs.com/pricing'
+      });
     }
 
-    const metrics = await HealthMetrics.find(query).sort({ date: -1 });
-    res.json(metrics);
+    if (!fileData || !fileName) {
+      return res.status(400).json({
+        error: 'File data required',
+        message: 'Please provide fileData and fileName in the request body'
+      });
+    }
+
+    console.log(`📄 Analyzing file for user ${req.user.id} (${tier} tier): ${fileName}`);
+
+    // Use Claude for file analysis (even basic tier gets Claude for this)
+    const model = tier === 'premium' ? 'sonnet' : 'haiku';
+    const claudeService = new ClaudeService(model);
+    const analysis = await claudeService.analyzeFile(fileData, fileName, fileCategory);
+
+    // Track usage
+    const usageTracker = new UsageTracker(db);
+    await usageTracker.trackFileAnalysis(req.user.id, tier, `claude-3-${model}`, fileName);
+
+    res.json({
+      analysis: analysis,
+      metadata: {
+        tier: tier,
+        model: `claude-3-${model}`,
+        fileName: fileName,
+        messagesRemaining: req.usage.remaining - 1
+      }
+    });
+
   } catch (error) {
-    console.error('Error getting health metrics:', error);
-    res.status(500).json({ error: 'Failed to get health metrics' });
+    console.error('❌ File analysis error:', error);
+    res.status(500).json({
+      error: 'File analysis failed',
+      message: error.message
+    });
   }
 });
 
-// Lab Results routes
-app.post('/api/lab-results', async (req, res) => {
-  try {
-    const labResult = new LabResults(req.body);
-    await labResult.save();
-    res.status(201).json(labResult);
-  } catch (error) {
-    console.error('Error saving lab results:', error);
-    res.status(500).json({ error: 'Failed to save lab results' });
-  }
-});
-
-app.get('/api/lab-results/:userId', async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const results = await LabResults.find({ userId }).sort({ testDate: -1 });
-    res.json(results);
-  } catch (error) {
-    console.error('Error getting lab results:', error);
-    res.status(500).json({ error: 'Failed to get lab results' });
-  }
-});
-
-// Genetic Data routes
-app.post('/api/genetic-data', async (req, res) => {
-  try {
-    const geneticData = new GeneticData(req.body);
-    await geneticData.save();
-    res.status(201).json(geneticData);
-  } catch (error) {
-    console.error('Error saving genetic data:', error);
-    res.status(500).json({ error: 'Failed to save genetic data' });
-  }
-});
-
-app.get('/api/genetic-data/:userId', async (req, res) => {
+// Get user's current usage stats
+app.get('/api/usage/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    const data = await GeneticData.find({ userId }).sort({ uploadDate: -1 });
-    res.json(data);
+
+    const usageCollection = db.collection('ai_usage');
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const usage = await usageCollection.findOne({
+      userId: userId,
+      month: startOfMonth
+    });
+
+    // Get user tier
+    const usersCollection = db.collection('users');
+    const user = await usersCollection.findOne({
+      $or: [{ uid: userId }, { sub: userId }, { _id: userId }]
+    });
+
+    const tier = user?.subscription?.tier || 'free';
+
+    const TIER_LIMITS = {
+      free: 10,
+      basic: 100,
+      pro: 500,
+      premium: 1000
+    };
+
+    res.json({
+      userId: userId,
+      tier: tier,
+      messagesUsed: usage?.messagesUsed || 0,
+      limit: TIER_LIMITS[tier],
+      remaining: TIER_LIMITS[tier] - (usage?.messagesUsed || 0),
+      month: startOfMonth,
+      tokensUsed: usage?.tokensUsed || 0
+    });
+
   } catch (error) {
-    console.error('Error getting genetic data:', error);
-    res.status(500).json({ error: 'Failed to get genetic data' });
+    console.error('Error fetching usage:', error);
+    res.status(500).json({ error: 'Failed to fetch usage data' });
   }
 });
 
-// Wearable Data routes
-app.post('/api/wearable-data', async (req, res) => {
+// Admin endpoint - get all usage stats (protected - add auth later)
+app.get('/api/admin/usage-stats', async (req, res) => {
   try {
-    const wearableData = new WearableData(req.body);
-    await wearableData.save();
-    res.status(201).json(wearableData);
+    const usageCollection = db.collection('ai_usage');
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const stats = await usageCollection.aggregate([
+      { $match: { month: startOfMonth } },
+      {
+        $group: {
+          _id: '$tier',
+          totalUsers: { $sum: 1 },
+          totalMessages: { $sum: '$messagesUsed' },
+          totalTokens: { $sum: '$tokensUsed' },
+          avgMessagesPerUser: { $avg: '$messagesUsed' }
+        }
+      }
+    ]).toArray();
+
+    res.json({
+      month: startOfMonth,
+      stats: stats
+    });
+
   } catch (error) {
-    console.error('Error saving wearable data:', error);
-    res.status(500).json({ error: 'Failed to save wearable data' });
+    console.error('Error fetching admin stats:', error);
+    res.status(500).json({ error: 'Failed to fetch statistics' });
   }
 });
 
-app.get('/api/wearable-data/:userId', async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const data = await WearableData.find({ userId }).sort({ syncDate: -1 });
-    res.json(data);
-  } catch (error) {
-    console.error('Error getting wearable data:', error);
-    res.status(500).json({ error: 'Failed to get wearable data' });
-  }
-});
+// New Client Management & Data Routes
+// These routes use JWT authentication and enforce data ownership
+app.use('/api/clients', generalLimiter, clientRoutes);
+app.use('/api/upload', uploadLimiter, uploadRoutes);
+app.use('/api/lab-results', dataFetchLimiter);
+app.use('/api/genetic-data', dataFetchLimiter);
+app.use('/api/medical-reports', dataFetchLimiter);
+app.use('/api/wearable-data', dataFetchLimiter);
+app.use('/api/health-metrics', dataFetchLimiter);
+app.use('/api', dataRoutes); // General data routes
+app.use('/api/recommendations', recommendationsLimiter, recommendationsRoutes);
 
-// Medical Reports routes
-app.post('/api/medical-reports', async (req, res) => {
-  try {
-    const report = new MedicalReports(req.body);
-    await report.save();
-    res.status(201).json(report);
-  } catch (error) {
-    console.error('Error saving medical report:', error);
-    res.status(500).json({ error: 'Failed to save medical report' });
-  }
-});
+// Visualization Routes (JavaScript-based chart generation)
+app.use('/api/visualize', generalLimiter, visualizationRoutes);
 
-app.get('/api/medical-reports/:userId', async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const reports = await MedicalReports.find({ userId }).sort({ reportDate: -1 });
-    res.json(reports);
-  } catch (error) {
-    console.error('Error getting medical reports:', error);
-    res.status(500).json({ error: 'Failed to get medical reports' });
-  }
-});
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
-});
-
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({ error: 'Route not found' });
-});
+// Error Handlers (must be after all routes)
+app.use(notFoundHandler); // Handle 404s
+app.use(errorHandler); // Handle all other errors
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Hodie Backend API running on port ${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
+async function startServer() {
+  await connectDB();
+
+  // Make database available to all routes
+  app.locals.db = db;
+
+  app.listen(PORT, () => {
+    console.log(`🚀 Hodie Labs Backend API running on port ${PORT}`);
+    console.log(`📊 Environment: ${process.env.NODE_ENV}`);
+    console.log(`🔐 Security: API keys protected server-side`);
+    console.log(`🛡️  Rate limiting active on all endpoints`);
+    console.log(`⚡ Ready to process AI requests with tiered access`);
+    console.log(`👥 Client management endpoints ready`);
+    console.log(`📤 Secure file upload system active`);
+    console.log(`💡 Recommendations tracking enabled`);
+    console.log(`🔒 Error sanitization enabled`);
+  });
+}
+
+// Graceful shutdown
+process.on('SIGINT', async () => {
+  console.log('\n🛑 Shutting down gracefully...');
+  await mongoClient.close();
+  process.exit(0);
 });
+
+startServer().catch(console.error);
 
 module.exports = app;

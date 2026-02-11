@@ -1,6 +1,6 @@
 import React from 'react';
 import { User } from 'firebase/auth';
-import { useAuth0 } from '@auth0/auth0-react';
+import { useAuth } from '../../contexts/AuthContext';
 import { HelpCircle, Settings, TestTube, Zap } from 'lucide-react';
 
 interface BrandHeaderProps {
@@ -16,14 +16,15 @@ const BrandHeader: React.FC<BrandHeaderProps> = ({
   onScreenChange,
   showNavigation = true 
 }) => {
-  const { logout } = useAuth0();
+  const { logout } = useAuth();
 
-  const handleLogout = () => {
-    logout({ 
-      logoutParams: {
-        returnTo: window.location.origin
-      }
-    });
+  const handleLogout = async () => {
+    try {
+      await logout();
+      window.location.href = '/login';
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   return (

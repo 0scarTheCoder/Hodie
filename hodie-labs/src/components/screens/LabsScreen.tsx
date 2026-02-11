@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { User } from 'firebase/auth';
-import { 
-  Stethoscope, 
-  TrendingUp, 
-  TrendingDown, 
-  Activity, 
-  Heart, 
-  Shield, 
+import { useAuth } from '../../contexts/AuthContext';
+import {
+  Stethoscope,
+  TrendingUp,
+  TrendingDown,
+  Activity,
+  Heart,
+  Shield,
   AlertTriangle,
   CheckCircle,
   Calendar,
@@ -14,9 +15,11 @@ import {
   Upload,
   Info,
   Brain,
-  Zap
+  Zap,
+  Loader2
 } from 'lucide-react';
 import { labIntegrationService, ComprehensiveLabPanel, LabResult } from '../../services/labIntegrationService';
+import FileUpload from '../common/FileUpload';
 
 interface LabsScreenProps {
   user: User;
@@ -38,11 +41,143 @@ interface EnhancedBiomarker {
 }
 
 const LabsScreen: React.FC<LabsScreenProps> = ({ user }) => {
+  const { getAccessToken } = useAuth();
   const [selectedTimeframe, setSelectedTimeframe] = useState('6months');
   const [labAnalysis, setLabAnalysis] = useState<ComprehensiveLabPanel | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [biomarkers, setBiomarkers] = useState<EnhancedBiomarker[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showUploadModal, setShowUploadModal] = useState(false);
 
-  const biomarkers = [
+  // Fetch lab results from MongoDB on component mount
+  useEffect(() => {
+    const fetchLabResults = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const userId = (user as any).sub || user.uid;
+
+        // Get Auth0 token
+        const token = await getAccessToken().catch((error) => {
+          console.warn('⚠️ Could not get Auth0 token for labs:', error);
+          return null;
+        });
+
+        const headers: HeadersInit = { 'Content-Type': 'application/json' };
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        // Fetch lab results from backend
+        const response = await fetch(
+          `${process.env.REACT_APP_API_BASE_URL}/lab-results/${userId}`,
+          { headers }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch lab results: ${response.status}`);
+        }
+
+        const labResults = await response.json();
+        console.log('📊 Fetched lab results:', labResults);
+
+        // Process lab results into biomarkers
+        if (labResults && labResults.length > 0) {
+          const extractedBiomarkers = extractBiomarkersFromLabResults(labResults);
+          setBiomarkers(extractedBiomarkers);
+        } else {
+          // If no data, show empty state
+          setBiomarkers([]);
+        }
+
+      } catch (err) {
+        console.error('Error fetching lab results:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load lab results');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchLabResults();
+  }, [user, getAccessToken]);
+
+  // Extract biomarkers from lab results data
+  const extractBiomarkersFromLabResults = (labResults: any[]): EnhancedBiomarker[] => {
+    const biomarkersArray: EnhancedBiomarker[] = [];
+
+    labResults.forEach((result) => {
+      // Check if result has biomarkers array
+      if (result.biomarkers && Array.isArray(result.biomarkers)) {
+        result.biomarkers.forEach((biomarker: any) => {
+          biomarkersArray.push({
+            name: biomarker.name || 'Unknown',
+            value: parseFloat(biomarker.value) || 0,
+            unit: biomarker.unit || '',
+            range: biomarker.referenceRange || biomarker.range || 'N/A',
+            status: determineBiomarkerStatus(biomarker),
+            trend: biomarker.trend || 'stable',
+            change: parseFloat(biomarker.change) || 0,
+            category: biomarker.category || 'General',
+            lastTest: biomarker.testDate || result.testDate || new Date().toISOString(),
+            history: biomarker.history || [parseFloat(biomarker.value) || 0],
+            aiInsights: biomarker.aiInsights,
+            personalisedRec: biomarker.recommendation
+          });
+        });
+      }
+
+      // Also check for blood donation data (from results array)
+      if (result.results && Array.isArray(result.results) && result.results.length > 0) {
+        // Blood donation data - create summary biomarkers
+        const bloodData = result.results;
+
+        // Average recency
+        const avgRecency = bloodData.reduce((sum: number, item: any) => sum + (parseFloat(item.recency) || 0), 0) / bloodData.length;
+        biomarkersArray.push({
+          name: 'Blood Donation Recency',
+          value: Math.round(avgRecency),
+          unit: 'days',
+          range: '0-100',
+          status: avgRecency < 30 ? 'optimal' : avgRecency < 60 ? 'good' : 'borderline',
+          trend: 'stable',
+          change: 0,
+          category: 'Blood Health',
+          lastTest: result.uploadDate || new Date().toISOString(),
+          history: [Math.round(avgRecency)]
+        });
+
+        // Average frequency
+        const avgFrequency = bloodData.reduce((sum: number, item: any) => sum + (parseFloat(item.frequency) || 0), 0) / bloodData.length;
+        biomarkersArray.push({
+          name: 'Blood Donation Frequency',
+          value: Math.round(avgFrequency),
+          unit: 'donations',
+          range: '0-50',
+          status: avgFrequency > 10 ? 'optimal' : avgFrequency > 5 ? 'good' : 'borderline',
+          trend: 'stable',
+          change: 0,
+          category: 'Blood Health',
+          lastTest: result.uploadDate || new Date().toISOString(),
+          history: [Math.round(avgFrequency)]
+        });
+      }
+    });
+
+    return biomarkersArray.length > 0 ? biomarkersArray : getDefaultBiomarkers();
+  };
+
+  // Determine biomarker status based on value and range
+  const determineBiomarkerStatus = (biomarker: any): string => {
+    if (biomarker.status) return biomarker.status;
+    if (biomarker.flagged === true) return 'out of range';
+    if (biomarker.flagged === false) return 'optimal';
+    return 'good';
+  };
+
+  // Fallback default biomarkers if no data available
+  const getDefaultBiomarkers = (): EnhancedBiomarker[] => [
     {
       name: 'Total Cholesterol',
       value: 4.2,
@@ -56,7 +191,7 @@ const LabsScreen: React.FC<LabsScreenProps> = ({ user }) => {
       history: [5.1, 4.8, 4.5, 4.2]
     },
     {
-      name: 'HDL Cholesterol', 
+      name: 'HDL Cholesterol',
       value: 1.8,
       unit: 'mmol/L',
       range: '> 1.0',
@@ -66,54 +201,6 @@ const LabsScreen: React.FC<LabsScreenProps> = ({ user }) => {
       category: 'Cardiovascular',
       lastTest: '2024-10-15',
       history: [1.4, 1.6, 1.7, 1.8]
-    },
-    {
-      name: 'LDL Cholesterol',
-      value: 2.1,
-      unit: 'mmol/L',
-      range: '< 2.6',
-      status: 'optimal',
-      trend: 'down',
-      change: -15,
-      category: 'Cardiovascular',
-      lastTest: '2024-10-15',
-      history: [2.8, 2.5, 2.3, 2.1]
-    },
-    {
-      name: 'Triglycerides',
-      value: 1.2,
-      unit: 'mmol/L',
-      range: '< 1.7',
-      status: 'optimal',
-      trend: 'stable',
-      change: 2,
-      category: 'Cardiovascular',
-      lastTest: '2024-10-15',
-      history: [1.3, 1.2, 1.1, 1.2]
-    },
-    {
-      name: 'HbA1c',
-      value: 5.2,
-      unit: '%',
-      range: '< 5.7',
-      status: 'optimal',
-      trend: 'stable',
-      change: 0,
-      category: 'Metabolic',
-      lastTest: '2024-10-15',
-      history: [5.3, 5.2, 5.1, 5.2]
-    },
-    {
-      name: 'Fasting Glucose',
-      value: 4.8,
-      unit: 'mmol/L',
-      range: '3.9-5.6',
-      status: 'optimal',
-      trend: 'down',
-      change: -6,
-      category: 'Metabolic',
-      lastTest: '2024-10-15',
-      history: [5.3, 5.1, 4.9, 4.8]
     },
     {
       name: 'Vitamin D',
@@ -126,222 +213,6 @@ const LabsScreen: React.FC<LabsScreenProps> = ({ user }) => {
       category: 'Vitamins',
       lastTest: '2024-10-15',
       history: [62, 71, 78, 85]
-    },
-    {
-      name: 'Vitamin B12',
-      value: 420,
-      unit: 'pmol/L',
-      range: '145-569',
-      status: 'optimal',
-      trend: 'stable',
-      change: 3,
-      category: 'Vitamins',
-      lastTest: '2024-10-15',
-      history: [398, 405, 415, 420]
-    },
-    {
-      name: 'Folate',
-      value: 28,
-      unit: 'nmol/L',
-      range: '> 7',
-      status: 'optimal',
-      trend: 'up',
-      change: 8,
-      category: 'Vitamins',
-      lastTest: '2024-10-15',
-      history: [24, 25, 27, 28]
-    },
-    {
-      name: 'Iron',
-      value: 18,
-      unit: 'μmol/L',
-      range: '9-30',
-      status: 'optimal',
-      trend: 'stable',
-      change: 1,
-      category: 'Minerals',
-      lastTest: '2024-10-15',
-      history: [17, 18, 17, 18]
-    },
-    {
-      name: 'Ferritin',
-      value: 145,
-      unit: 'μg/L',
-      range: '30-400',
-      status: 'optimal',
-      trend: 'up',
-      change: 12,
-      category: 'Minerals',
-      lastTest: '2024-10-15',
-      history: [118, 128, 135, 145]
-    },
-    {
-      name: 'TSH',
-      value: 2.1,
-      unit: 'mIU/L',
-      range: '0.4-4.0',
-      status: 'optimal',
-      trend: 'stable',
-      change: -2,
-      category: 'Hormonal',
-      lastTest: '2024-10-15',
-      history: [2.3, 2.2, 2.1, 2.1]
-    },
-    {
-      name: 'Testosterone',
-      value: 18.5,
-      unit: 'nmol/L',
-      range: '8.0-30.0',
-      status: 'optimal',
-      trend: 'up',
-      change: 8,
-      category: 'Hormonal',
-      lastTest: '2024-10-15',
-      history: [16.2, 17.1, 18.0, 18.5]
-    },
-    {
-      name: 'CRP (High Sensitivity)',
-      value: 0.8,
-      unit: 'mg/L',
-      range: '< 3.0',
-      status: 'optimal',
-      trend: 'down',
-      change: -20,
-      category: 'Inflammatory',
-      lastTest: '2024-10-15',
-      history: [1.2, 1.0, 0.9, 0.8]
-    },
-    {
-      name: 'LDL Cholesterol',
-      value: 2.1,
-      unit: 'mmol/L', 
-      range: '< 3.0',
-      status: 'optimal',
-      trend: 'down',
-      change: -15,
-      category: 'Cardiovascular',
-      lastTest: '2024-10-15',
-      history: [2.8, 2.5, 2.3, 2.1]
-    },
-    {
-      name: 'Fasting Glucose',
-      value: 5.2,
-      unit: 'mmol/L',
-      range: '< 5.6',
-      status: 'good',
-      trend: 'stable',
-      change: 0,
-      category: 'Metabolic',
-      lastTest: '2024-10-15',
-      history: [5.4, 5.3, 5.2, 5.2]
-    },
-    {
-      name: 'HbA1c',
-      value: 5.1,
-      unit: '%',
-      range: '< 5.7',
-      status: 'optimal',
-      trend: 'down',
-      change: -4,
-      category: 'Metabolic',
-      lastTest: '2024-10-15',
-      history: [5.4, 5.3, 5.2, 5.1]
-    },
-    {
-      name: 'C-Reactive Protein',
-      value: 0.8,
-      unit: 'mg/L',
-      range: '< 1.0',
-      status: 'optimal',
-      trend: 'down',
-      change: -20,
-      category: 'Inflammation',
-      lastTest: '2024-10-15',
-      history: [1.2, 1.0, 0.9, 0.8]
-    },
-    {
-      name: 'Vitamin D',
-      value: 85,
-      unit: 'nmol/L',
-      range: '50-250',
-      status: 'optimal',
-      trend: 'up',
-      change: 25,
-      category: 'Vitamins',
-      lastTest: '2024-10-15',
-      history: [58, 65, 75, 85]
-    },
-    {
-      name: 'Vitamin B12',
-      value: 425,
-      unit: 'pmol/L',
-      range: '150-700',
-      status: 'good',
-      trend: 'stable',
-      change: 2,
-      category: 'Vitamins',
-      lastTest: '2024-10-15',
-      history: [415, 420, 422, 425]
-    },
-    {
-      name: 'TSH',
-      value: 2.1,
-      unit: 'mIU/L',
-      range: '0.5-4.0',
-      status: 'good',
-      trend: 'stable',
-      change: 0,
-      category: 'Hormones',
-      lastTest: '2024-10-15',
-      history: [2.2, 2.1, 2.1, 2.1]
-    },
-    {
-      name: 'PSA',
-      value: 0.6,
-      unit: 'μg/L',
-      range: '< 2.5',
-      status: 'optimal',
-      trend: 'stable',
-      change: 0,
-      category: 'Cancer Markers',
-      lastTest: '2024-10-15',
-      history: [0.5, 0.6, 0.6, 0.6]
-    },
-    {
-      name: 'LDL Cholesterol (Direct)',
-      value: 4.5,
-      unit: 'mmol/L',
-      range: '< 3.0',
-      status: 'out of range',
-      trend: 'up',
-      change: 15,
-      category: 'Cardiovascular',
-      lastTest: '2024-10-15',
-      history: [3.8, 4.1, 4.3, 4.5]
-    },
-    {
-      name: 'HbA1c (Elevated)',
-      value: 6.2,
-      unit: '%',
-      range: '< 5.7',
-      status: 'out of range',
-      trend: 'up',
-      change: 8,
-      category: 'Metabolic',
-      lastTest: '2024-10-15',
-      history: [5.8, 5.9, 6.0, 6.2]
-    },
-    {
-      name: 'Homocysteine',
-      value: 18.5,
-      unit: 'μmol/L',
-      range: '< 15.0',
-      status: 'out of range',
-      trend: 'stable',
-      change: 2,
-      category: 'Cardiovascular',
-      lastTest: '2024-10-15',
-      history: [17.8, 18.2, 18.3, 18.5]
     }
   ];
 
@@ -357,11 +228,13 @@ const LabsScreen: React.FC<LabsScreenProps> = ({ user }) => {
 
   const [selectedCategory, setSelectedCategory] = useState('All');
 
-  // Convert static biomarkers to LabResult format and analyse
+  // Convert biomarkers to LabResult format and analyze with AI
   useEffect(() => {
     const processLabData = async () => {
+      if (biomarkers.length === 0 || isLoading) return;
+
       setIsAnalyzing(true);
-      
+
       try {
         // Convert biomarkers to LabResult format
         const labResults: LabResult[] = biomarkers.map((biomarker, index) => ({
@@ -372,20 +245,21 @@ const LabsScreen: React.FC<LabsScreenProps> = ({ user }) => {
           referenceRange: {
             text: biomarker.range
           },
-          status: biomarker.status === 'out of range' ? 'critical' : 
-                 biomarker.status === 'optimal' ? 'normal' : 
+          status: biomarker.status === 'out of range' ? 'critical' :
+                 biomarker.status === 'optimal' ? 'normal' :
                  biomarker.status === 'good' ? 'normal' : 'high',
           flagged: biomarker.status === 'out of range',
           collectionDate: new Date(biomarker.lastTest),
           processedDate: new Date(biomarker.lastTest),
-          methodology: 'Standard labouratory analysis',
-          labProvider: 'Pathology North'
+          methodology: 'Standard laboratory analysis',
+          labProvider: 'Hodie Labs'
         }));
 
         // Process with AI analysis
         const analysis = await labIntegrationService.processLabResults(labResults);
-        analysis.userId = user.uid;
-        
+        const userId = (user as any).sub || user.uid;
+        analysis.userId = userId;
+
         setLabAnalysis(analysis);
       } catch (error) {
         console.error('Error processing lab analysis:', error);
@@ -395,7 +269,7 @@ const LabsScreen: React.FC<LabsScreenProps> = ({ user }) => {
     };
 
     processLabData();
-  }, [user.uid]);
+  }, [biomarkers, user, isLoading]);
 
   const filteredBiomarkers = selectedCategory === 'All' 
     ? biomarkers 
@@ -461,6 +335,66 @@ const LabsScreen: React.FC<LabsScreenProps> = ({ user }) => {
       </div>
     );
   };
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="px-6 pb-6">
+        <div className="flex items-center justify-center h-96">
+          <div className="text-center">
+            <Loader2 className="w-12 h-12 text-blue-500 animate-spin mx-auto mb-4" />
+            <p className="text-white/70">Loading lab results...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="px-6 pb-6">
+        <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-6">
+          <div className="flex items-start space-x-3">
+            <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0 mt-1" />
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-2">Error Loading Lab Results</h3>
+              <p className="text-white/70 mb-4">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              >
+                Try Again
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Empty state (no lab results available)
+  if (biomarkers.length === 0) {
+    return (
+      <div className="px-6 pb-6">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-white mb-2">Lab Results & Biomarkers</h1>
+          <p className="text-white/70">Track your biomarker trends and health improvements over time</p>
+        </div>
+        <div className="bg-blue-500/20 border border-blue-500/50 rounded-xl p-8 text-center">
+          <Stethoscope className="w-16 h-16 text-blue-400 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-white mb-2">No Lab Results Available</h3>
+          <p className="text-white/70 mb-6">
+            Upload your lab results to see personalized biomarker analysis and AI-powered health insights.
+          </p>
+          <button className="flex items-center space-x-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg mx-auto">
+            <Upload className="w-5 h-5" />
+            <span>Upload Lab Results</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-6 pb-6">
@@ -648,12 +582,40 @@ const LabsScreen: React.FC<LabsScreenProps> = ({ user }) => {
             <Download className="w-4 h-4" />
             <span>Export</span>
           </button>
-          <button className="flex items-centre space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
+          <button
+            onClick={() => setShowUploadModal(!showUploadModal)}
+            className="flex items-centre space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+          >
             <Upload className="w-4 h-4" />
             <span>Upload Results</span>
           </button>
         </div>
       </div>
+
+      {/* Upload Modal */}
+      {showUploadModal && (
+        <div className="mb-6 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-xl p-6 border border-white/10">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-white">Upload Lab Results</h3>
+            <button
+              onClick={() => setShowUploadModal(false)}
+              className="text-white/70 hover:text-white"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <FileUpload
+            category="lab_results"
+            onUploadSuccess={() => {
+              setShowUploadModal(false);
+              // Refetch lab results
+              window.location.reload();
+            }}
+          />
+        </div>
+      )}
 
       {/* Biomarkers Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

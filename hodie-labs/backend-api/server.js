@@ -24,6 +24,19 @@ const clientRoutes = require('./routes/clientRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const dataRoutes = require('./routes/dataRoutes');
 const visualizationRoutes = require('./routes/visualizationRoutes');
+const recommendationsRoutes = require('./routes/recommendationsRoutes');
+
+// Import rate limiters
+const {
+  generalLimiter,
+  uploadLimiter,
+  chatLimiter,
+  recommendationsLimiter,
+  dataFetchLimiter
+} = require('./middleware/rateLimitMiddleware');
+
+// Import error handlers
+const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -182,8 +195,8 @@ function createRateLimiter(tier) {
   });
 }
 
-// Main AI chat endpoint
-app.post('/api/chat', getUserTier, checkMessageLimit, async (req, res) => {
+// Main AI chat endpoint (with rate limiting)
+app.post('/api/chat', chatLimiter, getUserTier, checkMessageLimit, async (req, res) => {
   try {
     const { tier } = req.user;
     const { message, conversationHistory, healthContext } = req.body;
@@ -397,12 +410,22 @@ app.get('/api/admin/usage-stats', async (req, res) => {
 
 // New Client Management & Data Routes
 // These routes use JWT authentication and enforce data ownership
-app.use('/api/clients', clientRoutes);
-app.use('/api/upload', uploadRoutes);
-app.use('/api', dataRoutes);
+app.use('/api/clients', generalLimiter, clientRoutes);
+app.use('/api/upload', uploadLimiter, uploadRoutes);
+app.use('/api/lab-results', dataFetchLimiter);
+app.use('/api/genetic-data', dataFetchLimiter);
+app.use('/api/medical-reports', dataFetchLimiter);
+app.use('/api/wearable-data', dataFetchLimiter);
+app.use('/api/health-metrics', dataFetchLimiter);
+app.use('/api', dataRoutes); // General data routes
+app.use('/api/recommendations', recommendationsLimiter, recommendationsRoutes);
 
 // Visualization Routes (JavaScript-based chart generation)
-app.use('/api/visualize', visualizationRoutes);
+app.use('/api/visualize', generalLimiter, visualizationRoutes);
+
+// Error Handlers (must be after all routes)
+app.use(notFoundHandler); // Handle 404s
+app.use(errorHandler); // Handle all other errors
 
 // Start server
 async function startServer() {
@@ -415,9 +438,12 @@ async function startServer() {
     console.log(`🚀 Hodie Labs Backend API running on port ${PORT}`);
     console.log(`📊 Environment: ${process.env.NODE_ENV}`);
     console.log(`🔐 Security: API keys protected server-side`);
+    console.log(`🛡️  Rate limiting active on all endpoints`);
     console.log(`⚡ Ready to process AI requests with tiered access`);
     console.log(`👥 Client management endpoints ready`);
     console.log(`📤 Secure file upload system active`);
+    console.log(`💡 Recommendations tracking enabled`);
+    console.log(`🔒 Error sanitization enabled`);
   });
 }
 
