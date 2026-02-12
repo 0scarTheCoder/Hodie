@@ -474,6 +474,14 @@ app.post('/api/users/:userId/profile', async (req, res) => {
   }
 });
 
+// API key usage tracking stubs (used by autoApiKeyService on frontend)
+app.patch('/api/users/:userId/api-key/usage', (req, res) => {
+  res.json({ success: true, message: 'Usage tracked' });
+});
+app.get('/api/users/:userId/api-key', (req, res) => {
+  res.json({ apiKey: null, message: 'API keys managed server-side' });
+});
+
 // Visualization Routes (JavaScript-based chart generation)
 app.use('/api/visualize', generalLimiter, visualizationRoutes);
 
