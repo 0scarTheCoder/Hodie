@@ -72,8 +72,53 @@ app.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    service: 'Hodie Labs Backend API'
+    service: 'Hodie Labs Backend API',
+    version: '2.1.0'
   });
+});
+
+// API key usage tracking stubs (used by autoApiKeyService on frontend)
+app.patch('/api/users/:userId/api-key/usage', (req, res) => {
+  res.json({ success: true, message: 'Usage tracked' });
+});
+app.get('/api/users/:userId/api-key', (req, res) => {
+  res.json({ apiKey: null, message: 'API keys managed server-side' });
+});
+
+// File interpretation endpoint (for when frontend Kimi K2 fails)
+// Uses backend Claude to interpret uploaded files
+app.post('/api/interpret-file', chatLimiter, async (req, res) => {
+  try {
+    const { fileData, fileName, fileCategory, userId } = req.body;
+
+    if (!fileData || !fileName) {
+      return res.status(400).json({
+        error: 'File data required',
+        message: 'Please provide fileData and fileName in the request body'
+      });
+    }
+
+    console.log(`📄 Interpreting file via backend Claude: ${fileName} (${fileCategory})`);
+
+    const claudeService = new ClaudeService('haiku');
+    const analysis = await claudeService.analyzeFile(fileData, fileName, fileCategory);
+
+    console.log(`✅ File interpretation complete for: ${fileName}`);
+
+    res.json({
+      interpretation: analysis.interpretation,
+      databaseMappings: analysis.databaseMappings,
+      clarifyingQuestions: analysis.clarifyingQuestions,
+      recommendations: analysis.recommendations
+    });
+
+  } catch (error) {
+    console.error('❌ File interpretation error:', error);
+    res.status(500).json({
+      error: 'File interpretation failed',
+      message: error.message
+    });
+  }
 });
 
 // Middleware to get user subscription tier
@@ -332,42 +377,6 @@ app.post('/api/analyze-file', getUserTier, checkMessageLimit, async (req, res) =
   }
 });
 
-// File interpretation endpoint (for when frontend Kimi K2 fails)
-// Uses backend Claude to interpret uploaded files
-app.post('/api/interpret-file', chatLimiter, async (req, res) => {
-  try {
-    const { fileData, fileName, fileCategory, userId } = req.body;
-
-    if (!fileData || !fileName) {
-      return res.status(400).json({
-        error: 'File data required',
-        message: 'Please provide fileData and fileName in the request body'
-      });
-    }
-
-    console.log(`📄 Interpreting file via backend Claude: ${fileName} (${fileCategory})`);
-
-    const claudeService = new ClaudeService('haiku');
-    const analysis = await claudeService.analyzeFile(fileData, fileName, fileCategory);
-
-    console.log(`✅ File interpretation complete for: ${fileName}`);
-
-    res.json({
-      interpretation: analysis.interpretation,
-      databaseMappings: analysis.databaseMappings,
-      clarifyingQuestions: analysis.clarifyingQuestions,
-      recommendations: analysis.recommendations
-    });
-
-  } catch (error) {
-    console.error('❌ File interpretation error:', error);
-    res.status(500).json({
-      error: 'File interpretation failed',
-      message: error.message
-    });
-  }
-});
-
 // Get user's current usage stats
 app.get('/api/usage/:userId', async (req, res) => {
   try {
@@ -472,14 +481,6 @@ app.post('/api/users/:userId/profile', async (req, res) => {
     console.error('Error saving user profile:', error);
     res.status(500).json({ error: 'Failed to save profile' });
   }
-});
-
-// API key usage tracking stubs (used by autoApiKeyService on frontend)
-app.patch('/api/users/:userId/api-key/usage', (req, res) => {
-  res.json({ success: true, message: 'Usage tracked' });
-});
-app.get('/api/users/:userId/api-key', (req, res) => {
-  res.json({ apiKey: null, message: 'API keys managed server-side' });
 });
 
 // Visualization Routes (JavaScript-based chart generation)
