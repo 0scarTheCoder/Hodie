@@ -332,6 +332,42 @@ app.post('/api/analyze-file', getUserTier, checkMessageLimit, async (req, res) =
   }
 });
 
+// File interpretation endpoint (for when frontend Kimi K2 fails)
+// Uses backend Claude to interpret uploaded files
+app.post('/api/interpret-file', chatLimiter, async (req, res) => {
+  try {
+    const { fileData, fileName, fileCategory, userId } = req.body;
+
+    if (!fileData || !fileName) {
+      return res.status(400).json({
+        error: 'File data required',
+        message: 'Please provide fileData and fileName in the request body'
+      });
+    }
+
+    console.log(`📄 Interpreting file via backend Claude: ${fileName} (${fileCategory})`);
+
+    const claudeService = new ClaudeService('haiku');
+    const analysis = await claudeService.analyzeFile(fileData, fileName, fileCategory);
+
+    console.log(`✅ File interpretation complete for: ${fileName}`);
+
+    res.json({
+      interpretation: analysis.interpretation,
+      databaseMappings: analysis.databaseMappings,
+      clarifyingQuestions: analysis.clarifyingQuestions,
+      recommendations: analysis.recommendations
+    });
+
+  } catch (error) {
+    console.error('❌ File interpretation error:', error);
+    res.status(500).json({
+      error: 'File interpretation failed',
+      message: error.message
+    });
+  }
+});
+
 // Get user's current usage stats
 app.get('/api/usage/:userId', async (req, res) => {
   try {
