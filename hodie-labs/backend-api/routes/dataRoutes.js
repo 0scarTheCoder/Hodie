@@ -405,6 +405,83 @@ router.post('/medical-reports', authenticateUser, async (req, res) => {
 });
 
 /**
+ * GET /api/miscellaneous/:userId
+ * Get miscellaneous uploads for a specific user
+ */
+router.get('/miscellaneous/:userId', authenticateUser, async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (userId !== req.auth.userId && !req.auth.isAdmin) {
+      return res.status(403).json({
+        error: 'Forbidden',
+        message: 'You can only access your own health data'
+      });
+    }
+
+    const miscCollection = req.app.locals.db.collection('miscellaneous');
+    const results = await miscCollection
+      .find({ userId: userId })
+      .sort({ uploadDate: -1 })
+      .toArray();
+
+    res.json(results);
+
+  } catch (error) {
+    console.error('Error fetching miscellaneous data:', error);
+    res.status(500).json({
+      error: 'Failed to fetch miscellaneous data',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/miscellaneous
+ * Save new miscellaneous data for authenticated user
+ */
+router.post('/miscellaneous', authenticateUser, async (req, res) => {
+  try {
+    const userId = req.auth.userId;
+    const miscData = req.body;
+
+    if (!miscData || typeof miscData !== 'object') {
+      return res.status(400).json({
+        error: 'Invalid data',
+        message: 'Please provide valid data'
+      });
+    }
+
+    const miscCollection = req.app.locals.db.collection('miscellaneous');
+
+    const document = {
+      ...miscData,
+      userId: userId,
+      uploadDate: new Date(),
+      createdAt: new Date(),
+      source: 'chat_interface'
+    };
+
+    const result = await miscCollection.insertOne(document);
+
+    console.log(`✅ Saved miscellaneous data for user ${userId}`);
+
+    res.status(201).json({
+      success: true,
+      message: 'Miscellaneous data saved successfully',
+      id: result.insertedId
+    });
+
+  } catch (error) {
+    console.error('Error saving miscellaneous data:', error);
+    res.status(500).json({
+      error: 'Failed to save miscellaneous data',
+      message: error.message
+    });
+  }
+});
+
+/**
  * DELETE /api/:collection/:recordId
  * Delete a specific health data record (must be owner)
  */
@@ -419,7 +496,8 @@ router.delete('/:collection/:recordId', authenticateUser, async (req, res) => {
       'geneticdatas',
       'wearabledatas',
       'healthmetrics',
-      'medicalreports'
+      'medicalreports',
+      'miscellaneous'
     ];
 
     if (!allowedCollections.includes(collection)) {

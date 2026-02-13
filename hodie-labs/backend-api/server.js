@@ -168,47 +168,40 @@ async function getUserTier(req, res, next) {
 // Middleware to check message limits
 async function checkMessageLimit(req, res, next) {
   try {
-    const { tier } = req.user;
     const userId = req.user.id;
 
-    // Get message limits per tier (monthly)
-    const TIER_LIMITS = {
-      free: 10,
-      basic: 100,
-      pro: 500,
-      premium: 1000
-    };
+    // Daily conversation limit - same for all tiers (50 per day)
+    // Tiers differ by AI model quality, not message limits
+    const DAILY_LIMIT = 50;
 
-    const limit = TIER_LIMITS[tier];
-
-    // Get current month's usage from MongoDB
+    // Get today's usage from MongoDB
     const usageCollection = db.collection('ai_usage');
     const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     const usage = await usageCollection.findOne({
       userId: userId,
-      month: startOfMonth
+      day: startOfDay
     });
 
     const messagesUsed = usage?.messagesUsed || 0;
 
-    if (messagesUsed >= limit) {
+    if (messagesUsed >= DAILY_LIMIT) {
       return res.status(429).json({
-        error: 'Message limit reached',
-        message: `You've reached your monthly limit of ${limit} messages. Upgrade your plan for more messages.`,
+        error: 'Daily limit reached',
+        message: `You've reached your daily limit of ${DAILY_LIMIT} conversations. Your limit resets at midnight.`,
         messagesUsed: messagesUsed,
-        limit: limit,
-        tier: tier,
-        upgradeUrl: 'https://hodielabs.com/pricing'
+        limit: DAILY_LIMIT,
+        tier: req.user.tier,
+        resetsAt: new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000).toISOString()
       });
     }
 
     // Store usage info in request for later tracking
     req.usage = {
       messagesUsed: messagesUsed,
-      limit: limit,
-      remaining: limit - messagesUsed
+      limit: DAILY_LIMIT,
+      remaining: DAILY_LIMIT - messagesUsed
     };
 
     next();
@@ -331,15 +324,6 @@ app.post('/api/analyze-file', getUserTier, checkMessageLimit, async (req, res) =
     const { tier } = req.user;
     const { fileData, fileName, fileCategory } = req.body;
 
-    // Check if user has access to file analysis
-    if (tier === 'free') {
-      return res.status(403).json({
-        error: 'Feature not available',
-        message: 'File analysis is only available for paid subscribers. Upgrade to Basic tier or higher.',
-        upgradeUrl: 'https://hodielabs.com/pricing'
-      });
-    }
-
     if (!fileData || !fileName) {
       return res.status(400).json({
         error: 'File data required',
@@ -384,11 +368,12 @@ app.get('/api/usage/:userId', async (req, res) => {
 
     const usageCollection = db.collection('ai_usage');
     const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-    const usage = await usageCollection.findOne({
+    // Daily usage for limit tracking
+    const dailyUsage = await usageCollection.findOne({
       userId: userId,
-      month: startOfMonth
+      day: startOfDay
     });
 
     // Get user tier
@@ -398,22 +383,19 @@ app.get('/api/usage/:userId', async (req, res) => {
     });
 
     const tier = user?.subscription?.tier || 'free';
-
-    const TIER_LIMITS = {
-      free: 10,
-      basic: 100,
-      pro: 500,
-      premium: 1000
-    };
+    const DAILY_LIMIT = 50;
+    const messagesUsed = dailyUsage?.messagesUsed || 0;
 
     res.json({
       userId: userId,
       tier: tier,
-      messagesUsed: usage?.messagesUsed || 0,
-      limit: TIER_LIMITS[tier],
-      remaining: TIER_LIMITS[tier] - (usage?.messagesUsed || 0),
-      month: startOfMonth,
-      tokensUsed: usage?.tokensUsed || 0
+      messagesUsed: messagesUsed,
+      limit: DAILY_LIMIT,
+      remaining: DAILY_LIMIT - messagesUsed,
+      period: 'daily',
+      date: startOfDay,
+      resetsAt: new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000).toISOString(),
+      tokensUsed: dailyUsage?.tokensUsed || 0
     });
 
   } catch (error) {

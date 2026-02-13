@@ -36,7 +36,6 @@ import ChatbotTester from '../testing/ChatbotTester';
 import DemoScreen from '../screens/DemoScreen';
 import HealthDataUploadTester from '../testing/HealthDataUploadTester';
 import { userMetricsService, HealthScoreMetrics, UserLoginData } from '../../services/userMetricsService';
-import { forceSetupApiForCurrentUser } from '../../services/instantApiSetup';
 
 interface DashboardProps {
   user: User;
@@ -348,14 +347,6 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
 
   const renderHomeContent = () => (
     <>
-      {/* Manual AI Setup Button - Emergency Fix */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-4 rounded-full shadow-lg flex items-centre space-x-2" title="AI Features Active">
-          <CheckCircle className="w-6 h-6" />
-          <span className="hidden sm:inline font-medium">AI Active</span>
-        </div>
-      </div>
-
       {/* Top Stats Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
         {/* Streak Card */}
@@ -771,7 +762,13 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
       <BrandHeader 
         user={user}
         currentScreen={currentScreen}
-        onScreenChange={(screen) => setCurrentScreen(screen as 'home' | 'recommendations' | 'dna' | 'labs' | 'reports' | 'faq' | 'settings' | 'testing' | 'demo')}
+        onScreenChange={(screen) => {
+          if (screen === 'chat') {
+            setShowChat(true);
+          } else {
+            setCurrentScreen(screen as 'home' | 'recommendations' | 'dna' | 'labs' | 'reports' | 'faq' | 'settings' | 'testing' | 'demo');
+          }
+        }}
         showNavigation={true}
       />
 
@@ -779,7 +776,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
       {mobileMenuOpen && (
         <div className="md:hidden bg-white/10 backdrop-blur-sm border-t border-white/20">
           <nav className="flex flex-col space-y-4 p-6">
-            <button 
+            <button
               onClick={() => {
                 setCurrentScreen('home');
                 setMobileMenuOpen(false);
@@ -788,7 +785,16 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
             >
               Home
             </button>
-            <button 
+            <button
+              onClick={() => {
+                setShowChat(true);
+                setMobileMenuOpen(false);
+              }}
+              className="text-left text-white hover:text-blue-300"
+            >
+              Chat
+            </button>
+            <button
               onClick={() => {
                 setCurrentScreen('recommendations');
                 setMobileMenuOpen(false);
@@ -869,38 +875,36 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
         {renderScreenContent()}
       </div>
 
-      {/* Chat Modal */}
-      {showChat && (
+      {/* Chat Modal - always mounted to preserve state */}
+      <div
+        className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 ${showChat ? '' : 'hidden'}`}
+        style={{ overscrollBehavior: 'contain', touchAction: 'none' }}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) setShowChat(false);
+        }}
+      >
         <div
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-          style={{ overscrollBehavior: 'contain', touchAction: 'none' }}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setShowChat(false);
-          }}
+          className="bg-white rounded-2xl w-full max-w-4xl h-[85vh] md:h-[80vh] flex flex-col overflow-hidden shadow-2xl"
+          onClick={(e) => e.stopPropagation()}
         >
-          <div
-            className="bg-white rounded-2xl w-full max-w-4xl h-[85vh] md:h-[80vh] flex flex-col overflow-hidden shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex justify-between items-center p-4 border-b flex-shrink-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-t-2xl">
-              <h2 className="text-xl font-semibold text-white">Ask HodieLabs</h2>
-              <button
-                onClick={() => setShowChat(false)}
-                className="text-white hover:text-gray-200 text-2xl leading-none"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="flex-1 overflow-hidden">
-              <ChatInterface
-                user={user}
-                initialQuery={initialChatQuery}
-                onQueryProcessed={() => setInitialChatQuery('')}
-              />
-            </div>
+          <div className="flex justify-between items-center p-4 border-b flex-shrink-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-t-2xl">
+            <h2 className="text-xl font-semibold text-white">Ask HodieLabs</h2>
+            <button
+              onClick={() => setShowChat(false)}
+              className="text-white hover:text-gray-200 text-2xl leading-none"
+            >
+              ✕
+            </button>
+          </div>
+          <div className="flex-1 overflow-hidden">
+            <ChatInterface
+              user={user}
+              initialQuery={initialChatQuery}
+              onQueryProcessed={() => setInitialChatQuery('')}
+            />
           </div>
         </div>
-      )}
+      </div>
 
       {/* Blood Test Workflow */}
       {currentStep === 'blood' && (

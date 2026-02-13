@@ -313,7 +313,7 @@ const LabsScreen: React.FC<LabsScreenProps> = ({ user }) => {
 
   const [selectedCategory, setSelectedCategory] = useState('All');
 
-  // Convert biomarkers to LabResult format and analyze with AI
+  // Convert biomarkers to LabResult format and analyse with AI
   useEffect(() => {
     const processLabData = async () => {
       if (biomarkers.length === 0 || isLoading) return;
@@ -470,7 +470,7 @@ const LabsScreen: React.FC<LabsScreenProps> = ({ user }) => {
           <Stethoscope className="w-16 h-16 text-blue-400 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-white mb-2">No Lab Results Available</h3>
           <p className="text-white/70 mb-6">
-            Upload your lab results to see personalized biomarker analysis and AI-powered health insights.
+            Upload your lab results to see personalised biomarker analysis and AI-powered health insights.
           </p>
           <button className="flex items-center space-x-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg mx-auto">
             <Upload className="w-5 h-5" />

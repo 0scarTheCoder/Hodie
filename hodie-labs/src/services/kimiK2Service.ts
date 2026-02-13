@@ -55,12 +55,8 @@ class KimiK2Service {
   private model: string = 'moonshot-v1-8k';
 
   constructor() {
-    // Use working API key and correct model
-    this.apiKey = 'sk-k70lkhZA9kmz9VI4OrowDMqcbWXiMKpsS58p5cL0OIK1rvAN';
-    
-    console.log('✅ KimiK2 service initialised with working configuration');
-    console.log('🔧 Using model:', this.model);
-    console.log('🌐 Using endpoint:', this.baseUrl);
+    // Kimi K2 service is deprecated - backend API handles all AI requests now
+    this.apiKey = '';
   }
 
   // Get API key for a specific user (automatic assignment)

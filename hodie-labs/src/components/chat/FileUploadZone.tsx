@@ -7,7 +7,7 @@ export interface UploadedFile {
   name: string;
   size: number;
   type: string;
-  category: 'lab_results' | 'genetic_data' | 'medical_images' | 'health_reports' | 'other';
+  category: 'lab_results' | 'genetic_data' | 'medical_images' | 'health_reports' | 'miscellaneous';
   status: 'uploading' | 'success' | 'error';
   progress: number;
   previewData?: any;
@@ -25,7 +25,7 @@ const FileUploadZone: React.FC<FileUploadZoneProps> = ({
   onFilesUploaded,
   onFileRemove,
   acceptedTypes = ['.pdf', '.jpg', '.jpeg', '.png', '.csv', '.xlsx', '.xls', '.txt', '.json', '.xml', '.rtf'],
-  maxSize = 10, // 10MB default
+  maxSize = 50, // 50MB default
   isVisible
 }) => {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
@@ -36,30 +36,39 @@ const FileUploadZone: React.FC<FileUploadZoneProps> = ({
     const name = file.name.toLowerCase();
     const type = file.type.toLowerCase();
 
-    // Lab results
-    if (name.includes('lab') || name.includes('blood') || name.includes('test') || 
-        name.includes('pathology') || name.includes('biomarker')) {
+    // Lab results / medical data
+    if (name.includes('lab') || name.includes('blood') || name.includes('test') ||
+        name.includes('pathology') || name.includes('biomarker') ||
+        name.includes('tumour') || name.includes('tumor') || name.includes('cancer') ||
+        name.includes('patient') || name.includes('clinical') || name.includes('diagnosis') ||
+        name.includes('medical') || name.includes('biopsy') || name.includes('specimen') ||
+        name.includes('cholesterol') || name.includes('glucose') || name.includes('haemoglobin')) {
       return 'lab_results';
     }
-    
+
     // Genetic data
-    if (name.includes('23andme') || name.includes('ancestry') || name.includes('dna') || 
+    if (name.includes('23andme') || name.includes('ancestry') || name.includes('dna') ||
         name.includes('genetic') || name.includes('genome') || type.includes('vcf')) {
       return 'genetic_data';
     }
-    
+
     // Medical images
-    if (type.startsWith('image/') || name.includes('scan') || name.includes('xray') || 
+    if (type.startsWith('image/') || name.includes('scan') || name.includes('xray') ||
         name.includes('mri') || name.includes('ct')) {
       return 'medical_images';
     }
-    
+
     // Health reports
     if (name.includes('report') || name.includes('summary') || name.includes('health')) {
       return 'health_reports';
     }
-    
-    return 'other';
+
+    // CSV/spreadsheet files default to lab_results (most health data uploads are tabular)
+    if (name.endsWith('.csv') || name.endsWith('.xlsx') || name.endsWith('.xls') || name.endsWith('.tsv')) {
+      return 'lab_results';
+    }
+
+    return 'miscellaneous';
   };
 
   const validateFile = (file: File): { valid: boolean; error?: string } => {
@@ -252,6 +261,8 @@ const FileUploadZone: React.FC<FileUploadZoneProps> = ({
     if (e.target.files) {
       processFiles(e.target.files);
     }
+    // Reset input so the same file can be uploaded again
+    e.target.value = '';
   }, [processFiles]);
 
   const removeFile = (fileId: string) => {
@@ -265,6 +276,7 @@ const FileUploadZone: React.FC<FileUploadZoneProps> = ({
       case 'genetic_data': return '🧬';
       case 'medical_images': return '📸';
       case 'health_reports': return '📊';
+      case 'miscellaneous': return '📎';
       default: return '📄';
     }
   };
@@ -275,6 +287,7 @@ const FileUploadZone: React.FC<FileUploadZoneProps> = ({
       case 'genetic_data': return 'bg-purple-50 border-purple-200';
       case 'medical_images': return 'bg-green-50 border-green-200';
       case 'health_reports': return 'bg-yellow-50 border-yellow-200';
+      case 'miscellaneous': return 'bg-orange-50 border-orange-200';
       default: return 'bg-gray-50 border-gray-200';
     }
   };

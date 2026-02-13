@@ -63,6 +63,7 @@ const BrandHeader: React.FC<BrandHeaderProps> = ({
             <nav className="hidden md:flex items-centre space-x-8">
               {[
                 { id: 'home', label: 'Overview' },
+                { id: 'chat', label: 'Chat' },
                 { id: 'recommendations', label: 'Insights' },
                 { id: 'labs', label: 'Labs' },
                 { id: 'dna', label: 'DNA' },

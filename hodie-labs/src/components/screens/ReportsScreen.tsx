@@ -68,6 +68,7 @@ const ReportsScreen: React.FC<ReportsScreenProps> = ({ user }) => {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [upcomingReports, setUpcomingReports] = useState<UpcomingReport[]>([]);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [miscFiles, setMiscFiles] = useState<any[]>([]);
 
   // Fetch medical reports from MongoDB on mount
   useEffect(() => {
@@ -89,11 +90,17 @@ const ReportsScreen: React.FC<ReportsScreenProps> = ({ user }) => {
           headers['Authorization'] = `Bearer ${token}`;
         }
 
-        // Fetch medical reports from backend
-        const response = await fetch(
-          `${process.env.REACT_APP_API_BASE_URL}/medical-reports/${userId}`,
-          { headers }
-        );
+        // Fetch medical reports and miscellaneous files from backend
+        const [response, miscResponse] = await Promise.all([
+          fetch(
+            `${process.env.REACT_APP_API_BASE_URL}/medical-reports/${userId}`,
+            { headers }
+          ),
+          fetch(
+            `${process.env.REACT_APP_API_BASE_URL}/miscellaneous/${userId}`,
+            { headers }
+          ).catch(() => null)
+        ]);
 
         if (!response.ok) {
           throw new Error(`Failed to fetch medical reports: ${response.status}`);
@@ -101,6 +108,13 @@ const ReportsScreen: React.FC<ReportsScreenProps> = ({ user }) => {
 
         const medicalReportsData = await response.json();
         console.log('📋 Fetched medical reports:', medicalReportsData);
+
+        // Process miscellaneous files
+        if (miscResponse && miscResponse.ok) {
+          const miscData = await miscResponse.json();
+          setMiscFiles(miscData);
+          console.log('📎 Fetched miscellaneous files:', miscData.length);
+        }
 
         // Process medical reports data
         if (medicalReportsData && medicalReportsData.length > 0) {
@@ -578,6 +592,37 @@ const ReportsScreen: React.FC<ReportsScreenProps> = ({ user }) => {
           ))}
         </div>
       </div>
+
+      {/* Miscellaneous Uploads */}
+      {miscFiles.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-xl font-bold text-white mb-4">📎 Miscellaneous Uploads</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {miscFiles.map((file: any, index: number) => (
+              <div key={file._id || index} className="bg-orange-50 rounded-xl p-4 border border-orange-200 shadow-lg">
+                <div className="flex items-start space-x-3">
+                  <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-centre justify-centre text-white font-bold text-lg flex-shrink-0">
+                    📎
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-sm font-semibold text-gray-900 truncate">
+                      {file.fileName || file.testType || 'Miscellaneous File'}
+                    </h4>
+                    <p className="text-xs text-gray-600 mt-1">
+                      Uploaded {file.uploadDate ? new Date(file.uploadDate).toLocaleDateString('en-AU') : 'Unknown date'}
+                    </p>
+                    {file.results && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        {Array.isArray(file.results) ? `${file.results.length} records` : 'Data available'}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Recent Achievements */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">

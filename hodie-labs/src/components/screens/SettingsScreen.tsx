@@ -698,7 +698,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
                   <div className="flex-1">
                     <h3 className="text-xl font-bold text-white">🎉 AI Features Automatically Enabled!</h3>
                     <p className="text-green-100">
-                      Your account has automatic access to Kimi K2 AI-powered health analytics
+                      Your account has automatic access to AI-powered health analytics
                     </p>
                   </div>
                   <div className="px-4 py-2 bg-green-500 text-white rounded-full text-sm font-medium">
@@ -716,7 +716,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
                     <div className="text-sm text-green-100">Daily Usage</div>
                   </div>
                   <div className="text-centre p-4 bg-white/10 rounded-lg">
-                    <div className="text-2xl font-bold text-white">Kimi K2</div>
+                    <div className="text-2xl font-bold text-white">Claude AI</div>
                     <div className="text-sm text-green-100">AI Model</div>
                   </div>
                 </div>
@@ -739,7 +739,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
                   {[
                     { name: 'Advanced Health Chat', desc: 'Contextual conversations with full memory', icon: '💬' },
                     { name: 'DNA Analysis', desc: 'AI-powered genetic insights and recommendations', icon: '🧬' },
-                    { name: 'Health Recommendations', desc: 'Personalized suggestions based on your data', icon: '📋' },
+                    { name: 'Health Recommendations', desc: 'Personalised suggestions based on your data', icon: '📋' },
                     { name: 'Biomarker Interpretation', desc: 'Understand your health metrics with AI insights', icon: '📊' }
                   ].map((feature, index) => (
                     <div key={index} className="flex items-centre space-x-3 p-4 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg border border-white/10">

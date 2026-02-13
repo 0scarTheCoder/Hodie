@@ -16,8 +16,9 @@ class UsageTracker {
     try {
       const now = new Date();
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-      // Update or create usage record for this month
+      // Update or create monthly usage record (for analytics/billing)
       await this.usageCollection.updateOne(
         {
           userId: userId,
@@ -44,6 +45,25 @@ class UsageTracker {
         { upsert: true }
       );
 
+      // Update or create daily usage record (for daily limit enforcement)
+      await this.usageCollection.updateOne(
+        {
+          userId: userId,
+          day: startOfDay
+        },
+        {
+          $inc: {
+            messagesUsed: 1,
+            tokensUsed: tokensUsed
+          },
+          $set: {
+            tier: tier,
+            lastUsed: now
+          }
+        },
+        { upsert: true }
+      );
+
       console.log(`✅ Tracked message for user ${userId}: ${modelUsed} (${tokensUsed} tokens)`);
     } catch (error) {
       console.error('Error tracking message:', error);
@@ -58,8 +78,9 @@ class UsageTracker {
     try {
       const now = new Date();
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-      // File analysis counts as 1 message
+      // File analysis counts as 1 message - monthly record
       await this.usageCollection.updateOne(
         {
           userId: userId,
@@ -68,8 +89,8 @@ class UsageTracker {
         {
           $inc: {
             messagesUsed: 1,
-            filesAnalyzed: 1,
-            tokensUsed: 1500 // Estimate for file analysis
+            filesAnalysed: 1,
+            tokensUsed: 1500
           },
           $set: {
             tier: tier,
@@ -83,6 +104,26 @@ class UsageTracker {
               fileName: fileName,
               tokens: 1500
             }
+          }
+        },
+        { upsert: true }
+      );
+
+      // Daily record for limit enforcement
+      await this.usageCollection.updateOne(
+        {
+          userId: userId,
+          day: startOfDay
+        },
+        {
+          $inc: {
+            messagesUsed: 1,
+            filesAnalysed: 1,
+            tokensUsed: 1500
+          },
+          $set: {
+            tier: tier,
+            lastUsed: now
           }
         },
         { upsert: true }

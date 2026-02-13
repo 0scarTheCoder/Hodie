@@ -77,7 +77,7 @@ const BloodDataVisualizations: React.FC<BloodDataVisualizationsProps> = ({ data 
           Blood Donation Data Visualizations
         </h3>
         <p className="text-gray-400 text-sm">
-          {data.length} records analyzed
+          {data.length} records analysed
         </p>
       </div>
 

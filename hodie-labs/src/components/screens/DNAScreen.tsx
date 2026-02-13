@@ -16,7 +16,7 @@ import {
   Loader2,
   Upload
 } from 'lucide-react';
-import { kimiK2Service, DNAInsight, HealthContext } from '../../services/kimiK2Service';
+import type { DNAInsight, HealthContext } from '../../services/kimiK2Service';
 import FileUpload from '../common/FileUpload';
 
 interface DNAScreenProps {
@@ -110,48 +110,11 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
     fetchGeneticData();
   }, [user, getAccessToken]);
 
-  // Check AI status and load insights on mount
+  // AI is enabled via backend - no client-side API key needed
   useEffect(() => {
-    const initialiseAI = async () => {
-      const isEnabled = await kimiK2Service.checkApiStatus();
-      setAiEnabled(isEnabled);
-      loadInsights();
-    };
-
-    initialiseAI();
+    setAiEnabled(true);
+    setLoading(false);
   }, []);
-
-  // Load AI-generated insights
-  const loadInsights = async () => {
-    setLoading(true);
-    
-    const healthContext: HealthContext = {
-      userId: user.uid,
-      recentHealthData: {
-        steps: 8500,
-        sleep: 7.5,
-        mood: 'good',
-        healthScore: 82,
-        heartRate: 65
-      }
-    };
-
-    try {
-      const [fitness, nutrition, health] = await Promise.all([
-        kimiK2Service.generateDNAInsights('fitness', healthContext),
-        kimiK2Service.generateDNAInsights('nutrition', healthContext),
-        kimiK2Service.generateDNAInsights('health', healthContext)
-      ]);
-
-      setFitnessInsights(fitness);
-      setNutritionInsights(nutrition);
-      setHealthInsights(health);
-    } catch (error) {
-      console.error('Error loading DNA insights:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const mainCategories = [
     { id: 'fitness', name: 'Fitness', icon: Activity },
@@ -318,7 +281,7 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
                 </div>
               ))}
               {fitnessInsights.length === 0 && (
-                <div className="text-white/60 text-sm">Configure Kimi K2 API for personalised insights</div>
+                <div className="text-white/60 text-sm">Upload genetic data for personalised insights</div>
               )}
             </div>
           )}
@@ -345,7 +308,7 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
             </div>
           ) : (
             <div className="text-white/60 text-sm">
-              Upload your genetic data to see your personalized health risk analysis
+              Upload your genetic data to see your personalised health risk analysis
             </div>
           )}
         </div>
@@ -354,14 +317,7 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
       {/* Actionable Recommendations */}
       <div className="bg-white/10 rounded-xl p-6">
         <h3 className="text-lg font-semibold text-white mb-4 flex items-centre">
-          Top DNA-Based Recommendations 
-          <button 
-            onClick={loadInsights}
-            className="ml-auto px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
-            disabled={loading}
-          >
-            {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Refresh AI'}
-          </button>
+          Top DNA-Based Recommendations
         </h3>
         {loading ? (
           <div className="flex items-centre justify-centre py-8">
@@ -382,8 +338,7 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
             ))}
             {[...fitnessInsights, ...nutritionInsights, ...healthInsights].length === 0 && (
               <div className="text-centre py-4">
-                <div className="text-white/60">Configure your Kimi K2 API key to unlock AI-powered genetic insights</div>
-                <div className="text-white/40 text-sm mt-1">See KIMI_K2_SETUP.md for instructions</div>
+                <div className="text-white/60">Upload your genetic data to unlock AI-powered insights</div>
               </div>
             )}
           </div>
@@ -403,7 +358,7 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
       {loading ? (
         <div className="flex items-centre justify-centre py-12">
           <Loader2 className="w-8 h-8 animate-spin text-white/60" />
-          <span className="text-white/60 ml-3">Analyzing your fitness genetics...</span>
+          <span className="text-white/60 ml-3">Analysing your fitness genetics...</span>
         </div>
       ) : (
         <>
@@ -437,7 +392,7 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
           {fitnessInsights.length === 0 && (
             <div className="bg-gray-50 rounded-xl p-8 text-centre">
               <div className="text-gray-600 mb-2">No fitness insights available</div>
-              <div className="text-gray-500 text-sm">Configure Kimi K2 API for AI-generated fitness genetics analysis</div>
+              <div className="text-gray-500 text-sm">Upload genetic data for AI-generated fitness genetics analysis</div>
             </div>
           )}
         </>
@@ -455,7 +410,7 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
       {loading ? (
         <div className="flex items-centre justify-centre py-12">
           <Loader2 className="w-8 h-8 animate-spin text-white/60" />
-          <span className="text-white/60 ml-3">Analyzing your nutrition genetics...</span>
+          <span className="text-white/60 ml-3">Analysing your nutrition genetics...</span>
         </div>
       ) : (
         <>
@@ -489,7 +444,7 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
           {nutritionInsights.length === 0 && (
             <div className="bg-gray-50 rounded-xl p-8 text-centre">
               <div className="text-gray-600 mb-2">No nutrition insights available</div>
-              <div className="text-gray-500 text-sm">Configure Kimi K2 API for AI-generated nutrition genetics analysis</div>
+              <div className="text-gray-500 text-sm">Upload genetic data for AI-generated nutrition genetics analysis</div>
             </div>
           )}
         </>
@@ -614,7 +569,7 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
           <Dna className="w-16 h-16 text-purple-400 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-white mb-2">No Genetic Data Available</h3>
           <p className="text-white/70 mb-6">
-            Upload your DNA data to unlock personalized genetic insights, health risk analysis, and tailored recommendations.
+            Upload your DNA data to unlock personalised genetic insights, health risk analysis, and tailored recommendations.
           </p>
           <button
             onClick={() => setShowUploadModal(true)}

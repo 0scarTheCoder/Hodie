@@ -15,7 +15,7 @@ import {
   AlertCircle,
   Upload
 } from 'lucide-react';
-import { kimiK2Service, HealthRecommendation, HealthContext } from '../../services/kimiK2Service';
+import type { HealthRecommendation, HealthContext } from '../../services/kimiK2Service';
 
 interface RecommendationsScreenProps {
   user: User;
@@ -31,18 +31,9 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
   const [isLoadingFromDB, setIsLoadingFromDB] = useState<boolean>(true);
   const [dbError, setDbError] = useState<string | null>(null);
 
-  // Check if user has configured their own API key
+  // AI is enabled via backend for all users
   const checkUserApiKey = (): boolean => {
-    try {
-      const storedSettings = localStorage.getItem(`aiSettings_${user.uid}`);
-      if (storedSettings) {
-        const settings = JSON.parse(storedSettings);
-        return settings.enableAI && settings.kimiK2ApiKey && settings.kimiK2ApiKey.trim().length > 0;
-      }
-      return false;
-    } catch {
-      return false;
-    }
+    return true;
   };
 
   // Fetch saved recommendations from MongoDB on mount
@@ -94,54 +85,14 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
     fetchSavedRecommendations();
   }, [user, getAccessToken]);
 
-  // Initialize AI and load recommendations
+  // AI is enabled via backend for all users
   useEffect(() => {
-    const initialiseAI = async () => {
-      // Don't load AI recommendations while still loading from DB
-      if (isLoadingFromDB) return;
-
-      // Check API status for this specific user (includes auto-assigned keys)
-      const userApiEnabled = await kimiK2Service.checkApiStatus(user.uid);
-
-      setAiEnabled(userApiEnabled);
-
-      // Only load AI recommendations if we don't have saved ones
-      if (recommendations.length === 0) {
-        loadRecommendations();
-      }
-    };
-
-    initialiseAI();
+    if (isLoadingFromDB) return;
+    setAiEnabled(true);
   }, [user.uid, healthScore, isLoadingFromDB]);
 
-  // Load AI-generated recommendations
-  const loadRecommendations = async () => {
-    setLoading(true);
-
-    const healthContext: HealthContext = {
-      userId: user.uid,
-      recentHealthData: {
-        steps: 8500,
-        sleep: 7.5,
-        mood: 'good',
-        healthScore: healthScore,
-        heartRate: 65,
-        bloodPressure: '120/80'
-      }
-    };
-
-    try {
-      const aiRecommendations = await kimiK2Service.generateHealthRecommendations(healthContext);
-      setRecommendations(aiRecommendations);
-
-      // Save AI-generated recommendations to MongoDB
-      await saveRecommendationsToMongoDB(aiRecommendations);
-    } catch (error) {
-      console.error('Error loading recommendations:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Recommendations are loaded from the database on mount
+  // No client-side AI generation needed
 
   // Save recommendations to MongoDB
   const saveRecommendationsToMongoDB = async (recs: HealthRecommendation[]) => {
@@ -376,20 +327,19 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
       <div className="px-6 pb-6">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-white mb-2">Your Health Recommendations</h1>
-          <p className="text-white/70">AI-powered personalized recommendations based on your health data</p>
+          <p className="text-white/70">AI-powered personalised recommendations based on your health data</p>
         </div>
         <div className="bg-blue-500/20 border border-blue-500/50 rounded-xl p-8 text-center">
           <Target className="w-16 h-16 text-blue-400 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-white mb-2">No Recommendations Available</h3>
           <p className="text-white/70 mb-6">
-            Complete health assessments and upload data to receive personalized AI-powered health recommendations.
+            Complete health assessments and upload data to receive personalised AI-powered health recommendations.
           </p>
           <button
-            onClick={loadRecommendations}
             className="flex items-center space-x-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg mx-auto"
           >
-            <Zap className="w-5 h-5" />
-            <span>Generate Recommendations</span>
+            <Upload className="w-5 h-5" />
+            <span>Upload Health Data</span>
           </button>
         </div>
       </div>
@@ -411,7 +361,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
               {!aiEnabled && <span className="text-sm text-blue-400 ml-3">(AI Connecting...)</span>}
             </h1>
             <p className="text-white/70">
-              {aiEnabled ? 'AI-powered personalised recommendations based on your health data' : 'General recommendations shown - configure your API key in Settings for personalised AI insights'}
+              {aiEnabled ? 'AI-powered personalised recommendations based on your health data' : 'Upload your health data to receive personalised AI-powered recommendations'}
             </p>
           </div>
           <div className="text-right space-y-2">
@@ -419,13 +369,6 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
               <div className="text-2xl font-bold text-white">{completedCount}/{totalCount}</div>
               <div className="text-sm text-white/70">Completed</div>
             </div>
-            <button 
-              onClick={loadRecommendations}
-              disabled={loading}
-              className="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 rounded-lg transition-colors"
-            >
-              {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Refresh AI'}
-            </button>
           </div>
         </div>
 

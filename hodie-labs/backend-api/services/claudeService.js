@@ -228,7 +228,7 @@ Respond with valid JSON only (no markdown, no extra text).`;
       const parsed = JSON.parse(jsonString);
 
       return {
-        interpretation: parsed.interpretation || 'File analyzed successfully',
+        interpretation: parsed.interpretation || 'File analysed successfully',
         databaseMappings: parsed.databaseMappings || [],
         clarifyingQuestions: parsed.clarifyingQuestions || [],
         recommendations: parsed.recommendations || []

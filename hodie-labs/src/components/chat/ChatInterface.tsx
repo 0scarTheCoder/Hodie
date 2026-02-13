@@ -4,7 +4,7 @@ import { User } from 'firebase/auth';
 import { useAuth } from '../../contexts/AuthContext';
 import { Upload, Paperclip } from 'lucide-react';
 import { queryLogger } from '../../utils/queryLogger';
-import { kimiK2Service, HealthContext, ConversationMessage } from '../../services/kimiK2Service';
+import type { HealthContext, ConversationMessage } from '../../services/kimiK2Service';
 import { claudeService } from '../../services/claudeService';
 import { chatStorageService, ChatConversation, ChatMessage } from '../../services/chatStorageService';
 import FileUploadZone, { UploadedFile } from './FileUploadZone';
@@ -80,7 +80,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user, initialQuery, onQue
     const initialiseChat = async () => {
       // Force AI to always be enabled
       setAiEnabled(true);
-      console.log('✅ Kimi K2 AI: ENABLED');
+      console.log('✅ AI: ENABLED');
       
       try {
         // Load recent conversations for context
@@ -107,7 +107,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user, initialQuery, onQue
           // Start new conversation
           const welcomeMessage: Message = {
             id: '1',
-            text: `G'day! I'm your Hodie Labs AI health assistant, powered by Kimi K2 advanced AI with 256K context! 🚀
+            text: `G'day! I'm your Hodie Labs AI health assistant. 🚀
 
 🏥 **I have access to your health profile** and previous conversations for personalised advice.
 
@@ -120,9 +120,9 @@ I can help you with:
 🧬 **DNA Insights**: Genetic-based health recommendations
 📊 **Biomarker Analysis**: Health metrics interpretation
 📁 **File Analysis**: Upload lab results, DNA data, or health reports for AI interpretation
-📈 **Data Visualizations**: Generate charts and graphs of your health data
+📈 **Data Visualisations**: Generate charts and graphs of your health data
 
-💡 **Tip**: Click the pulsing 📎 button to upload health files, or ask to "visualize my data" for interactive charts!
+💡 **Tip**: Click the pulsing 📎 button to upload health files, or ask to "visualise my data" for interactive charts!
 
 I use advanced AI with memory of our past discussions to provide contextual health guidance. What would you like to know?`,
             sender: 'assistant',
@@ -155,10 +155,10 @@ I use advanced AI with memory of our past discussions to provide contextual heal
         // Fallback to basic welcome message
         const welcomeMessage: Message = {
           id: '1',
-          text: `G'day! I'm your Hodie Labs AI health assistant, powered by Kimi K2 advanced AI! 🚀
+          text: `G'day! I'm your Hodie Labs AI health assistant! 🚀
 
 💡 **Tip**: Click the pulsing 📎 button to upload health files for instant AI analysis!
-📈 **Visualizations**: Ask me to "visualize my data" to see interactive charts and graphs!
+📈 **Visualisations**: Ask me to "visualise my data" to see interactive charts and graphs!
 
 What would you like to know about your health today?`,
           sender: 'assistant',
@@ -302,25 +302,21 @@ What would you like to know about your health today?`,
       // Get user's comprehensive health data for context
       const healthContext = await getUserHealthContext(getUserId());
 
-      // Check which AI provider to use
-      const aiProvider = localStorage.getItem('aiProvider') || 'kimi';
       let responseText: string = '';
 
-      if (aiProvider === 'claude' && claudeService.isAvailable()) {
-        console.log('🤖 Using Claude AI for response');
+      // Try client-side Claude first if configured
+      if (claudeService.isAvailable()) {
+        console.log('🤖 Using client-side Claude AI for response');
 
-        // Add context summary to the query if user has uploaded data
         let enhancedQuery = query;
         if (healthContext.availableDataSummary) {
           enhancedQuery = `${query}\n\n[Context: ${healthContext.availableDataSummary}]`;
         }
 
-        // If we have blood data for visualization, let AI know
         if (bloodData && bloodData.length > 0) {
-          enhancedQuery += `\n\n[Note: Interactive data visualizations (histograms, scatter plots) have been generated from ${bloodData.length} records and will be displayed to the user. Please provide textual analysis and interpretation of the blood donation data.]`;
+          enhancedQuery += `\n\n[Note: Interactive data visualisations (histograms, scatter plots) have been generated from ${bloodData.length} records and will be displayed to the user. Please provide textual analysis and interpretation of the blood donation data.]`;
         }
 
-        // Filter conversation history to only include user/assistant messages (exclude system)
         const claudeHistory = conversationHistory
           .filter(msg => msg.role === 'user' || msg.role === 'assistant')
           .map(msg => ({ role: msg.role as 'user' | 'assistant', content: msg.content }));
@@ -331,109 +327,92 @@ What would you like to know about your health today?`,
           healthContext
         );
       } else {
-        // Try backend Claude API for real AI responses with health context
-        let usedBackendChat = false;
-        const hasHealthData = healthContext.labResults || healthContext.geneticData || healthContext.recentHealthData;
+        // Use backend API (routes to Groq/Claude based on user tier)
+        console.log('🤖 Using backend API for response...');
+        try {
+          const token = await getAccessToken().catch(() => null);
+          const chatHeaders: HeadersInit = {
+            'Content-Type': 'application/json'
+          };
+          if (token) {
+            chatHeaders['Authorization'] = `Bearer ${token}`;
+          }
 
-        if (hasHealthData) {
-          console.log('🤖 Trying backend Claude API for data-aware response...');
-          try {
-            const token = await getAccessToken().catch(() => null);
-            const chatHeaders: HeadersInit = {
-              'Content-Type': 'application/json'
-            };
-            if (token) {
-              chatHeaders['Authorization'] = `Bearer ${token}`;
-            }
-
-            // Build enhanced message with actual health data for analysis
-            let enhancedMessage = query;
-            if (healthContext.labResults && healthContext.labResults.length > 0) {
-              const labSummary = healthContext.labResults.map((r: any) => {
-                const rows = r.results || [];
-                const columns = rows.length > 0 ? Object.keys(rows[0]) : [];
-                // Include up to 50 rows of actual data for meaningful analysis
-                const sampleRows = rows.slice(0, 50);
-                // Also include biomarkers if available
-                const biomarkers = r.biomarkers || [];
-                let dataStr = `Dataset: ${r.testType || 'Lab Results'}, ${r.recordCount || rows.length} total records`;
-                dataStr += `\nColumns: [${columns.join(', ')}]`;
-                if (biomarkers.length > 0) {
-                  dataStr += `\nBiomarkers: ${JSON.stringify(biomarkers.slice(0, 30))}`;
-                }
-                dataStr += `\nData (first ${sampleRows.length} rows): ${JSON.stringify(sampleRows)}`;
-                return dataStr;
-              }).join('\n\n');
-              enhancedMessage += `\n\n[USER'S ACTUAL LAB RESULTS DATA - Please analyze this data and provide specific health insights:\n${labSummary}]`;
-            }
-            if (healthContext.geneticData && healthContext.geneticData.length > 0) {
-              const geneticSummary = healthContext.geneticData.map((g: any) => {
-                return `Genetic Data: ${g.testType || 'DNA'}, traits: ${JSON.stringify((g.traits || []).slice(0, 20))}`;
-              }).join('\n');
-              enhancedMessage += `\n\n[USER'S GENETIC DATA:\n${geneticSummary}]`;
-            }
-            if (healthContext.availableDataSummary) {
-              enhancedMessage += `\n\n[Summary: ${healthContext.availableDataSummary}]`;
-            }
-
-            // Strip bulk data from context before sending to backend
-            const lightContext: any = {
-              userId: healthContext.userId,
-              availableDataSummary: healthContext.availableDataSummary,
-              recentHealthData: healthContext.recentHealthData
-            };
-            if (healthContext.labResults) {
-              lightContext.labResults = healthContext.labResults.map((r: any) => ({
-                testType: r.testType,
-                recordCount: r.recordCount,
-                biomarkersCount: r.biomarkersCount,
-                uploadDate: r.uploadDate,
-                summary: r.summary
-              }));
-            }
-
-            const chatRes = await fetchWithRetry(
-              `${process.env.REACT_APP_API_BASE_URL}/chat`,
-              {
-                method: 'POST',
-                headers: chatHeaders,
-                body: JSON.stringify({
-                  userId: getUserId(),
-                  message: enhancedMessage,
-                  conversationHistory: conversationHistory.slice(-6).map((m: any) => ({
-                    role: m.role,
-                    content: (m.content || '').substring(0, 500)
-                  })),
-                  healthContext: lightContext
-                })
+          // Build enhanced message with actual health data for analysis
+          let enhancedMessage = query;
+          if (healthContext.labResults && healthContext.labResults.length > 0) {
+            const labSummary = healthContext.labResults.map((r: any) => {
+              const rows = r.results || [];
+              const columns = rows.length > 0 ? Object.keys(rows[0]) : [];
+              const sampleRows = rows.slice(0, 50);
+              const biomarkers = r.biomarkers || [];
+              let dataStr = `Dataset: ${r.testType || 'Lab Results'}, ${r.recordCount || rows.length} total records`;
+              dataStr += `\nColumns: [${columns.join(', ')}]`;
+              if (biomarkers.length > 0) {
+                dataStr += `\nBiomarkers: ${JSON.stringify(biomarkers.slice(0, 30))}`;
               }
-            );
-
-            if (chatRes.ok) {
-              const chatData = await chatRes.json();
-              responseText = chatData.response;
-              usedBackendChat = true;
-              console.log('✅ Backend Claude response received');
-            }
-          } catch (backendChatError) {
-            console.warn('Backend Claude chat failed:', backendChatError);
+              dataStr += `\nData (first ${sampleRows.length} rows): ${JSON.stringify(sampleRows)}`;
+              return dataStr;
+            }).join('\n\n');
+            enhancedMessage += `\n\n[USER'S ACTUAL LAB RESULTS DATA - Please analyse this data and provide specific health insights:\n${labSummary}]`;
           }
-        }
+          if (healthContext.geneticData && healthContext.geneticData.length > 0) {
+            const geneticSummary = healthContext.geneticData.map((g: any) => {
+              return `Genetic Data: ${g.testType || 'DNA'}, traits: ${JSON.stringify((g.traits || []).slice(0, 20))}`;
+            }).join('\n');
+            enhancedMessage += `\n\n[USER'S GENETIC DATA:\n${geneticSummary}]`;
+          }
+          if (healthContext.availableDataSummary) {
+            enhancedMessage += `\n\n[Summary: ${healthContext.availableDataSummary}]`;
+          }
 
-        if (!usedBackendChat) {
-          console.log('🤖 Using Kimi K2 AI for response');
-
-          // If we have blood data for visualization, modify the query for Kimi K2
-          let queryForAI = query;
           if (bloodData && bloodData.length > 0) {
-            queryForAI = `${query}\n\n[Note: Interactive data visualizations (histograms, scatter plots) have been generated from ${bloodData.length} records and displayed. Please provide textual analysis and interpretation of the blood donation data.]`;
+            enhancedMessage += `\n\n[Note: Interactive data visualisations (histograms, scatter plots) have been generated from ${bloodData.length} records and displayed. Please provide textual analysis and interpretation of the data.]`;
           }
 
-          responseText = await kimiK2Service.generateHealthResponse(
-            queryForAI,
-            healthContext,
-            conversationHistory
+          // Strip bulk data from context before sending to backend
+          const lightContext: any = {
+            userId: healthContext.userId,
+            availableDataSummary: healthContext.availableDataSummary,
+            recentHealthData: healthContext.recentHealthData
+          };
+          if (healthContext.labResults) {
+            lightContext.labResults = healthContext.labResults.map((r: any) => ({
+              testType: r.testType,
+              recordCount: r.recordCount,
+              biomarkersCount: r.biomarkersCount,
+              uploadDate: r.uploadDate,
+              summary: r.summary
+            }));
+          }
+
+          const chatRes = await fetchWithRetry(
+            `${process.env.REACT_APP_API_BASE_URL}/chat`,
+            {
+              method: 'POST',
+              headers: chatHeaders,
+              body: JSON.stringify({
+                userId: getUserId(),
+                message: enhancedMessage,
+                conversationHistory: conversationHistory.slice(-6).map((m: any) => ({
+                  role: m.role,
+                  content: (m.content || '').substring(0, 500)
+                })),
+                healthContext: lightContext
+              })
+            }
           );
+
+          if (chatRes.ok) {
+            const chatData = await chatRes.json();
+            responseText = chatData.response;
+            console.log('✅ Backend AI response received');
+          } else {
+            responseText = 'Sorry, I was unable to process your request. Please try again in a moment.';
+          }
+        } catch (backendChatError) {
+          console.warn('Backend AI chat failed:', backendChatError);
+          responseText = 'Sorry, the AI service is temporarily unavailable. Please try again shortly.';
         }
       }
 
@@ -500,12 +479,13 @@ What would you like to know about your health today?`,
       }
 
       // Fetch data from all collections in parallel with authentication
-      const [healthMetricsRes, labResultsRes, geneticDataRes, wearableDataRes, medicalReportsRes] = await Promise.all([
+      const [healthMetricsRes, labResultsRes, geneticDataRes, wearableDataRes, medicalReportsRes, miscellaneousRes] = await Promise.all([
         fetch(`${process.env.REACT_APP_API_BASE_URL}/health-metrics/${userId}?limit=5`, { headers }).catch(() => null),
         fetch(`${process.env.REACT_APP_API_BASE_URL}/lab-results/${userId}`, { headers }).catch(() => null),
         fetch(`${process.env.REACT_APP_API_BASE_URL}/genetic-data/${userId}`, { headers }).catch(() => null),
         fetch(`${process.env.REACT_APP_API_BASE_URL}/wearable-data/${userId}?limit=7`, { headers }).catch(() => null),
-        fetch(`${process.env.REACT_APP_API_BASE_URL}/medical-reports/${userId}`, { headers }).catch(() => null)
+        fetch(`${process.env.REACT_APP_API_BASE_URL}/medical-reports/${userId}`, { headers }).catch(() => null),
+        fetch(`${process.env.REACT_APP_API_BASE_URL}/miscellaneous/${userId}`, { headers }).catch(() => null)
       ]);
 
       const context: any = { userId };
@@ -585,6 +565,19 @@ What would you like to know about your health today?`,
         }
       }
 
+      // Miscellaneous uploads
+      if (miscellaneousRes && miscellaneousRes.ok) {
+        const miscData = await miscellaneousRes.json();
+        if (miscData.length > 0) {
+          context.miscellaneous = miscData.map((item: any) => ({
+            id: item._id,
+            fileName: item.fileName,
+            uploadDate: item.createdAt
+          }));
+          console.log(`✅ Found ${miscData.length} miscellaneous uploads`);
+        }
+      }
+
       // Add summary of available data
       const availableDataTypes = [];
       if (context.labResults && context.labResults.length > 0) {
@@ -594,6 +587,7 @@ What would you like to know about your health today?`,
       if (context.geneticData) availableDataTypes.push(`${context.geneticData.length} genetic dataset(s)`);
       if (context.wearableData) availableDataTypes.push('wearable data');
       if (context.medicalReports) availableDataTypes.push(`${context.medicalReports.length} medical report(s)`);
+      if (context.miscellaneous) availableDataTypes.push(`${context.miscellaneous.length} miscellaneous file(s)`);
 
       if (availableDataTypes.length > 0) {
         context.availableDataSummary = `You have access to: ${availableDataTypes.join(', ')}`;
@@ -656,7 +650,7 @@ What would you like to know about your health today?`,
     // Show processing message
     const processingMessage: Message = {
       id: Date.now().toString(),
-      text: `🔄 **Processing ${files.length} file(s)**...\n\n🤖 Analyzing with Kimi K2 AI to determine optimal data storage and health insights.\n\nThis may take a moment...`,
+      text: `🔄 **Processing ${files.length} file(s)**...\n\n🤖 Analysing with AI to determine optimal data storage and health insights.\n\nThis may take a moment...`,
       sender: 'assistant',
       timestamp: new Date()
     };
@@ -672,28 +666,16 @@ What would you like to know about your health today?`,
         console.log('✅ File parsed successfully:', parsedData);
 
         // Step 2: Use AI to interpret the file and determine database mappings
-        // Try: 1) Kimi K2 or Claude client-side, 2) Backend Claude API, 3) Basic fallback
-        const aiProvider = localStorage.getItem('aiProvider') || 'kimi';
-        console.log(`🤖 Step 2: AI interpreting file using ${aiProvider.toUpperCase()}...`);
+        // Try: 1) Client-side Claude, 2) Backend Claude API, 3) Basic fallback
+        console.log('🤖 Step 2: AI interpreting file...');
 
         let aiInterpretation;
         let usedBackendFallback = false;
 
         try {
-          if (aiProvider === 'claude' && claudeService.isAvailable()) {
-            console.log('Using Claude AI for file interpretation');
+          if (claudeService.isAvailable()) {
+            console.log('Using client-side Claude AI for file interpretation');
             aiInterpretation = await claudeService.interpretHealthFile(
-              parsedData.data,
-              file.name,
-              file.category,
-              getUserId()
-            );
-          } else {
-            if (aiProvider === 'claude') {
-              console.warn('Claude API not configured, falling back to Kimi K2');
-            }
-            console.log('Using Kimi K2 for file interpretation');
-            aiInterpretation = await kimiK2Service.interpretHealthFile(
               parsedData.data,
               file.name,
               file.category,
@@ -701,12 +683,12 @@ What would you like to know about your health today?`,
             );
           }
         } catch (frontendAiError) {
-          console.warn('Frontend AI interpretation failed:', frontendAiError);
+          console.warn('Client-side AI interpretation failed:', frontendAiError);
           aiInterpretation = null;
         }
 
         // Check if interpretation is a generic fallback (no real AI analysis)
-        const isGenericFallback = aiInterpretation?.interpretation?.includes('has been successfully parsed and categorized');
+        const isGenericFallback = aiInterpretation?.interpretation?.includes('has been successfully parsed and categorised');
 
         // If frontend AI failed or returned generic fallback, try backend Claude
         if (!aiInterpretation || isGenericFallback) {
@@ -749,15 +731,15 @@ What would you like to know about your health today?`,
           }
         }
 
-        // If all AI attempts failed, we still have the generic fallback from Kimi
+        // If all AI attempts failed, use a basic fallback
         if (!aiInterpretation) {
           console.warn('All AI interpretation attempts failed, using basic fallback');
-          aiInterpretation = await kimiK2Service.interpretHealthFile(
-            parsedData.data,
-            file.name,
-            file.category,
-            getUserId()
-          );
+          aiInterpretation = {
+            interpretation: `File "${file.name}" has been successfully parsed and stored.`,
+            databaseMappings: [],
+            clarifyingQuestions: [],
+            recommendations: ['Review your uploaded data in the Labs section for detailed analysis.']
+          };
         }
 
         console.log('✅ AI interpretation complete:', aiInterpretation, usedBackendFallback ? '(via backend Claude)' : '');
@@ -818,7 +800,7 @@ What would you like to know about your health today?`,
 **Common Causes**:
 • Network connection issue - check if backend is awake
 • Content Security Policy blocking API calls - try hard refresh (Cmd+Shift+R)
-• AI returned empty database mappings - file format not recognized
+• AI returned empty database mappings - file format not recognised
 
 **What you can try**:
 • Check the file format (PDF, CSV, JSON, TXT supported)
@@ -844,7 +826,7 @@ What would you like to know about your health today?`,
     parsedData: any,
     aiInterpretation: any
   ): string => {
-    let message = `📁 **File Analyzed**: ${fileName}\n\n`;
+    let message = `📁 **File Analysed**: ${fileName}\n\n`;
 
     // AI Interpretation
     message += `🤖 **AI Analysis**:\n${aiInterpretation.interpretation}\n\n`;
@@ -880,7 +862,7 @@ What would you like to know about your health today?`,
     message += `You can now ask me questions about this data, such as:\n`;
     message += `• "What do my lab results show?"\n`;
     message += `• "Explain any concerning values"\n`;
-    message += `• "Give me personalized recommendations based on this data"`;
+    message += `• "Give me personalised recommendations based on this data"`;
 
     return message;
   };
@@ -1027,9 +1009,10 @@ What would you like to know about your health today?`,
       'labResults': 'lab-results',
       'geneticData': 'genetic-data',
       'wearableData': 'wearable-data',
-      'medicalReports': 'medical-reports'
+      'medicalReports': 'medical-reports',
+      'miscellaneous': 'miscellaneous'
     };
-    return endpointMap[collection] || 'health-metrics';
+    return endpointMap[collection] || 'miscellaneous';
   };
 
   const handleFileRemove = (fileId: string) => {
@@ -1040,16 +1023,11 @@ What would you like to know about your health today?`,
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 md:px-6 py-3 md:py-4 flex-shrink-0">
-        <h2 className="text-lg md:text-xl font-semibold flex items-centre">
+        <h2 className="text-lg md:text-xl font-semibold">
           🇦🇺 Hodie Health Assistant
-          {aiEnabled ? (
-            <span className="ml-3 text-xs bg-green-500 px-2 py-1 rounded-full">Kimi K2 Enabled</span>
-          ) : (
-            <span className="ml-3 text-xs bg-orange-500 px-2 py-1 rounded-full">Limited Mode</span>
-          )}
         </h2>
         <p className="text-xs md:text-sm opacity-90">
-          {aiEnabled ? 'Advanced AI health guidance' : 'Basic health guidance'} • Evidence-based advice • Always consult your GP
+          AI-powered health guidance • Evidence-based advice • Always consult your GP
         </p>
       </div>
 
@@ -1151,7 +1129,7 @@ What would you like to know about your health today?`,
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
             {[
               { topic: 'DNA Insights', question: 'Explain my genetic fitness and nutrition profile', emoji: '🧬' },
-              { topic: 'Health Analysis', question: 'Analyze my current health metrics and provide recommendations', emoji: '📊' },
+              { topic: 'Health Analysis', question: 'Analyse my current health metrics and provide recommendations', emoji: '📊' },
               { topic: 'Data Visualizations', question: 'Show me a graphical representation of all my health data', emoji: '📈' },
               { topic: 'Nutrition', question: 'What foods should I eat for optimal health based on my data?', emoji: '🍎' },
               { topic: 'Exercise', question: 'What exercise routine should I start with based on my genetics?', emoji: '🏃' },
@@ -1199,7 +1177,7 @@ What would you like to know about your health today?`,
             <div className="flex flex-wrap gap-2">
               {uploadedFiles.map((file) => (
                 <div key={file.id} className="flex items-centre space-x-2 bg-blue-50 px-3 py-1 rounded-full text-sm border border-blue-200">
-                  <span>{file.category === 'lab_results' ? '🧪' : file.category === 'genetic_data' ? '🧬' : '📄'}</span>
+                  <span>{file.category === 'lab_results' ? '🧪' : file.category === 'genetic_data' ? '🧬' : file.category === 'miscellaneous' ? '📎' : '📄'}</span>
                   <span className="text-blue-700 font-medium truncate max-w-24">{file.name}</span>
                   <button
                     onClick={() => handleFileRemove(file.id)}

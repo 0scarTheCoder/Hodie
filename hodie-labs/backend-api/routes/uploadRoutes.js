@@ -167,7 +167,8 @@ router.post('/', authenticateUser, upload.single('file'), async (req, res) => {
       'genetic_data': 'geneticdatas',
       'wearable_data': 'wearabledatas',
       'medical_reports': 'medicalreports',
-      'health_metrics': 'healthmetrics'
+      'health_metrics': 'healthmetrics',
+      'miscellaneous': 'miscellaneous'
     };
 
     const collectionName = collectionMap[category] || category;

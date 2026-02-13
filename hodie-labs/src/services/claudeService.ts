@@ -169,6 +169,7 @@ Available MongoDB collections:
 - geneticData: DNA and genetic information (23andMe, AncestryDNA, variants)
 - wearableData: Fitness tracker data (Apple Health, Fitbit, Garmin)
 - medicalReports: Doctor's reports, medical imaging, prescriptions
+- miscellaneous: Any file that does not clearly fit the above categories (general documents, notes, mixed data)
 
 You MUST respond with valid JSON in this exact format:
 {
@@ -375,9 +376,10 @@ Respond with valid JSON only (no markdown, no extra text).`;
       'medical_images': 'medicalReports',
       'health_reports': 'medicalReports',
       'wearable_data': 'wearableData',
-      'other': 'healthMetrics'
+      'miscellaneous': 'miscellaneous',
+      'other': 'miscellaneous'
     };
-    return categoryMap[category] || 'healthMetrics';
+    return categoryMap[category] || 'miscellaneous';
   }
 }
 
