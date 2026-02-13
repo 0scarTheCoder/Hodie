@@ -153,22 +153,25 @@ RESPONSE FORMAT:
 - Use emojis sparingly for clarity
 - Structure answers with clear sections
 - Cite scientific evidence when relevant
-- Provide specific examples and numbers`;
+- Provide specific examples and numbers
 
-    // Add health context if available (summarized to save tokens)
+CRITICAL: When the user's message contains lab data or biomarker values, you MUST analyse the actual data provided. Look at the specific values, identify any that are outside normal reference ranges, and provide personalised health insights. NEVER give generic responses like "upload your data" or "connect with lab providers" when actual data is present in the message. The data will be included in [brackets] within the user message.`;
+
+    // Add health context if available
     if (healthContext) {
-      let contextSection = '\n\nUSER HEALTH DATA:';
+      let contextSection = '\n\nUSER HEALTH DATA SUMMARY:';
 
       if (healthContext.recentHealthData) {
         contextSection += `\n\nRecent Metrics: ${JSON.stringify(healthContext.recentHealthData)}`;
       }
 
-      // Add summarized lab results (not full 748 rows)
       if (healthContext.labResults && healthContext.labResults.length > 0) {
-        contextSection += `\n\nLab Results: ${healthContext.labResults.length} dataset(s) available`;
+        contextSection += `\n\nLab Results: ${healthContext.labResults.length} dataset(s) uploaded`;
         healthContext.labResults.forEach((dataset, index) => {
-          contextSection += `\n- Dataset ${index + 1}: ${dataset.testType}, ${dataset.recordCount} records`;
+          contextSection += `\n- Dataset ${index + 1}: ${dataset.testType || 'Lab Results'}, ${dataset.recordCount || 'unknown'} records`;
+          if (dataset.summary) contextSection += ` - ${dataset.summary}`;
         });
+        contextSection += '\n\nNote: The actual data values are included in the user message for analysis.';
       }
 
       if (healthContext.availableDataSummary) {

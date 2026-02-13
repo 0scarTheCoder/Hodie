@@ -10,6 +10,7 @@ import { chatStorageService, ChatConversation, ChatMessage } from '../../service
 import FileUploadZone, { UploadedFile } from './FileUploadZone';
 import { healthDataParsingService } from '../../services/healthDataParsingService';
 import BloodDataVisualizations from './BloodDataVisualizations';
+import GenericDataVisualizations from './GenericDataVisualizations';
 
 interface BloodRecord {
   recency: number;
@@ -25,6 +26,8 @@ interface Message {
   sender: 'user' | 'assistant';
   timestamp: Date;
   bloodData?: BloodRecord[];
+  genericData?: Record<string, any>[];
+  genericDataTitle?: string;
 }
 
 interface ChatInterfaceProps {
@@ -232,14 +235,15 @@ What would you like to know about your health today?`,
       );
 
       let bloodData: BloodRecord[] | undefined;
+      let genericVizData: Record<string, any>[] | undefined;
+      let genericVizTitle: string | undefined;
 
       if (isVizRequest) {
         console.log('📊 Visualization request detected');
 
         try {
-          // Get Auth0 token for authenticated API calls
           const token = await getAccessToken().catch((error) => {
-            console.warn('⚠️ Could not get Auth0 token for visualization:', error);
+            console.warn('⚠️ Could not get token for visualization:', error);
             return null;
           });
 
@@ -248,7 +252,6 @@ What would you like to know about your health today?`,
             headers['Authorization'] = `Bearer ${token}`;
           }
 
-          // Fetch blood donation data from lab results
           const labResultsResponse = await fetch(
             `${process.env.REACT_APP_API_BASE_URL}/lab-results/${getUserId()}`,
             { headers }
@@ -257,35 +260,42 @@ What would you like to know about your health today?`,
           if (labResultsResponse.ok) {
             const labResults = await labResultsResponse.json();
 
-            // Find blood donation data (look for the dataset with 748 records)
-            const bloodDataset = labResults.find((result: any) =>
-              result.testType?.toLowerCase().includes('blood') ||
-              result.results?.length > 100 // Blood donation dataset is large
-            );
+            // Try blood donation data first (specific fields)
+            const bloodDataset = labResults.find((result: any) => {
+              if (!result.results || result.results.length === 0) return false;
+              const firstRecord = result.results[0];
+              return firstRecord &&
+                ('recency' in firstRecord || 'Recency' in firstRecord) &&
+                ('frequency' in firstRecord || 'Frequency' in firstRecord) &&
+                ('monetary' in firstRecord || 'Monetary' in firstRecord);
+            });
 
             if (bloodDataset && bloodDataset.results && bloodDataset.results.length > 0) {
               console.log(`📊 Found blood dataset with ${bloodDataset.results.length} records`);
-
-              // Convert string values to numbers (data from MongoDB is stored as strings)
               bloodData = bloodDataset.results.map((record: any) => ({
-                recency: parseFloat(record.recency) || 0,
-                frequency: parseFloat(record.frequency) || 0,
-                monetary: parseFloat(record.monetary) || 0,
-                time: parseFloat(record.time) || 0,
-                class: parseInt(record.class) || 0
+                recency: parseFloat(record.recency || record.Recency) || 0,
+                frequency: parseFloat(record.frequency || record.Frequency) || 0,
+                monetary: parseFloat(record.monetary || record.Monetary) || 0,
+                time: parseFloat(record.time || record.Time) || 0,
+                class: parseInt(record.class || record.Class) || 0
               }));
-
-              if (bloodData) {
-                console.log(`🔢 Converted ${bloodData.length} records to numeric format`);
-                console.log(`✅ Ready to display interactive visualizations`);
-              }
+              console.log(`✅ Ready to display blood data visualizations`);
             } else {
-              console.warn('⚠️ No blood donation data found in lab results');
+              // No blood data — use any available lab results for generic visualization
+              const anyDataset = labResults.find((result: any) =>
+                result.results && result.results.length > 0
+              );
+              if (anyDataset && anyDataset.results) {
+                genericVizData = anyDataset.results.slice(0, 2000);
+                genericVizTitle = anyDataset.testType || 'Lab Results';
+                console.log(`📊 Using generic visualization for ${genericVizTitle}: ${genericVizData!.length} records`);
+              } else {
+                console.warn('⚠️ No visualizable data found in lab results');
+              }
             }
           }
         } catch (vizError) {
-          console.error('❌ Error fetching blood data:', vizError);
-          // Continue with text response even if data fetch fails
+          console.error('❌ Error fetching data for visualization:', vizError);
         }
       }
 
@@ -294,7 +304,7 @@ What would you like to know about your health today?`,
 
       // Check which AI provider to use
       const aiProvider = localStorage.getItem('aiProvider') || 'kimi';
-      let responseText: string;
+      let responseText: string = '';
 
       if (aiProvider === 'claude' && claudeService.isAvailable()) {
         console.log('🤖 Using Claude AI for response');
@@ -321,19 +331,110 @@ What would you like to know about your health today?`,
           healthContext
         );
       } else {
-        console.log('🤖 Using Kimi K2 AI for response');
+        // Try backend Claude API for real AI responses with health context
+        let usedBackendChat = false;
+        const hasHealthData = healthContext.labResults || healthContext.geneticData || healthContext.recentHealthData;
 
-        // If we have blood data for visualization, modify the query for Kimi K2
-        let queryForAI = query;
-        if (bloodData && bloodData.length > 0) {
-          queryForAI = `${query}\n\n[Note: Interactive data visualizations (histograms, scatter plots) have been generated from ${bloodData.length} records and displayed. Please provide textual analysis and interpretation of the blood donation data.]`;
+        if (hasHealthData) {
+          console.log('🤖 Trying backend Claude API for data-aware response...');
+          try {
+            const token = await getAccessToken().catch(() => null);
+            const chatHeaders: HeadersInit = {
+              'Content-Type': 'application/json'
+            };
+            if (token) {
+              chatHeaders['Authorization'] = `Bearer ${token}`;
+            }
+
+            // Build enhanced message with actual health data for analysis
+            let enhancedMessage = query;
+            if (healthContext.labResults && healthContext.labResults.length > 0) {
+              const labSummary = healthContext.labResults.map((r: any) => {
+                const rows = r.results || [];
+                const columns = rows.length > 0 ? Object.keys(rows[0]) : [];
+                // Include up to 50 rows of actual data for meaningful analysis
+                const sampleRows = rows.slice(0, 50);
+                // Also include biomarkers if available
+                const biomarkers = r.biomarkers || [];
+                let dataStr = `Dataset: ${r.testType || 'Lab Results'}, ${r.recordCount || rows.length} total records`;
+                dataStr += `\nColumns: [${columns.join(', ')}]`;
+                if (biomarkers.length > 0) {
+                  dataStr += `\nBiomarkers: ${JSON.stringify(biomarkers.slice(0, 30))}`;
+                }
+                dataStr += `\nData (first ${sampleRows.length} rows): ${JSON.stringify(sampleRows)}`;
+                return dataStr;
+              }).join('\n\n');
+              enhancedMessage += `\n\n[USER'S ACTUAL LAB RESULTS DATA - Please analyze this data and provide specific health insights:\n${labSummary}]`;
+            }
+            if (healthContext.geneticData && healthContext.geneticData.length > 0) {
+              const geneticSummary = healthContext.geneticData.map((g: any) => {
+                return `Genetic Data: ${g.testType || 'DNA'}, traits: ${JSON.stringify((g.traits || []).slice(0, 20))}`;
+              }).join('\n');
+              enhancedMessage += `\n\n[USER'S GENETIC DATA:\n${geneticSummary}]`;
+            }
+            if (healthContext.availableDataSummary) {
+              enhancedMessage += `\n\n[Summary: ${healthContext.availableDataSummary}]`;
+            }
+
+            // Strip bulk data from context before sending to backend
+            const lightContext: any = {
+              userId: healthContext.userId,
+              availableDataSummary: healthContext.availableDataSummary,
+              recentHealthData: healthContext.recentHealthData
+            };
+            if (healthContext.labResults) {
+              lightContext.labResults = healthContext.labResults.map((r: any) => ({
+                testType: r.testType,
+                recordCount: r.recordCount,
+                biomarkersCount: r.biomarkersCount,
+                uploadDate: r.uploadDate,
+                summary: r.summary
+              }));
+            }
+
+            const chatRes = await fetchWithRetry(
+              `${process.env.REACT_APP_API_BASE_URL}/chat`,
+              {
+                method: 'POST',
+                headers: chatHeaders,
+                body: JSON.stringify({
+                  userId: getUserId(),
+                  message: enhancedMessage,
+                  conversationHistory: conversationHistory.slice(-6).map((m: any) => ({
+                    role: m.role,
+                    content: (m.content || '').substring(0, 500)
+                  })),
+                  healthContext: lightContext
+                })
+              }
+            );
+
+            if (chatRes.ok) {
+              const chatData = await chatRes.json();
+              responseText = chatData.response;
+              usedBackendChat = true;
+              console.log('✅ Backend Claude response received');
+            }
+          } catch (backendChatError) {
+            console.warn('Backend Claude chat failed:', backendChatError);
+          }
         }
 
-        responseText = await kimiK2Service.generateHealthResponse(
-          queryForAI,
-          healthContext,
-          conversationHistory
-        );
+        if (!usedBackendChat) {
+          console.log('🤖 Using Kimi K2 AI for response');
+
+          // If we have blood data for visualization, modify the query for Kimi K2
+          let queryForAI = query;
+          if (bloodData && bloodData.length > 0) {
+            queryForAI = `${query}\n\n[Note: Interactive data visualizations (histograms, scatter plots) have been generated from ${bloodData.length} records and displayed. Please provide textual analysis and interpretation of the blood donation data.]`;
+          }
+
+          responseText = await kimiK2Service.generateHealthResponse(
+            queryForAI,
+            healthContext,
+            conversationHistory
+          );
+        }
       }
 
       const assistantMessage: Message = {
@@ -341,7 +442,9 @@ What would you like to know about your health today?`,
         text: responseText,
         sender: 'assistant',
         timestamp: new Date(),
-        bloodData: bloodData // Add blood data for visualization if available
+        bloodData: bloodData,
+        genericData: genericVizData,
+        genericDataTitle: genericVizTitle
       };
 
       setMessages(prev => [...prev, assistantMessage]);
@@ -398,7 +501,7 @@ What would you like to know about your health today?`,
 
       // Fetch data from all collections in parallel with authentication
       const [healthMetricsRes, labResultsRes, geneticDataRes, wearableDataRes, medicalReportsRes] = await Promise.all([
-        fetch(`${process.env.REACT_APP_API_BASE_URL}/health-metrics/${userId}?limit=1`, { headers }).catch(() => null),
+        fetch(`${process.env.REACT_APP_API_BASE_URL}/health-metrics/${userId}?limit=5`, { headers }).catch(() => null),
         fetch(`${process.env.REACT_APP_API_BASE_URL}/lab-results/${userId}`, { headers }).catch(() => null),
         fetch(`${process.env.REACT_APP_API_BASE_URL}/genetic-data/${userId}`, { headers }).catch(() => null),
         fetch(`${process.env.REACT_APP_API_BASE_URL}/wearable-data/${userId}?limit=7`, { headers }).catch(() => null),
@@ -407,16 +510,17 @@ What would you like to know about your health today?`,
 
       const context: any = { userId };
 
-      // Health metrics
+      // Health metrics (daily tracking data)
       if (healthMetricsRes && healthMetricsRes.ok) {
         const healthData = await healthMetricsRes.json();
-        const recentData = healthData[0];
-        if (recentData) {
-          const healthScore = calculateHealthScore(recentData);
+        // Find daily metrics (ones with steps/sleep, not raw file uploads)
+        const dailyMetrics = healthData.find((d: any) => d.steps || d.sleepHours || d.mood);
+        if (dailyMetrics) {
+          const healthScore = calculateHealthScore(dailyMetrics);
           context.recentHealthData = {
-            steps: recentData.steps,
-            sleep: recentData.sleepHours,
-            mood: recentData.mood,
+            steps: dailyMetrics.steps,
+            sleep: dailyMetrics.sleepHours,
+            mood: dailyMetrics.mood,
             healthScore
           };
         }
@@ -483,7 +587,10 @@ What would you like to know about your health today?`,
 
       // Add summary of available data
       const availableDataTypes = [];
-      if (context.labResults) availableDataTypes.push(`${context.labResults.length} lab result dataset(s)`);
+      if (context.labResults && context.labResults.length > 0) {
+        const totalRecords = context.labResults.reduce((sum: number, r: any) => sum + r.recordCount, 0);
+        availableDataTypes.push(`${context.labResults.length} lab result dataset(s) with ${totalRecords} total records`);
+      }
       if (context.geneticData) availableDataTypes.push(`${context.geneticData.length} genetic dataset(s)`);
       if (context.wearableData) availableDataTypes.push('wearable data');
       if (context.medicalReports) availableDataTypes.push(`${context.medicalReports.length} medical report(s)`);
@@ -565,24 +672,86 @@ What would you like to know about your health today?`,
         console.log('✅ File parsed successfully:', parsedData);
 
         // Step 2: Use AI to interpret the file and determine database mappings
-        // Check localStorage for AI provider preference (kimi or claude)
+        // Try: 1) Kimi K2 or Claude client-side, 2) Backend Claude API, 3) Basic fallback
         const aiProvider = localStorage.getItem('aiProvider') || 'kimi';
         console.log(`🤖 Step 2: AI interpreting file using ${aiProvider.toUpperCase()}...`);
 
         let aiInterpretation;
-        if (aiProvider === 'claude' && claudeService.isAvailable()) {
-          console.log('Using Claude AI for file interpretation');
-          aiInterpretation = await claudeService.interpretHealthFile(
-            parsedData.data,
-            file.name,
-            file.category,
-            getUserId()
-          );
-        } else {
-          if (aiProvider === 'claude') {
-            console.warn('Claude API not configured, falling back to Kimi K2');
+        let usedBackendFallback = false;
+
+        try {
+          if (aiProvider === 'claude' && claudeService.isAvailable()) {
+            console.log('Using Claude AI for file interpretation');
+            aiInterpretation = await claudeService.interpretHealthFile(
+              parsedData.data,
+              file.name,
+              file.category,
+              getUserId()
+            );
+          } else {
+            if (aiProvider === 'claude') {
+              console.warn('Claude API not configured, falling back to Kimi K2');
+            }
+            console.log('Using Kimi K2 for file interpretation');
+            aiInterpretation = await kimiK2Service.interpretHealthFile(
+              parsedData.data,
+              file.name,
+              file.category,
+              getUserId()
+            );
           }
-          console.log('Using Kimi K2 for file interpretation');
+        } catch (frontendAiError) {
+          console.warn('Frontend AI interpretation failed:', frontendAiError);
+          aiInterpretation = null;
+        }
+
+        // Check if interpretation is a generic fallback (no real AI analysis)
+        const isGenericFallback = aiInterpretation?.interpretation?.includes('has been successfully parsed and categorized');
+
+        // If frontend AI failed or returned generic fallback, try backend Claude
+        if (!aiInterpretation || isGenericFallback) {
+          console.log('🔄 Trying backend Claude API for file interpretation...');
+          try {
+            const token = await getAccessToken().catch(() => null);
+            const backendHeaders: HeadersInit = { 'Content-Type': 'application/json' };
+            if (token) {
+              backendHeaders['Authorization'] = `Bearer ${token}`;
+            }
+
+            // Send only first 50 rows to keep payload manageable
+            const dataPreview = Array.isArray(parsedData.data)
+              ? parsedData.data.slice(0, 50)
+              : parsedData.data;
+
+            const backendRes = await fetchWithRetry(
+              `${process.env.REACT_APP_API_BASE_URL}/interpret-file`,
+              {
+                method: 'POST',
+                headers: backendHeaders,
+                body: JSON.stringify({
+                  fileData: { data: dataPreview, metadata: parsedData.metadata },
+                  fileName: file.name,
+                  fileCategory: file.category,
+                  userId: getUserId()
+                })
+              }
+            );
+
+            if (backendRes.ok) {
+              aiInterpretation = await backendRes.json();
+              usedBackendFallback = true;
+              console.log('✅ Backend Claude interpretation succeeded');
+            } else {
+              console.warn('Backend interpretation failed:', backendRes.status);
+            }
+          } catch (backendError) {
+            console.warn('Backend Claude fallback also failed:', backendError);
+          }
+        }
+
+        // If all AI attempts failed, we still have the generic fallback from Kimi
+        if (!aiInterpretation) {
+          console.warn('All AI interpretation attempts failed, using basic fallback');
           aiInterpretation = await kimiK2Service.interpretHealthFile(
             parsedData.data,
             file.name,
@@ -590,7 +759,8 @@ What would you like to know about your health today?`,
             getUserId()
           );
         }
-        console.log('✅ AI interpretation complete:', aiInterpretation);
+
+        console.log('✅ AI interpretation complete:', aiInterpretation, usedBackendFallback ? '(via backend Claude)' : '');
 
         // Step 3: Save to database based on AI recommendations
         console.log('💾 Step 3: Saving to database...');
@@ -715,6 +885,46 @@ What would you like to know about your health today?`,
     return message;
   };
 
+  // Fetch with retry logic (handles Render free tier cold starts)
+  const fetchWithRetry = async (url: string, options: RequestInit, maxRetries = 3): Promise<Response> => {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const response = await fetch(url, options);
+        return response;
+      } catch (error: any) {
+        const isLastAttempt = attempt === maxRetries;
+        const isNetworkError = error.name === 'TypeError' && error.message === 'Failed to fetch';
+        if (isLastAttempt || !isNetworkError) throw error;
+        const delay = attempt * 3000; // 3s, 6s wait between retries
+        console.log(`⏳ Server may be waking up, retrying in ${delay / 1000}s... (attempt ${attempt}/${maxRetries})`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+    throw new Error('Max retries exceeded');
+  };
+
+  // Estimate JSON size of data in bytes
+  const estimateJsonSize = (data: any): number => {
+    try {
+      return JSON.stringify(data).length;
+    } catch {
+      return 0;
+    }
+  };
+
+  // Truncate large arrays to keep payload within ~8MB limit
+  const truncateToFitLimit = (data: any[], maxBytes: number = 7_000_000): any[] => {
+    if (!Array.isArray(data) || data.length === 0) return data;
+    // Start with estimate per row
+    const sampleSize = Math.min(10, data.length);
+    const sampleBytes = estimateJsonSize(data.slice(0, sampleSize));
+    const bytesPerRow = sampleBytes / sampleSize;
+    const maxRows = Math.max(100, Math.floor(maxBytes / bytesPerRow));
+    if (data.length <= maxRows) return data;
+    console.log(`📦 Truncating from ${data.length} to ${maxRows} rows (est. ${(bytesPerRow * data.length / 1_000_000).toFixed(1)}MB → ${(bytesPerRow * maxRows / 1_000_000).toFixed(1)}MB)`);
+    return data.slice(0, maxRows);
+  };
+
   // Save data to database based on AI-recommended mappings
   const saveToDatabaseWithAI = async (mappings: any[], userId: string) => {
     if (!mappings || mappings.length === 0) {
@@ -732,15 +942,37 @@ What would you like to know about your health today?`,
         console.log(`📤 Saving to collection: ${mapping.collection}`);
         console.log(`📊 Fields to save:`, Object.keys(mapping.fields));
 
+        // Truncate large data arrays to avoid 413 payload errors
+        const fields = { ...mapping.fields };
+        // If we have results, strip rawData entirely (it's redundant)
+        if (fields.results && Array.isArray(fields.results) && fields.results.length > 0) {
+          delete fields.rawData;
+          fields.results = truncateToFitLimit(fields.results);
+        } else if (fields.rawData) {
+          fields.rawData = truncateToFitLimit(fields.rawData);
+        }
+
         // Prepare the data for storage
         const dataToSave = {
           userId,
-          ...mapping.fields,
+          ...fields,
           aiProcessed: true,
           confidence: mapping.confidence,
           createdAt: new Date(),
           updatedAt: new Date()
         };
+
+        // Final size check - if still too large, aggressively truncate
+        const payloadSize = estimateJsonSize(dataToSave);
+        if (payloadSize > 8_000_000) {
+          console.log(`⚠️ Payload still ${(payloadSize / 1_000_000).toFixed(1)}MB, aggressively truncating...`);
+          if (fields.results && Array.isArray(fields.results)) {
+            fields.results = fields.results.slice(0, 500);
+          }
+          if (fields.rawData && Array.isArray(fields.rawData)) {
+            fields.rawData = fields.rawData.slice(0, 500);
+          }
+        }
 
         // Save to appropriate collection based on AI recommendation
         const endpoint = getApiEndpoint(mapping.collection);
@@ -754,7 +986,7 @@ What would you like to know about your health today?`,
           headers['Authorization'] = `Bearer ${token}`;
         }
 
-        const response = await fetch(apiUrl, {
+        const response = await fetchWithRetry(apiUrl, {
           method: 'POST',
           headers,
           body: JSON.stringify(dataToSave)
@@ -836,12 +1068,12 @@ What would you like to know about your health today?`,
           <div
             key={message.id}
             className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} ${
-              message.bloodData && message.bloodData.length > 0 ? 'w-full' : ''
+              (message.bloodData && message.bloodData.length > 0) || (message.genericData && message.genericData.length > 0) ? 'w-full' : ''
             }`}
           >
             <div
               className={`${
-                message.bloodData && message.bloodData.length > 0
+                (message.bloodData && message.bloodData.length > 0) || (message.genericData && message.genericData.length > 0)
                   ? 'w-full'
                   : 'max-w-xs lg:max-w-2xl'
               } px-4 py-3 rounded-xl ${
@@ -874,6 +1106,13 @@ What would you like to know about your health today?`,
               {message.bloodData && message.bloodData.length > 0 && (
                 <div className="mt-4">
                   <BloodDataVisualizations data={message.bloodData} />
+                </div>
+              )}
+
+              {/* Display generic data visualizations for non-blood datasets */}
+              {message.genericData && message.genericData.length > 0 && (
+                <div className="mt-4">
+                  <GenericDataVisualizations data={message.genericData} title={message.genericDataTitle} />
                 </div>
               )}
 

@@ -128,44 +128,53 @@ const LabsScreen: React.FC<LabsScreenProps> = ({ user }) => {
         });
       }
 
-      // Also check for blood donation data (from results array)
+      // Handle generic results data (any CSV/tabular data with numeric columns)
       if (result.results && Array.isArray(result.results) && result.results.length > 0) {
-        // Blood donation data - create summary biomarkers
-        const bloodData = result.results;
+        const sampleRow = result.results[0];
+        const columns = Object.keys(sampleRow);
 
-        // Average recency
-        const avgRecency = bloodData.reduce((sum: number, item: any) => sum + (parseFloat(item.recency) || 0), 0) / bloodData.length;
-        biomarkersArray.push({
-          name: 'Blood Donation Recency',
-          value: Math.round(avgRecency),
-          unit: 'days',
-          range: '0-100',
-          status: avgRecency < 30 ? 'optimal' : avgRecency < 60 ? 'good' : 'borderline',
-          trend: 'stable',
-          change: 0,
-          category: 'Blood Health',
-          lastTest: result.uploadDate || new Date().toISOString(),
-          history: [Math.round(avgRecency)]
+        // Find numeric columns
+        const numericColumns = columns.filter(col => {
+          const sample = result.results.slice(0, 20);
+          return sample.some((row: any) => {
+            const val = parseFloat(row[col]);
+            return !isNaN(val) && isFinite(val);
+          });
         });
 
-        // Average frequency
-        const avgFrequency = bloodData.reduce((sum: number, item: any) => sum + (parseFloat(item.frequency) || 0), 0) / bloodData.length;
-        biomarkersArray.push({
-          name: 'Blood Donation Frequency',
-          value: Math.round(avgFrequency),
-          unit: 'donations',
-          range: '0-50',
-          status: avgFrequency > 10 ? 'optimal' : avgFrequency > 5 ? 'good' : 'borderline',
-          trend: 'stable',
-          change: 0,
-          category: 'Blood Health',
-          lastTest: result.uploadDate || new Date().toISOString(),
-          history: [Math.round(avgFrequency)]
+        // Create a biomarker entry for each numeric column (up to 20)
+        numericColumns.slice(0, 20).forEach((col: string) => {
+          const values = result.results
+            .map((row: any) => parseFloat(row[col]))
+            .filter((v: number) => !isNaN(v) && isFinite(v));
+
+          if (values.length === 0) return;
+
+          const mean = values.reduce((a: number, b: number) => a + b, 0) / values.length;
+          const min = Math.min(...values);
+          const max = Math.max(...values);
+          const latest = values[values.length - 1];
+
+          // Use clinical reference ranges if this looks like a known biomarker
+          const refRange = getClinicalReference(col);
+
+          biomarkersArray.push({
+            name: col.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()),
+            value: Math.round(latest * 100) / 100,
+            unit: refRange?.unit || '',
+            range: refRange?.range || `${min.toFixed(1)} - ${max.toFixed(1)}`,
+            status: refRange ? classifyValue(latest, refRange) : (latest >= min && latest <= max ? 'good' : 'borderline'),
+            trend: values.length >= 2 ? (values[values.length - 1] > values[0] ? 'up' : values[values.length - 1] < values[0] ? 'down' : 'stable') : 'stable',
+            change: values.length >= 2 ? Math.round(((latest - values[0]) / (values[0] || 1)) * 100) : 0,
+            category: refRange?.category || result.testType || 'Lab Results',
+            lastTest: result.uploadDate || new Date().toISOString(),
+            history: values.slice(-5).map((v: number) => Math.round(v * 100) / 100)
+          });
         });
       }
     });
 
-    return biomarkersArray.length > 0 ? biomarkersArray : getDefaultBiomarkers();
+    return biomarkersArray.length > 0 ? biomarkersArray : [];
   };
 
   // Determine biomarker status based on value and range
@@ -174,6 +183,78 @@ const LabsScreen: React.FC<LabsScreenProps> = ({ user }) => {
     if (biomarker.flagged === true) return 'out of range';
     if (biomarker.flagged === false) return 'optimal';
     return 'good';
+  };
+
+  // Clinical reference ranges for common biomarkers
+  interface ClinicalReference {
+    unit: string;
+    range: string;
+    category: string;
+    optimalLow: number;
+    optimalHigh: number;
+    borderlineLow: number;
+    borderlineHigh: number;
+  }
+
+  const getClinicalReference = (name: string): ClinicalReference | null => {
+    const key = name.toLowerCase().replace(/[_\s-]+/g, '');
+    const refs: Record<string, ClinicalReference> = {
+      // Cardiovascular
+      'totalcholesterol': { unit: 'mmol/L', range: '< 5.5', category: 'Cardiovascular', optimalLow: 0, optimalHigh: 5.0, borderlineLow: 0, borderlineHigh: 5.5 },
+      'cholesterol': { unit: 'mmol/L', range: '< 5.5', category: 'Cardiovascular', optimalLow: 0, optimalHigh: 5.0, borderlineLow: 0, borderlineHigh: 5.5 },
+      'hdl': { unit: 'mmol/L', range: '> 1.0', category: 'Cardiovascular', optimalLow: 1.2, optimalHigh: 3.0, borderlineLow: 1.0, borderlineHigh: 4.0 },
+      'hdlcholesterol': { unit: 'mmol/L', range: '> 1.0', category: 'Cardiovascular', optimalLow: 1.2, optimalHigh: 3.0, borderlineLow: 1.0, borderlineHigh: 4.0 },
+      'ldl': { unit: 'mmol/L', range: '< 3.4', category: 'Cardiovascular', optimalLow: 0, optimalHigh: 2.6, borderlineLow: 0, borderlineHigh: 3.4 },
+      'ldlcholesterol': { unit: 'mmol/L', range: '< 3.4', category: 'Cardiovascular', optimalLow: 0, optimalHigh: 2.6, borderlineLow: 0, borderlineHigh: 3.4 },
+      'triglycerides': { unit: 'mmol/L', range: '< 1.7', category: 'Cardiovascular', optimalLow: 0, optimalHigh: 1.5, borderlineLow: 0, borderlineHigh: 2.0 },
+      // Metabolic
+      'glucose': { unit: 'mmol/L', range: '3.9 - 5.5', category: 'Metabolic', optimalLow: 3.9, optimalHigh: 5.5, borderlineLow: 3.5, borderlineHigh: 6.1 },
+      'fastingglucose': { unit: 'mmol/L', range: '3.9 - 5.5', category: 'Metabolic', optimalLow: 3.9, optimalHigh: 5.5, borderlineLow: 3.5, borderlineHigh: 6.1 },
+      'hba1c': { unit: '%', range: '< 5.7', category: 'Metabolic', optimalLow: 4.0, optimalHigh: 5.6, borderlineLow: 3.5, borderlineHigh: 6.4 },
+      'insulin': { unit: 'mU/L', range: '2.6 - 24.9', category: 'Metabolic', optimalLow: 2.6, optimalHigh: 15.0, borderlineLow: 1.0, borderlineHigh: 24.9 },
+      // Blood
+      'haemoglobin': { unit: 'g/L', range: '130 - 170', category: 'Blood Health', optimalLow: 130, optimalHigh: 170, borderlineLow: 120, borderlineHigh: 180 },
+      'hemoglobin': { unit: 'g/L', range: '130 - 170', category: 'Blood Health', optimalLow: 130, optimalHigh: 170, borderlineLow: 120, borderlineHigh: 180 },
+      'rbc': { unit: '×10¹²/L', range: '4.5 - 5.5', category: 'Blood Health', optimalLow: 4.5, optimalHigh: 5.5, borderlineLow: 4.0, borderlineHigh: 6.0 },
+      'wbc': { unit: '×10⁹/L', range: '4.0 - 11.0', category: 'Blood Health', optimalLow: 4.0, optimalHigh: 11.0, borderlineLow: 3.5, borderlineHigh: 12.0 },
+      'platelets': { unit: '×10⁹/L', range: '150 - 400', category: 'Blood Health', optimalLow: 150, optimalHigh: 400, borderlineLow: 130, borderlineHigh: 450 },
+      // Inflammation
+      'crp': { unit: 'mg/L', range: '< 3.0', category: 'Inflammation', optimalLow: 0, optimalHigh: 1.0, borderlineLow: 0, borderlineHigh: 3.0 },
+      'creactiveprotein': { unit: 'mg/L', range: '< 3.0', category: 'Inflammation', optimalLow: 0, optimalHigh: 1.0, borderlineLow: 0, borderlineHigh: 3.0 },
+      'esr': { unit: 'mm/hr', range: '0 - 20', category: 'Inflammation', optimalLow: 0, optimalHigh: 15, borderlineLow: 0, borderlineHigh: 20 },
+      // Vitamins
+      'vitamind': { unit: 'nmol/L', range: '> 75', category: 'Vitamins', optimalLow: 75, optimalHigh: 200, borderlineLow: 50, borderlineHigh: 250 },
+      'vitaminb12': { unit: 'pmol/L', range: '150 - 600', category: 'Vitamins', optimalLow: 200, optimalHigh: 600, borderlineLow: 150, borderlineHigh: 700 },
+      'folate': { unit: 'nmol/L', range: '> 10', category: 'Vitamins', optimalLow: 10, optimalHigh: 45, borderlineLow: 7, borderlineHigh: 50 },
+      'iron': { unit: 'µmol/L', range: '10 - 30', category: 'Vitamins', optimalLow: 10, optimalHigh: 30, borderlineLow: 7, borderlineHigh: 35 },
+      'ferritin': { unit: 'µg/L', range: '30 - 300', category: 'Vitamins', optimalLow: 30, optimalHigh: 200, borderlineLow: 15, borderlineHigh: 300 },
+      // Liver
+      'alt': { unit: 'U/L', range: '< 40', category: 'Liver', optimalLow: 0, optimalHigh: 35, borderlineLow: 0, borderlineHigh: 45 },
+      'ast': { unit: 'U/L', range: '< 40', category: 'Liver', optimalLow: 0, optimalHigh: 35, borderlineLow: 0, borderlineHigh: 45 },
+      'ggt': { unit: 'U/L', range: '< 60', category: 'Liver', optimalLow: 0, optimalHigh: 45, borderlineLow: 0, borderlineHigh: 60 },
+      'bilirubin': { unit: 'µmol/L', range: '< 20', category: 'Liver', optimalLow: 0, optimalHigh: 17, borderlineLow: 0, borderlineHigh: 20 },
+      // Kidney
+      'creatinine': { unit: 'µmol/L', range: '60 - 110', category: 'Kidney', optimalLow: 60, optimalHigh: 110, borderlineLow: 50, borderlineHigh: 130 },
+      'egfr': { unit: 'mL/min', range: '> 90', category: 'Kidney', optimalLow: 90, optimalHigh: 200, borderlineLow: 60, borderlineHigh: 200 },
+      'urea': { unit: 'mmol/L', range: '2.5 - 7.1', category: 'Kidney', optimalLow: 2.5, optimalHigh: 7.1, borderlineLow: 2.0, borderlineHigh: 8.0 },
+      // Thyroid
+      'tsh': { unit: 'mU/L', range: '0.4 - 4.0', category: 'Hormones', optimalLow: 0.4, optimalHigh: 4.0, borderlineLow: 0.3, borderlineHigh: 5.0 },
+      'freet4': { unit: 'pmol/L', range: '10 - 20', category: 'Hormones', optimalLow: 10, optimalHigh: 20, borderlineLow: 8, borderlineHigh: 22 },
+      'freet3': { unit: 'pmol/L', range: '3.5 - 6.5', category: 'Hormones', optimalLow: 3.5, optimalHigh: 6.5, borderlineLow: 3.0, borderlineHigh: 7.0 },
+      // Hormones
+      'testosterone': { unit: 'nmol/L', range: '8 - 30', category: 'Hormones', optimalLow: 10, optimalHigh: 30, borderlineLow: 8, borderlineHigh: 35 },
+      'cortisol': { unit: 'nmol/L', range: '140 - 690', category: 'Hormones', optimalLow: 140, optimalHigh: 500, borderlineLow: 100, borderlineHigh: 690 },
+      // Cancer Markers
+      'psa': { unit: 'µg/L', range: '< 4.0', category: 'Cancer Markers', optimalLow: 0, optimalHigh: 2.5, borderlineLow: 0, borderlineHigh: 4.0 },
+    };
+    return refs[key] || null;
+  };
+
+  // Classify a value against clinical reference ranges
+  const classifyValue = (value: number, ref: ClinicalReference): string => {
+    if (value >= ref.optimalLow && value <= ref.optimalHigh) return 'optimal';
+    if (value >= ref.borderlineLow && value <= ref.borderlineHigh) return 'borderline';
+    return 'out of range';
   };
 
   // Fallback default biomarkers if no data available
@@ -219,11 +300,15 @@ const LabsScreen: React.FC<LabsScreenProps> = ({ user }) => {
   const categories = [
     'All',
     'Cardiovascular',
-    'Metabolic', 
+    'Metabolic',
+    'Blood Health',
     'Inflammation',
     'Vitamins',
+    'Liver',
+    'Kidney',
     'Hormones',
-    'Cancer Markers'
+    'Cancer Markers',
+    'Lab Results'
   ];
 
   const [selectedCategory, setSelectedCategory] = useState('All');
