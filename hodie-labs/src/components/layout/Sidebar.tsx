@@ -40,7 +40,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         ${open ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="flex flex-col h-full">
-          <div className="flex items-centre justify-between h-16 px-4 border-b border-gray-200">
+          <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
             <h1 className="text-xl font-bold text-brand-blue">Hodie Labs</h1>
             <button
               onClick={() => setOpen(false)}
@@ -59,7 +59,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   setOpen(false);
                 }}
                 className={`
-                  w-full flex items-centre px-4 py-2 text-left rounded-lg transition-colors
+                  w-full flex items-center px-4 py-2 text-left rounded-lg transition-colors
                   ${activeSection === item.id
                     ? 'bg-brand-blue text-white'
                     : 'text-gray-700 hover:bg-gray-100'
@@ -75,7 +75,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <div className="p-4 border-t border-gray-200">
             <button
               onClick={onSignOut}
-              className="w-full flex items-centre px-4 py-2 text-left text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              className="w-full flex items-center px-4 py-2 text-left text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <span className="mr-3 text-lg">🚪</span>
               Sign Out

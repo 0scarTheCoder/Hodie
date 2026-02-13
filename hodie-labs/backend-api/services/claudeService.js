@@ -94,7 +94,7 @@ class ClaudeService {
   }
 
   /**
-   * Analyze health file using Claude
+   * Analyse health file using Claude
    */
   async analyzeFile(fileData, fileName, fileCategory) {
     try {
@@ -103,7 +103,7 @@ class ClaudeService {
       const response = await this.client.messages.create({
         model: this.model,
         max_tokens: 4096,
-        system: `You are an expert health data analyst. Analyze the provided health data file and return structured JSON with interpretation, recommendations, and database mappings.
+        system: `You are an expert health data analyst. Analyse the provided health data file and return structured JSON with interpretation, recommendations, and database mappings.
 
 You MUST respond with valid JSON only (no markdown, no extra text).`,
         messages: [
@@ -191,7 +191,7 @@ CRITICAL: When the user's message contains lab data or biomarker values, you MUS
     const dataToAnalyze = fileData.data || fileData || [];
     const dataPreview = JSON.stringify(dataToAnalyze.slice(0, 20)).substring(0, 3000);
 
-    return `Analyze this health data file and provide structured interpretation.
+    return `Analyse this health data file and provide structured interpretation.
 
 **File Information:**
 - Name: ${fileName}

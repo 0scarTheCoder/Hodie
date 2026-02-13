@@ -353,9 +353,9 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
 
       {/* Header Stats */}
       <div className="mb-8">
-        <div className="flex items-centre justify-between mb-4">
+        <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2 flex items-centre">
+            <h1 className="text-3xl font-bold text-white mb-2 flex items-center">
               Your Health Recommendations
               {loading && <Loader2 className="w-6 h-6 animate-spin text-white/60 ml-3" />}
               {!aiEnabled && <span className="text-sm text-blue-400 ml-3">(AI Connecting...)</span>}
@@ -375,7 +375,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
         {/* Progress Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl p-4 text-white shadow-lg">
-            <div className="flex items-centre space-x-3">
+            <div className="flex items-center space-x-3">
               <TrendingUp className="w-8 h-8 text-white" />
               <div>
                 <div className="text-2xl font-bold text-white drop-shadow-sm">{completionRate}%</div>
@@ -385,7 +385,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
           </div>
           
           <div className="bg-gradient-to-br from-orange-500 to-red-600 rounded-xl p-4 text-white shadow-lg">
-            <div className="flex items-centre space-x-3">
+            <div className="flex items-center space-x-3">
               <Star className="w-8 h-8 text-white" />
               <div>
                 <div className="text-2xl font-bold text-white drop-shadow-sm">{healthScore}</div>
@@ -395,7 +395,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
           </div>
 
           <div className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-xl p-4 text-white shadow-lg">
-            <div className="flex items-centre space-x-3">
+            <div className="flex items-center space-x-3">
               <Target className="w-8 h-8 text-white" />
               <div>
                 <div className="text-2xl font-bold text-white drop-shadow-sm">{recommendations.filter(r => r.priority === 'High').length}</div>
@@ -441,12 +441,12 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
           >
             <div className="flex items-start justify-between">
               <div className="flex items-start space-x-4 flex-1">
-                <div className={`w-12 h-12 ${getCategoryColor(rec.category)} rounded-lg flex items-centre justify-centre flex-shrink-0`}>
+                <div className={`w-12 h-12 ${getCategoryColor(rec.category)} rounded-lg flex items-center justify-center flex-shrink-0`}>
                   {getCategoryIcon(rec.category)}
                 </div>
                 
                 <div className="flex-1">
-                  <div className="flex items-centre space-x-3 mb-2">
+                  <div className="flex items-center space-x-3 mb-2">
                     <h3 className="text-lg font-semibold text-white">{rec.title}</h3>
                     {rec.completed && <CheckCircle className="w-5 h-5 text-green-400" />}
                   </div>

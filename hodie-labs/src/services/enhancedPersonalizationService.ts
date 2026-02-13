@@ -285,7 +285,7 @@ class EnhancedPersonalizationService {
           methods: ['Blood test'],
           alerts: ['Homocysteine >15 μmol/L']
         },
-        interactions: ['Requires B12 for proper utilization'],
+        interactions: ['Requires B12 for proper utilisation'],
         contraindications: ['B12 deficiency (correct first)'],
         confidence: 95
       });
@@ -301,7 +301,7 @@ class EnhancedPersonalizationService {
         id: 'actn3_exercise',
         type: 'exercise',
         priority: 'medium',
-        title: `Genetically Optimized ${exerciseType.charAt(0).toUpperCase() + exerciseType.slice(1)} Training`,
+        title: `Genetically Optimised ${exerciseType.charAt(0).toUpperCase() + exerciseType.slice(1)} Training`,
         description: `Focus on ${exerciseType}-based exercises for optimal genetic adaptation`,
         rationale: `Your ACTN3 ${actn3Variant.genotype} variant favors ${exerciseType} performance`,
         evidence: {
@@ -350,7 +350,7 @@ class EnhancedPersonalizationService {
         id: 'vitamin_d_optimisation',
         type: 'supplement',
         priority: 'high',
-        title: 'Vitamin D3 Optimization',
+        title: 'Vitamin D3 Optimisation',
         description: `Take ${dosage} vitamin D3 daily with meals`,
         rationale: `Your vitamin D level of ${vitD.value} nmol/L is below optimal (>75 nmol/L)`,
         evidence: {

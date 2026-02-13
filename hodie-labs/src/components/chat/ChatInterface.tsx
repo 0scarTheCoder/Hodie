@@ -1130,7 +1130,7 @@ What would you like to know about your health today?`,
             {[
               { topic: 'DNA Insights', question: 'Explain my genetic fitness and nutrition profile', emoji: '🧬' },
               { topic: 'Health Analysis', question: 'Analyse my current health metrics and provide recommendations', emoji: '📊' },
-              { topic: 'Data Visualizations', question: 'Show me a graphical representation of all my health data', emoji: '📈' },
+              { topic: 'Data Visualisations', question: 'Show me a graphical representation of all my health data', emoji: '📈' },
               { topic: 'Nutrition', question: 'What foods should I eat for optimal health based on my data?', emoji: '🍎' },
               { topic: 'Exercise', question: 'What exercise routine should I start with based on my genetics?', emoji: '🏃' },
               { topic: 'Sleep', question: 'How can I improve my sleep quality and duration?', emoji: '😴' },
@@ -1145,7 +1145,7 @@ What would you like to know about your health today?`,
                   // This ensures visualization detection works for all queries
                   await processQuery(question);
                 }}
-                className="px-2 py-3 md:px-3 md:py-2 bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 text-gray-700 rounded-lg text-xs md:text-sm transition-all duration-200 flex flex-col md:flex-row items-centre space-y-1 md:space-y-0 md:space-x-1 border border-gray-200 hover:border-blue-300 touch-manipulation min-h-[60px] md:min-h-[auto]"
+                className="px-2 py-3 md:px-3 md:py-2 bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 text-gray-700 rounded-lg text-xs md:text-sm transition-all duration-200 flex flex-col md:flex-row items-center space-y-1 md:space-y-0 md:space-x-1 border border-gray-200 hover:border-blue-300 touch-manipulation min-h-[60px] md:min-h-[auto]"
                 disabled={isLoading}
               >
                 <span className="text-base">{emoji}</span>
@@ -1176,7 +1176,7 @@ What would you like to know about your health today?`,
           <div className="mb-3">
             <div className="flex flex-wrap gap-2">
               {uploadedFiles.map((file) => (
-                <div key={file.id} className="flex items-centre space-x-2 bg-blue-50 px-3 py-1 rounded-full text-sm border border-blue-200">
+                <div key={file.id} className="flex items-center space-x-2 bg-blue-50 px-3 py-1 rounded-full text-sm border border-blue-200">
                   <span>{file.category === 'lab_results' ? '🧪' : file.category === 'genetic_data' ? '🧬' : file.category === 'miscellaneous' ? '📎' : '📄'}</span>
                   <span className="text-blue-700 font-medium truncate max-w-24">{file.name}</span>
                   <button

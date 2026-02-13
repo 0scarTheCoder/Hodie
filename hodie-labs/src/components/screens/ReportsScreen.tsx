@@ -338,12 +338,12 @@ const ReportsScreen: React.FC<ReportsScreenProps> = ({ user }) => {
     },
     {
       id: '6',
-      title: 'Personalized Action Plan',
+      title: 'Personalised Action Plan',
       type: 'Recommendations',
       date: '2024-11-01',
       size: '0.9 MB',
       pages: 4,
-      description: 'Customized health and fitness recommendations based on your latest assessments',
+      description: 'Customised health and fitness recommendations based on your latest assessments',
       icon: Shield,
       color: 'bg-indigo-500',
       status: 'ready'
@@ -485,7 +485,7 @@ const ReportsScreen: React.FC<ReportsScreenProps> = ({ user }) => {
           <div key={index} className="bg-white/95 backdrop-blur-sm rounded-xl p-4 border border-white/20 shadow-lg">
             <div className="text-2xl font-bold text-gray-800">{metric.current}</div>
             <div className="text-sm font-medium text-gray-600">{metric.metric}</div>
-            <div className="flex items-centre space-x-1 mt-1">
+            <div className="flex items-center space-x-1 mt-1">
               <span className={`text-xs font-medium ${metric.change.startsWith('+') ? 'text-green-600' : 'text-blue-600'}`}>
                 {metric.change}
               </span>
@@ -539,7 +539,7 @@ const ReportsScreen: React.FC<ReportsScreenProps> = ({ user }) => {
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-start space-x-4">
-                  <div className={`w-12 h-12 ${report.color} rounded-lg flex items-centre justify-centre`}>
+                  <div className={`w-12 h-12 ${report.color} rounded-lg flex items-center justify-center`}>
                     <report.icon className="w-6 h-6 text-gray-900" />
                   </div>
                   <div className="flex-1">
@@ -559,7 +559,7 @@ const ReportsScreen: React.FC<ReportsScreenProps> = ({ user }) => {
                 </div>
               </div>
 
-              <div className="flex items-centre justify-between text-sm text-gray-900/50 mb-4">
+              <div className="flex items-center justify-between text-sm text-gray-900/50 mb-4">
                 <div className="flex space-x-4">
                   <span>📅 {report.date}</span>
                   <span>📄 {report.pages} pages</span>
@@ -569,21 +569,21 @@ const ReportsScreen: React.FC<ReportsScreenProps> = ({ user }) => {
 
               {report.status === 'ready' ? (
                 <div className="flex space-x-2">
-                  <button className="flex items-centre space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium">
+                  <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium">
                     <Eye className="w-4 h-4" />
                     <span>View</span>
                   </button>
-                  <button className="flex items-centre space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium">
+                  <button className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium">
                     <Download className="w-4 h-4" />
                     <span>Download</span>
                   </button>
-                  <button className="flex items-centre space-x-2 px-4 py-2 border border-gray-300 hover:bg-gray-100 text-gray-700 rounded-lg text-sm">
+                  <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 hover:bg-gray-100 text-gray-700 rounded-lg text-sm">
                     <Share2 className="w-4 h-4" />
                     <span>Share</span>
                   </button>
                 </div>
               ) : (
-                <div className="flex items-centre space-x-2">
+                <div className="flex items-center space-x-2">
                   <Clock className="w-4 h-4 text-yellow-400" />
                   <span className="text-sm text-yellow-400">Processing... ETA: 2-3 business days</span>
                 </div>
@@ -601,7 +601,7 @@ const ReportsScreen: React.FC<ReportsScreenProps> = ({ user }) => {
             {miscFiles.map((file: any, index: number) => (
               <div key={file._id || index} className="bg-orange-50 rounded-xl p-4 border border-orange-200 shadow-lg">
                 <div className="flex items-start space-x-3">
-                  <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-centre justify-centre text-white font-bold text-lg flex-shrink-0">
+                  <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
                     📎
                   </div>
                   <div className="flex-1 min-w-0">
@@ -627,13 +627,13 @@ const ReportsScreen: React.FC<ReportsScreenProps> = ({ user }) => {
       {/* Recent Achievements */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         <div className="bg-gray-50 rounded-xl p-6 shadow-lg border border-gray-100">
-          <h3 className="text-lg font-semibold text-white mb-4 flex items-centre">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
             <Star className="w-5 h-5 mr-2 text-yellow-400" />
             Recent Achievements
           </h3>
           <div className="space-y-4">
             {achievements.map((achievement, index) => (
-              <div key={index} className="flex items-centre space-x-3">
+              <div key={index} className="flex items-center space-x-3">
                 <div className="text-2xl">{achievement.icon}</div>
                 <div className="flex-1">
                   <div className="text-white font-medium">{achievement.title}</div>
@@ -646,13 +646,13 @@ const ReportsScreen: React.FC<ReportsScreenProps> = ({ user }) => {
         </div>
 
         <div className="bg-gray-50 rounded-xl p-6 shadow-lg border border-gray-100">
-          <h3 className="text-lg font-semibold text-white mb-4 flex items-centre">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
             <Calendar className="w-5 h-5 mr-2 text-blue-400" />
             Upcoming Reports
           </h3>
           <div className="space-y-4">
             {upcomingReports.map((report, index) => (
-              <div key={index} className="flex items-centre justify-between">
+              <div key={index} className="flex items-center justify-between">
                 <div>
                   <div className="text-white font-medium">{report.title}</div>
                   <div className="text-white/80 text-sm">{report.type}</div>
@@ -671,19 +671,19 @@ const ReportsScreen: React.FC<ReportsScreenProps> = ({ user }) => {
           Download all your health data in various formats for your records or to share with healthcare providers.
         </p>
         <div className="flex flex-wrap gap-3">
-          <button className="flex items-centre space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium">
+          <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium">
             <Download className="w-4 h-4" />
             <span>Download All Reports (ZIP)</span>
           </button>
-          <button className="flex items-centre space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium">
+          <button className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium">
             <FileText className="w-4 h-4" />
             <span>Export to PDF</span>
           </button>
-          <button className="flex items-centre space-x-2 px-4 py-2 border border-gray-300 hover:bg-gray-100 text-gray-700 rounded-lg text-sm">
+          <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 hover:bg-gray-100 text-gray-700 rounded-lg text-sm">
             <Printer className="w-4 h-4" />
             <span>Print Summary</span>
           </button>
-          <button className="flex items-centre space-x-2 px-4 py-2 border border-gray-300 hover:bg-gray-100 text-gray-700 rounded-lg text-sm">
+          <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 hover:bg-gray-100 text-gray-700 rounded-lg text-sm">
             <Share2 className="w-4 h-4" />
             <span>Share with Provider</span>
           </button>

@@ -244,7 +244,7 @@ rs1800497	11	113270828	AG`;
   return (
     <div className="max-w-6xl mx-auto p-4 sm:p-6 space-y-6 sm:space-y-8">
       {/* Header */}
-      <div className="text-centre px-4">
+      <div className="text-center px-4">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
           🧪 Health Data Upload & Testing Platform
         </h1>
@@ -254,7 +254,7 @@ rs1800497	11	113270828	AG`;
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex justify-centre px-4">
+      <div className="flex justify-center px-4">
         <div className="bg-gray-100 rounded-lg p-1 flex flex-col sm:flex-row space-y-1 sm:space-y-0 sm:space-x-1 w-full sm:w-auto">
           <button
             onClick={() => setActiveTab('upload')}
@@ -268,7 +268,7 @@ rs1800497	11	113270828	AG`;
           </button>
           <button
             onClick={() => setActiveTab('compare')}
-            className={`px-4 sm:px-6 py-2 sm:py-3 rounded-md font-medium transition-all duration-200 flex items-centre justify-centre text-sm sm:text-base ${
+            className={`px-4 sm:px-6 py-2 sm:py-3 rounded-md font-medium transition-all duration-200 flex items-center justify-center text-sm sm:text-base ${
               activeTab === 'compare'
                 ? 'bg-white text-purple-600 shadow-sm'
                 : 'text-gray-600 hover:text-gray-900'
@@ -285,7 +285,7 @@ rs1800497	11	113270828	AG`;
         <div className="space-y-8">
           {/* Sample Data Section */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-            <div className="flex items-centre justify-between mb-4">
+            <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-blue-900">📦 Sample Test Data</h2>
               <button
                 onClick={() => setShowSampleData(!showSampleData)}
@@ -322,7 +322,7 @@ rs1800497	11	113270828	AG`;
 
           {/* File Upload Section */}
           <div className="bg-white border-2 border-dashed border-gray-300 rounded-lg p-8">
-            <div className="text-centre">
+            <div className="text-center">
               <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Upload Health Data Files</h3>
               <p className="text-gray-600 mb-4">
@@ -339,7 +339,7 @@ rs1800497	11	113270828	AG`;
               />
               <label
                 htmlFor="file-upload"
-                className="inline-flex items-centre px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer transition-colors"
+                className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer transition-colors"
               >
                 <Upload className="w-5 h-5 mr-2" />
                 Choose Files
@@ -357,7 +357,7 @@ rs1800497	11	113270828	AG`;
               <div className="divide-y divide-gray-200">
                 {testFiles.map((file) => (
                   <div key={file.id} className="p-6">
-                    <div className="flex items-centre justify-between mb-4">
+                    <div className="flex items-center justify-between mb-4">
                       <div className="flex-1 min-w-0">
                         <h4 className="text-sm font-medium text-gray-900 truncate">{file.name}</h4>
                         <p className="text-sm text-gray-500">{file.category.replace('_', ' ')} • {Math.round(file.size / 1024)} KB</p>
@@ -365,16 +365,16 @@ rs1800497	11	113270828	AG`;
                     </div>
 
                     {/* Progress Steps */}
-                    <div className="flex items-centre space-x-8">
-                      <div className="flex items-centre space-x-2">
+                    <div className="flex items-center space-x-8">
+                      <div className="flex items-center space-x-2">
                         {getStatusIcon(file.uploadStatus)}
                         <span className="text-sm">Upload</span>
                       </div>
-                      <div className="flex items-centre space-x-2">
+                      <div className="flex items-center space-x-2">
                         {getStatusIcon(file.parseStatus)}
                         <span className="text-sm">Parse</span>
                       </div>
-                      <div className="flex items-centre space-x-2">
+                      <div className="flex items-center space-x-2">
                         {getStatusIcon(file.testStatus)}
                         <span className="text-sm">Test</span>
                       </div>
@@ -403,7 +403,7 @@ rs1800497	11	113270828	AG`;
 
           {/* Competitive Testing Section */}
           <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-6">
-            <div className="text-centre">
+            <div className="text-center">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
                 ⚔️ Competitive Analysis vs SelfDecode
               </h2>
@@ -415,7 +415,7 @@ rs1800497	11	113270828	AG`;
               <button
                 onClick={runCompetitiveTests}
                 disabled={isRunningTests}
-                className="inline-flex items-centre px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 transition-all duration-300"
+                className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 transition-all duration-300"
               >
                 {isRunningTests ? (
                   <div className="w-5 h-5 mr-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
@@ -431,7 +431,7 @@ rs1800497	11	113270828	AG`;
           {testResults && (
             <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
               <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-green-50 to-blue-50">
-                <h3 className="text-xl font-bold text-gray-900 flex items-centre">
+                <h3 className="text-xl font-bold text-gray-900 flex items-center">
                   <BarChart3 className="w-6 h-6 mr-2 text-green-600" />
                   Competitive Analysis Results
                 </h3>
@@ -440,7 +440,7 @@ rs1800497	11	113270828	AG`;
               <div className="p-6 space-y-6">
                 {/* Overall Scores */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="text-centre p-4 bg-blue-50 rounded-lg">
+                  <div className="text-center p-4 bg-blue-50 rounded-lg">
                     <h4 className="font-semibold text-blue-900">🏥 HodieLabs</h4>
                     <div className="text-3xl font-bold text-blue-600 mt-2">
                       {testResults.averageScores?.hodieLabs}
@@ -448,7 +448,7 @@ rs1800497	11	113270828	AG`;
                     <p className="text-sm text-blue-700">Overall Score</p>
                   </div>
 
-                  <div className="text-centre p-4 bg-purple-50 rounded-lg">
+                  <div className="text-center p-4 bg-purple-50 rounded-lg">
                     <h4 className="font-semibold text-purple-900">🧬 SelfDecode</h4>
                     <div className="text-3xl font-bold text-purple-600 mt-2">
                       {testResults.averageScores?.selfDecode}
@@ -456,7 +456,7 @@ rs1800497	11	113270828	AG`;
                     <p className="text-sm text-purple-700">Overall Score</p>
                   </div>
 
-                  <div className="text-centre p-4 bg-green-50 rounded-lg">
+                  <div className="text-center p-4 bg-green-50 rounded-lg">
                     <h4 className="font-semibold text-green-900">📈 Difference</h4>
                     <div className={`text-3xl font-bold mt-2 ${
                       testResults.averageScores?.difference > 0 ? 'text-green-600' : 'text-red-600'

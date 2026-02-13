@@ -38,7 +38,7 @@ const VisualizationDisplay: React.FC<VisualizationDisplayProps> = ({ images, tit
           >
             <img
               src={image.base64}
-              alt={`Visualization ${index + 1}`}
+              alt={`Visualisation ${index + 1}`}
               className="w-full h-auto rounded"
             />
             <div className="mt-2 text-xs text-gray-500 flex items-center justify-between">
@@ -59,7 +59,7 @@ const VisualizationDisplay: React.FC<VisualizationDisplayProps> = ({ images, tit
       </div>
 
       <div className="text-xs text-gray-400 mt-2 italic">
-        💡 Tip: You can download these charts or ask for different visualizations
+        💡 Tip: You can download these charts or ask for different visualisations
       </div>
     </div>
   );

@@ -299,7 +299,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
     const config = getGaugeConfig(status);
     
     return (
-      <div className="flex items-centre space-x-3">
+      <div className="flex items-center space-x-3">
         <span className="font-medium text-white">{value}</span>
         <div className="relative w-16 h-6">
           {/* Marker above bar */}
@@ -351,8 +351,8 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
         {/* Streak Card */}
         <div className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-600 rounded-2xl p-8 text-white shadow-xl">
-          <div className="flex items-centre justify-between mb-4">
-            <div className="w-16 h-16 bg-white/30 rounded-full flex items-centre justify-centre">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-16 h-16 bg-white/30 rounded-full flex items-center justify-center">
               <Zap className="w-8 h-8 text-white" />
             </div>
           </div>
@@ -366,23 +366,23 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
 
         {/* Health Score Card */}
         <div className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700 rounded-2xl p-8 text-white shadow-xl">
-          <div className="flex items-centre justify-between">
+          <div className="flex items-center justify-between">
             <div className="flex-1">
               <h2 className="text-2xl font-bold mb-4 text-white drop-shadow-sm">Your Health Score</h2>
               <div className="space-y-2 text-sm text-white">
-                <div className="flex items-centre space-x-2">
+                <div className="flex items-center space-x-2">
                   <span className={`${(healthScore?.changeIn60Days || 0) >= 0 ? 'text-green-200' : 'text-red-200'}`}>•</span>
                   <span><strong>Change:</strong> {(healthScore?.changeIn60Days || 0) >= 0 ? '+' : ''}{healthScore?.changeIn60Days || 0} in last 60 days</span>
                 </div>
-                <div className="flex items-centre space-x-2">
+                <div className="flex items-center space-x-2">
                   <span className="text-blue-200">•</span>
                   <span><strong>Biological Age:</strong> {healthScore?.biologicalAge || 42} (Chronological: {healthScore?.chronologicalAge || 42})</span>
                 </div>
-                <div className="flex items-centre space-x-2">
+                <div className="flex items-center space-x-2">
                   <span className="text-yellow-200">•</span>
                   <span><strong>Key wins:</strong> {healthScore?.keyWins?.join(', ') || 'Inflammation -12%'}</span>
                 </div>
-                <div className="flex items-centre space-x-2">
+                <div className="flex items-center space-x-2">
                   <span className="text-orange-200">•</span>
                   <span><strong>Focus area:</strong> {healthScore?.focusArea || 'Reduce inflammation (CRP) from 2.8 to <1.0 mg/L'}</span>
                 </div>
@@ -464,8 +464,8 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
                 </svg>
                 
                 {/* Center Content */}
-                <div className="absolute inset-0 flex items-centre justify-centre">
-                  <div className="text-centre">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center">
                     <div className="text-2xl font-bold">{healthScore?.currentScore || 46}</div>
                     <div className="text-xs">Overall Score</div>
                   </div>
@@ -478,7 +478,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
 
       {/* Top 3 Recommendations */}
       <div className="mb-12">
-        <div className="flex justify-between items-centre mb-4">
+        <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">Top 3 Recommendations</h2>
           <button 
             onClick={() => setCurrentScreen('recommendations')}
@@ -489,9 +489,9 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
         </div>
         <div className="space-y-4">
           {recommendations.map((rec) => (
-            <div key={rec.id} className="flex items-centre justify-between bg-white/10 rounded-xl p-6 hover:bg-white/15 transition-colors shadow-lg">
-              <div className="flex items-centre space-x-4">
-                <div className={`w-10 h-10 ${rec.color} rounded-lg flex items-centre justify-centre`}>
+            <div key={rec.id} className="flex items-center justify-between bg-white/10 rounded-xl p-6 hover:bg-white/15 transition-colors shadow-lg">
+              <div className="flex items-center space-x-4">
+                <div className={`w-10 h-10 ${rec.color} rounded-lg flex items-center justify-center`}>
                   <rec.icon className="w-5 h-5 text-white" />
                 </div>
                 <span className="font-medium">{rec.title}</span>
@@ -510,15 +510,15 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
             <h3 className="text-lg font-semibold mb-4 text-white">Your Health Summary</h3>
             <p className="text-sm text-white/70 mb-4">Latest Readings</p>
             <div className="space-y-4">
-              <div className="flex justify-between items-centre">
+              <div className="flex justify-between items-center">
                 <span className="text-white/80">Systolic</span>
                 {renderMiniGauge(`${healthMetrics.systolic}`, 'optimal')}
               </div>
-              <div className="flex justify-between items-centre">
+              <div className="flex justify-between items-center">
                 <span className="text-white/80">Diastolic</span>
                 {renderMiniGauge(`${healthMetrics.diastolic}`, 'optimal')}
               </div>
-              <div className="flex justify-between items-centre">
+              <div className="flex justify-between items-center">
                 <span className="text-white/80">Heart Rate</span>
                 {renderMiniGauge(`${healthMetrics.heartRate}`, 'optimal')}
               </div>
@@ -590,8 +590,8 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
       {/* Test Status Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
         <div className="bg-white/10 rounded-2xl p-6 shadow-xl flex flex-col h-full border border-white/20 backdrop-blur-sm">
-          <div className="flex items-centre justify-between mb-4 flex-1">
-            <div className="flex items-centre space-x-3">
+          <div className="flex items-center justify-between mb-4 flex-1">
+            <div className="flex items-center space-x-3">
               <Dna className="w-6 h-6 text-green-400" />
               <span className="font-semibold text-white">DNA Insights</span>
             </div>
@@ -606,8 +606,8 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
         </div>
 
         <div className="bg-white/10 rounded-2xl p-6 shadow-xl flex flex-col h-full border border-white/20 backdrop-blur-sm">
-          <div className="flex items-centre justify-between mb-4 flex-1">
-            <div className="flex items-centre space-x-3">
+          <div className="flex items-center justify-between mb-4 flex-1">
+            <div className="flex items-center space-x-3">
               <Stethoscope className="w-6 h-6 text-yellow-400" />
               <span className="font-semibold text-white">Blood Tests</span>
             </div>
@@ -622,8 +622,8 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
         </div>
 
         <div className="bg-white/10 rounded-2xl p-6 shadow-xl flex flex-col h-full border border-white/20 backdrop-blur-sm">
-          <div className="flex items-centre justify-between mb-4 flex-1">
-            <div className="flex items-centre space-x-3">
+          <div className="flex items-center justify-between mb-4 flex-1">
+            <div className="flex items-center space-x-3">
               <Camera className="w-6 h-6 text-blue-400" />
               <span className="font-semibold text-white">Body Scan</span>
             </div>
@@ -640,7 +640,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
 
       {/* Next Steps */}
       <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-2xl p-6 mb-12">
-        <div className="flex items-centre space-x-4">
+        <div className="flex items-center space-x-4">
           <AlertTriangle className="w-6 h-6 text-yellow-400" />
           <span className="font-semibold">Next steps:</span>
           <button 
@@ -662,8 +662,8 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Risk Analysis */}
         <div className="bg-white/10 rounded-2xl p-6">
-          <div className="flex items-centre space-x-3 mb-6">
-            <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-centre justify-centre">
+          <div className="flex items-center space-x-3 mb-6">
+            <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
               <Shield className="w-5 h-5" />
             </div>
             <div>
@@ -673,7 +673,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
           </div>
           <div className="space-y-3">
             {riskCategories.map((category, index) => (
-              <div key={index} className="flex items-centre justify-between py-2">
+              <div key={index} className="flex items-center justify-between py-2">
                 <span className="text-sm">{category.name}</span>
                 <span className={`font-semibold ${category.color}`}>{category.riskCount} Risks</span>
               </div>
@@ -683,8 +683,8 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
 
         {/* Ask HodieLabs */}
         <div className="bg-gradient-to-br from-purple-600/30 to-pink-600/30 rounded-2xl p-6">
-          <div className="flex items-centre space-x-3 mb-4">
-            <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-centre justify-centre">
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
               <MessageCircle className="w-5 h-5" />
             </div>
             <div>
@@ -747,8 +747,8 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
 
   if (loading) {
     return (
-      <div className="bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white flex items-centre justify-centre" style={{ minHeight: '100vh' }}>
-        <div className="text-centre">
+      <div className="bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white flex items-center justify-center" style={{ minHeight: '100vh' }}>
+        <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
           <p>Loading your health metrics...</p>
         </div>
@@ -838,7 +838,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
               }}
               className="text-left text-white hover:text-blue-300"
             >
-              Data Visualizations
+              Data Visualisations
             </button>
             <button
               onClick={() => {

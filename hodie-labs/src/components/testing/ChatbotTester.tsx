@@ -94,13 +94,13 @@ const ChatbotTesterComponent: React.FC<ChatbotTesterProps> = ({ user }) => {
 
         {/* Controls */}
         <div className="bg-white rounded-xl p-6 mb-6 shadow-sm">
-          <div className="flex items-centre justify-between mb-4">
+          <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-gray-800">Test Controls</h2>
             <div className="flex space-x-3">
               <button
                 onClick={runTests}
                 disabled={isRunning}
-                className="flex items-centre space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-lg font-medium transition-colors"
+                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-lg font-medium transition-colors"
               >
                 <Play className="w-4 h-4" />
                 <span>{isRunning ? 'Running Tests...' : 'Run Full Test Suite'}</span>
@@ -109,7 +109,7 @@ const ChatbotTesterComponent: React.FC<ChatbotTesterProps> = ({ user }) => {
               {results.length > 0 && (
                 <button
                   onClick={downloadReport}
-                  className="flex items-centre space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
+                  className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
                 >
                   <Download className="w-4 h-4" />
                   <span>Download Report</span>
@@ -121,7 +121,7 @@ const ChatbotTesterComponent: React.FC<ChatbotTesterProps> = ({ user }) => {
           {/* Progress */}
           {isRunning && (
             <div className="mb-4">
-              <div className="flex items-centre justify-between mb-2">
+              <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-gray-600">Testing Progress</span>
                 <span className="text-sm font-medium text-gray-800">{Math.round(progress)}%</span>
               </div>
@@ -144,21 +144,21 @@ const ChatbotTesterComponent: React.FC<ChatbotTesterProps> = ({ user }) => {
             <h2 className="text-xl font-semibold text-gray-800 mb-4">📊 Overall Performance</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-              <div className="text-centre">
+              <div className="text-center">
                 <div className={`text-3xl font-bold ${getScoreColor(averageScore)} mb-1`}>
                   {averageScore.toFixed(1)}/10
                 </div>
                 <div className="text-gray-600">Average Score</div>
               </div>
               
-              <div className="text-centre">
+              <div className="text-center">
                 <div className="text-3xl font-bold text-blue-600 mb-1">
                   {results.length}
                 </div>
                 <div className="text-gray-600">Tests Completed</div>
               </div>
               
-              <div className="text-centre">
+              <div className="text-center">
                 <div className="text-3xl font-bold text-purple-600 mb-1">
                   {Math.round(results.reduce((sum, r) => sum + r.responseTime, 0) / results.length)}ms
                 </div>
@@ -192,7 +192,7 @@ const ChatbotTesterComponent: React.FC<ChatbotTesterProps> = ({ user }) => {
                   <div key={result.questionId} className="border border-gray-200 rounded-lg p-4">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
-                        <div className="flex items-centre space-x-2 mb-1">
+                        <div className="flex items-center space-x-2 mb-1">
                           <span className="text-sm font-medium text-gray-500">
                             {question?.category.toUpperCase()} | {question?.difficulty.toUpperCase()}
                           </span>
@@ -202,7 +202,7 @@ const ChatbotTesterComponent: React.FC<ChatbotTesterProps> = ({ user }) => {
                         </div>
                         <h3 className="font-medium text-gray-800 mb-2">{result.question}</h3>
                       </div>
-                      <div className="flex items-centre space-x-1 text-sm text-gray-500">
+                      <div className="flex items-center space-x-1 text-sm text-gray-500">
                         <Clock className="w-4 h-4" />
                         <span>{result.responseTime}ms</span>
                       </div>
@@ -211,7 +211,7 @@ const ChatbotTesterComponent: React.FC<ChatbotTesterProps> = ({ user }) => {
                     {/* Score Breakdown */}
                     <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mb-3 text-xs">
                       {Object.entries(result.scores).map(([metric, score]) => (
-                        <div key={metric} className="text-centre">
+                        <div key={metric} className="text-center">
                           <div className={`font-medium ${getScoreColor(score)}`}>{score.toFixed(1)}</div>
                           <div className="text-gray-500 capitalize">{metric.replace(/([A-Z])/g, ' $1').toLowerCase()}</div>
                         </div>
@@ -260,7 +260,7 @@ const ChatbotTesterComponent: React.FC<ChatbotTesterProps> = ({ user }) => {
                 <ul className="space-y-2 text-sm text-gray-700">
                   <li>• Integrate real genetic analysis (200M+ variants)</li>
                   <li>• Add deeper blood work interpretation</li>
-                  <li>• Enhance personalization algorithms</li>
+                  <li>• Enhance personalisation algorithms</li>
                   <li>• Include medical citations</li>
                   <li>• Add specialist condition knowledge</li>
                   <li>• Implement user health profile persistence</li>

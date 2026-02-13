@@ -25,7 +25,7 @@ class VisualizationService {
 
   constructor() {
     this.baseUrl = VIZ_API_URL;
-    console.log(`📊 Visualization Service initialized: ${this.baseUrl}`);
+    console.log(`📊 Visualisation Service initialised: ${this.baseUrl}`);
   }
 
   /**
@@ -38,7 +38,7 @@ class VisualizationService {
       });
       return response.ok;
     } catch (error) {
-      console.warn('⚠️ Visualization service not available:', error);
+      console.warn('⚠️ Visualisation service not available:', error);
       return false;
     }
   }
@@ -165,7 +165,7 @@ class VisualizationService {
    */
   async visualizeBloodData(data: any[]): Promise<MultiVisualizationResult> {
     try {
-      console.log(`📊 Generating comprehensive blood data visualizations (${data.length} records)...`);
+      console.log(`📊 Generating comprehensive blood data visualisations (${data.length} records)...`);
 
       const response = await fetch(`${this.baseUrl}/api/visualize/blood-data`, {
         method: 'POST',
@@ -182,10 +182,10 @@ class VisualizationService {
       }
 
       const result = await response.json();
-      console.log(`✅ Generated ${result.count} visualizations`);
+      console.log(`✅ Generated ${result.count} visualisations`);
       return result;
     } catch (error) {
-      console.error('❌ Error generating blood data visualizations:', error);
+      console.error('❌ Error generating blood data visualisations:', error);
       throw error;
     }
   }

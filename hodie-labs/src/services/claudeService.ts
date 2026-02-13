@@ -154,10 +154,10 @@ class ClaudeService {
       const response = await this.client.messages.create({
         model: this.model,
         max_tokens: 4096,
-        system: `You are an expert health data analyst and database architect specializing in interpreting medical files and determining optimal data storage strategies.
+        system: `You are an expert health data analyst and database architect specialising in interpreting medical files and determining optimal data storage strategies.
 
 Your task is to:
-1. Analyze the provided health data file
+1. Analyse the provided health data file
 2. Determine the most appropriate MongoDB collection(s) to store this data
 3. Map the data fields to appropriate database schema
 4. Provide health insights and recommendations
@@ -295,7 +295,7 @@ RESPONSE FORMAT:
     const dataToAnalyze = parsedData.data || parsedData || [];
     const dataPreview = JSON.stringify(dataToAnalyze).substring(0, 3000);
 
-    return `Analyze this health data file and provide structured interpretation.
+    return `Analyse this health data file and provide structured interpretation.
 
 **File Information:**
 - Name: ${fileName}
@@ -340,7 +340,7 @@ Respond with valid JSON only (no markdown, no extra text).`;
       const parsed = JSON.parse(jsonString);
 
       return {
-        interpretation: parsed.interpretation || 'File analyzed successfully',
+        interpretation: parsed.interpretation || 'File analysed successfully',
         databaseMappings: parsed.databaseMappings || [],
         clarifyingQuestions: parsed.clarifyingQuestions || [],
         recommendations: parsed.recommendations || []

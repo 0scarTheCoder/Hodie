@@ -35,7 +35,7 @@ const FAQScreen: React.FC<FAQScreenProps> = ({ user }) => {
       id: '1',
       category: 'General',
       question: 'What is HodieLabs and how does it work?',
-      answer: 'HodieLabs is a precision health platform that combines AI, genetic analysis, and biomarker testing to provide personalised health insights. We analyse your DNA, blood tests, and lifestyle data to create customized recommendations for optimal health.',
+      answer: 'HodieLabs is a precision health platform that combines AI, genetic analysis, and biomarker testing to provide personalised health insights. We analyse your DNA, blood tests, and lifestyle data to create customised recommendations for optimal health.',
       icon: HelpCircle
     },
     {
@@ -97,7 +97,7 @@ const FAQScreen: React.FC<FAQScreenProps> = ({ user }) => {
       id: '9',
       category: 'Body Scans',
       question: 'What types of body scans do you offer?',
-      answer: 'We offer DEXA scans for body composition, coronary calcium scoring for heart health, full-body MRI for comprehensive screening, and specialized scans based on your risk profile and health goals.',
+      answer: 'We offer DEXA scans for body composition, coronary calcium scoring for heart health, full-body MRI for comprehensive screening, and specialised scans based on your risk profile and health goals.',
       icon: Camera
     },
     {
@@ -137,7 +137,7 @@ const FAQScreen: React.FC<FAQScreenProps> = ({ user }) => {
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white p-6">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="mb-8 text-centre">
+        <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold mb-4 text-white">Frequently Asked Questions</h1>
           <p className="text-white/70 text-lg">Find answers to common questions about HodieLabs health platform</p>
         </div>
@@ -150,14 +150,14 @@ const FAQScreen: React.FC<FAQScreenProps> = ({ user }) => {
               href="https://hodielabs.com/contact/" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="flex items-centre space-x-3 bg-hodie-primary hover:bg-blue-600 transition-colors p-4 rounded-lg"
+              className="flex items-center space-x-3 bg-hodie-primary hover:bg-blue-600 transition-colors p-4 rounded-lg"
             >
               <ExternalLink className="w-5 h-5" />
               <span>Contact Support</span>
             </a>
             <a 
               href="mailto:hello@hodielabs.com"
-              className="flex items-centre space-x-3 bg-purple-600 hover:bg-purple-700 transition-colors p-4 rounded-lg"
+              className="flex items-center space-x-3 bg-purple-600 hover:bg-purple-700 transition-colors p-4 rounded-lg"
             >
               <MessageCircle className="w-5 h-5" />
               <span>Email Us</span>
@@ -191,9 +191,9 @@ const FAQScreen: React.FC<FAQScreenProps> = ({ user }) => {
             <div key={faq.id} className="bg-white/10 rounded-xl overflow-hidden">
               <button
                 onClick={() => toggleExpanded(faq.id)}
-                className="w-full p-6 text-left flex items-centre justify-between hover:bg-white/5 transition-colors"
+                className="w-full p-6 text-left flex items-center justify-between hover:bg-white/5 transition-colors"
               >
-                <div className="flex items-centre space-x-4">
+                <div className="flex items-center space-x-4">
                   <faq.icon className="w-6 h-6 text-hodie-primary" />
                   <div>
                     <h4 className="text-lg font-semibold text-white">{faq.question}</h4>
@@ -219,10 +219,10 @@ const FAQScreen: React.FC<FAQScreenProps> = ({ user }) => {
         </div>
 
         {/* Contact Section */}
-        <div className="mt-12 text-centre bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-2xl p-8">
+        <div className="mt-12 text-center bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-2xl p-8">
           <h3 className="text-xl font-semibold mb-4 text-white">Still have questions?</h3>
           <p className="text-white/70 mb-6">Our support team is here to help you with any questions about your health journey.</p>
-          <div className="flex justify-centre space-x-4">
+          <div className="flex justify-center space-x-4">
             <a 
               href="https://hodielabs.com/contact/"
               target="_blank"

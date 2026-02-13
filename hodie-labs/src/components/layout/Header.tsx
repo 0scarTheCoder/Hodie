@@ -10,8 +10,8 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ user, onMenuClick, onSignOut }) => {
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
-      <div className="flex items-centre justify-between h-16 px-4">
-        <div className="flex items-centre">
+      <div className="flex items-center justify-between h-16 px-4">
+        <div className="flex items-center">
           <button
             onClick={onMenuClick}
             className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500"
@@ -23,9 +23,9 @@ const Header: React.FC<HeaderProps> = ({ user, onMenuClick, onSignOut }) => {
           <h1 className="ml-2 text-xl font-semibold text-gray-900 lg:hidden">Hodie Labs</h1>
         </div>
 
-        <div className="flex items-centre space-x-4">
-          <div className="hidden sm:flex sm:items-centre sm:space-x-2">
-            <div className="w-8 h-8 bg-brand-blue rounded-full flex items-centre justify-centre">
+        <div className="flex items-center space-x-4">
+          <div className="hidden sm:flex sm:items-center sm:space-x-2">
+            <div className="w-8 h-8 bg-brand-blue rounded-full flex items-center justify-center">
               <span className="text-white text-sm font-medium">
                 {user.email?.charAt(0).toUpperCase()}
               </span>

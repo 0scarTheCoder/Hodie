@@ -90,7 +90,7 @@ const ExactHodieLogin: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#2a1e5c] via-[#1a0f3a] to-[#0f0622] flex flex-col items-centre justify-centre px-4">
+    <div className="min-h-screen bg-gradient-to-b from-[#2a1e5c] via-[#1a0f3a] to-[#0f0622] flex flex-col items-center justify-center px-4">
       
       {/* Logo at the top */}
       <motion.div
@@ -125,7 +125,7 @@ const ExactHodieLogin: React.FC = () => {
         <div className="bg-[#1e1548]/80 backdrop-blur-sm border border-[#2a1e5c]/50 rounded-3xl p-8 shadow-2xl">
           
           {/* Log in heading */}
-          <h2 className="text-3xl font-semibold text-white text-centre mb-8">
+          <h2 className="text-3xl font-semibold text-white text-center mb-8">
             {isLogin ? 'Log in' : 'Sign up'}
           </h2>
 
@@ -169,7 +169,7 @@ const ExactHodieLogin: React.FC = () => {
 
             {/* Forgot Password Link */}
             {isLogin && (
-              <div className="text-centre">
+              <div className="text-center">
                 <button
                   type="button"
                   onClick={() => setShowForgotPassword(true)}
@@ -185,7 +185,7 @@ const ExactHodieLogin: React.FC = () => {
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-3 rounded-xl text-sm text-centre"
+                className="bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-3 rounded-xl text-sm text-center"
               >
                 {error}
               </motion.div>
@@ -201,7 +201,7 @@ const ExactHodieLogin: React.FC = () => {
             </button>
 
             {/* Sign up link */}
-            <div className="text-centre">
+            <div className="text-center">
               <span className="text-gray-400 text-sm">
                 {isLogin ? "Don't have an account? " : "Already have an account? "}
               </span>
@@ -223,7 +223,7 @@ const ExactHodieLogin: React.FC = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-centre justify-centre px-4 z-50"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center px-4 z-50"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -236,7 +236,7 @@ const ExactHodieLogin: React.FC = () => {
               {!resetSuccess ? (
                 <>
                   {/* Header */}
-                  <div className="flex items-centre justify-between mb-6">
+                  <div className="flex items-center justify-between mb-6">
                     <button
                       onClick={handleBackToLogin}
                       className="text-[#8b7ed8] hover:text-white transition-colors"
@@ -248,7 +248,7 @@ const ExactHodieLogin: React.FC = () => {
                   </div>
 
                   {/* Instructions */}
-                  <div className="text-centre mb-6">
+                  <div className="text-center mb-6">
                     <Mail className="w-12 h-12 text-[#8b7ed8] mx-auto mb-3" />
                     <p className="text-gray-300 text-sm">
                       Enter your email address and we'll send you a link to reset your password.
@@ -273,7 +273,7 @@ const ExactHodieLogin: React.FC = () => {
                       <motion.div
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-3 rounded-xl text-sm text-centre"
+                        className="bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-3 rounded-xl text-sm text-center"
                       >
                         {resetError}
                       </motion.div>
@@ -315,7 +315,7 @@ const ExactHodieLogin: React.FC = () => {
                 </>
               ) : (
                 /* Success State */
-                <div className="text-centre">
+                <div className="text-center">
                   <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
                   <h3 className="text-xl font-semibold text-white mb-3">Check Your Email</h3>
                   <p className="text-gray-300 text-sm mb-4">

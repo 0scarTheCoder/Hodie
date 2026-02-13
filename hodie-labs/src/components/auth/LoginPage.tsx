@@ -72,9 +72,9 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-centre justify-centre bg-gradient-to-br from-blue-50 to-blue-100">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100">
       <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-xl shadow-lg">
-        <div className="text-centre">
+        <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">Hodie Labs</h2>
           <p className="text-gray-600">Your health insights platform</p>
         </div>
@@ -124,13 +124,13 @@ const LoginPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-centre py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-blue hover:bg-brand-light-blue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-blue disabled:opacity-50"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-brand-blue hover:bg-brand-light-blue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-blue disabled:opacity-50"
             >
               {loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Sign Up')}
             </button>
           </div>
 
-          <div className="text-centre space-y-2">
+          <div className="text-center space-y-2">
             {isLogin && (
               <button
                 type="button"
@@ -153,7 +153,7 @@ const LoginPage: React.FC = () => {
 
       {/* Simple Forgot Password Modal */}
       {showForgotPassword && (
-        <div className="fixed inset-0 bg-black/50 flex items-centre justify-centre px-4 z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center px-4 z-50">
           <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
             {!resetSuccess ? (
               <>
@@ -197,7 +197,7 @@ const LoginPage: React.FC = () => {
                 </form>
               </>
             ) : (
-              <div className="text-centre">
+              <div className="text-center">
                 <div className="text-green-600 text-4xl mb-4">✓</div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Check Your Email</h3>
                 <p className="text-gray-600 text-sm mb-3">

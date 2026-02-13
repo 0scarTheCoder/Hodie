@@ -186,8 +186,8 @@ class CompetitiveTestingService {
 - MTHFR variant (rs1801133): Your CC genotype shows normal folate metabolism efficiency
 - TCF7L2 variant (rs7903146): Your CT genotype indicates 1.37x increased Type 2 diabetes risk
 
-**Personalized Recommendations:**
-1. **Exercise Optimization**: Mixed training approach recommended - combine strength and cardio
+**Personalised Recommendations:**
+1. **Exercise Optimisation**: Mixed training approach recommended - combine strength and cardio
 2. **Nutrition Focus**: Standard folate requirements, emphasize complex carbs for glucose control
 3. **Monitoring**: Annual glucose screening recommended due to diabetes predisposition
 
@@ -208,7 +208,7 @@ class CompetitiveTestingService {
    * Generate personalised recommendations response
    */
   private generatePersonalizedRecommendationsResponse(scenario: TestScenario): string {
-    return `## 🎯 Personalized Health Recommendations
+    return `## 🎯 Personalised Health Recommendations
 
 **Based on Your Profile:**
 - Age: ${scenario.userProfile.age} | Goals: ${scenario.userProfile.goals.join(', ')}
@@ -216,7 +216,7 @@ class CompetitiveTestingService {
 - Current medications: ${scenario.userProfile.medications.join(', ')}
 
 **Priority Recommendations:**
-1. **Nutrition Optimization**: Mediterranean diet with 30% carb reduction for glucose control
+1. **Nutrition Optimisation**: Mediterranean diet with 30% carb reduction for glucose control
 2. **Exercise Protocol**: 3x strength training + 2x cardio weekly based on genetic profile  
 3. **Supplement Stack**: Vitamin D (2000 IU), Omega-3 (1g EPA/DHA), Magnesium (400mg)
 4. **Monitoring Schedule**: HbA1c every 3 months, lipid panel every 6 months
@@ -256,7 +256,7 @@ class CompetitiveTestingService {
 - Biological age: 3.2 years above chronological (reversible)
 
 **Actionable Intelligence:**
-1. Prioritize sleep optimisation (your genetics make you sensitive to sleep debt)
+1. Prioritise sleep optimisation (your genetics make you sensitive to sleep debt)
 2. Stress management crucial for your genetic profile
 3. Nutrient timing matters more for your metabolism than average person
 
@@ -310,7 +310,7 @@ Your results indicate early metabolic dysfunction with cardiovascular risk facto
 **Evidence-Based Interventions:**
 1. **Diabetes Prevention**: Meta-analysis shows 58% risk reduction with lifestyle modification
 2. **Cholesterol Management**: Mediterranean diet reduces LDL by 8-15% (RCT evidence)
-3. **Vitamin D Optimization**: Supplementation reduces infection risk by 42% (Cochrane review)
+3. **Vitamin D Optimisation**: Supplementation reduces infection risk by 42% (Cochrane review)
 
 **Immediate Actions:**
 - Start 2000 IU vitamin D daily
@@ -340,12 +340,12 @@ Your results indicate early metabolic dysfunction with cardiovascular risk facto
 - Cardiovascular Disease: Moderate (5.8/10)
 - Athletic Performance: Mixed Power/Endurance
 
-**Key Variants Analyzed:**
+**Key Variants Analysed:**
 - 230+ SNPs analysed for diabetes risk
 - 180+ SNPs for cardiovascular health
 - 95+ SNPs for fitness traits
 
-**Personalized Recommendations:**
+**Personalised Recommendations:**
 1. Consider genetic-guided nutrition plan
 2. Specific exercise recommendations based on muscle fibre genetics
 3. Targeted supplement protocol
@@ -371,7 +371,7 @@ Your results are interpreted through the lens of your genetic makeup, providing 
 
 **Recommendations:**
 - Genetically-informed nutrition adjustments
-- Personalized supplement doses based on genetic variants
+- Personalised supplement doses based on genetic variants
 - Monitoring schedule adapted to your genetic risk profile
 
 *Powered by DecodeGPT AI with genetic integration*`;
@@ -512,7 +512,7 @@ Based on your genetic profile and health data, here are your personalised insigh
     return {
       ...baseScores,
       overallScore: Math.round(overallScore),
-      strengths: ['Extensive genetic database', 'Strong personalization', 'User-friendly interface'],
+      strengths: ['Extensive genetic database', 'Strong personalisation', 'User-friendly interface'],
       weaknesses: ['Less clinical depth', 'General recommendations', 'Limited actionability'],
       recommendations: ['More specific action plans', 'Enhanced clinical integration', 'Detailed timelines']
     };
@@ -526,7 +526,7 @@ Based on your genetic profile and health data, here are your personalised insigh
     
     if (response.includes('evidence level')) strengths.push('Strong scientific rigor');
     if (response.includes('action plan')) strengths.push('Clear actionability');
-    if (response.includes('personalised')) strengths.push('Good personalization');
+    if (response.includes('personalised')) strengths.push('Good personalisation');
     if (response.includes('monitoring')) strengths.push('Comprehensive follow-up');
     if (response.includes('##')) strengths.push('Excellent formatting');
     
@@ -577,7 +577,7 @@ Based on your genetic profile and health data, here are your personalised insigh
       improvementAreas: [
         'Enhance genetic database coverage',
         'Improve response time performance',
-        'Add more personalization algorithms',
+        'Add more personalisation algorithms',
         'Expand supplement interaction checking'
       ],
       competitiveAdvantages: [
@@ -622,7 +622,7 @@ Based on your genetic profile and health data, here are your personalised insigh
     }
     
     findings.push('HodieLabs excels in clinical evidence integration and actionability');
-    findings.push('SelfDecode leads in genetic personalization and database size');
+    findings.push('SelfDecode leads in genetic personalisation and database size');
     findings.push('Both platforms show strong potential for health optimisation');
     findings.push('User preference may depend on focus: clinical depth vs genetic insights');
     
@@ -637,7 +637,7 @@ Based on your genetic profile and health data, here are your personalised insigh
       {
         id: 'genetic_diabetes_risk',
         category: 'genetic_analysis',
-        description: 'Analyze genetic variants for Type 2 diabetes risk and provide personalised recommendations',
+        description: 'Analyse genetic variants for Type 2 diabetes risk and provide personalised recommendations',
         inputData: {
           variants: ['rs7903146', 'rs12255372', 'rs5219'],
           genotypes: ['CT', 'GG', 'GT']

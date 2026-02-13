@@ -183,7 +183,7 @@ const SelfDecodeComparator: React.FC = () => {
     if (hodiResponse.includes('timeline')) hodiStrengths.push('Clear timelines provided');
     
     if (selfDecodeResponse.includes('genetic')) selfDecodeStrengths.push('Genetic focus');
-    if (selfDecodeResponse.includes('personalised')) selfDecodeStrengths.push('Personalization emphasis');
+    if (selfDecodeResponse.includes('personalised')) selfDecodeStrengths.push('Personalisation emphasis');
     
     return `
 HodieLabs Strengths: ${hodiStrengths.join(', ') || 'General health guidance'}
@@ -201,7 +201,7 @@ Overall: ${hodiStrengths.length >= selfDecodeStrengths.length ? 'HodieLabs provi
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-8">
       {/* Header */}
-      <div className="text-centre">
+      <div className="text-center">
         <h1 className="text-3xl font-bold text-gray-900 mb-4">
           ⚔️ HodieLabs vs SelfDecode Live Comparison
         </h1>
@@ -226,7 +226,7 @@ Overall: ${hodiStrengths.length >= selfDecodeStrengths.length ? 'HodieLabs provi
               </div>
               <button
                 onClick={copyLoginCredentials}
-                className="mt-2 text-sm text-purple-600 hover:text-purple-800 flex items-centre"
+                className="mt-2 text-sm text-purple-600 hover:text-purple-800 flex items-center"
               >
                 <Copy className="w-4 h-4 mr-1" />
                 Copy credentials
@@ -310,7 +310,7 @@ Overall: ${hodiStrengths.length >= selfDecodeStrengths.length ? 'HodieLabs provi
           <button
             onClick={runComparison}
             disabled={isRunningTest || !testQuery.trim()}
-            className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 transition-all duration-300 flex items-centre justify-centre"
+            className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 transition-all duration-300 flex items-center justify-center"
           >
             {isRunningTest ? (
               <div className="w-5 h-5 mr-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
@@ -330,7 +330,7 @@ Overall: ${hodiStrengths.length >= selfDecodeStrengths.length ? 'HodieLabs provi
             currentTest.winner === 'selfdecode' ? 'bg-purple-50 border-purple-200' :
             'bg-yellow-50 border-yellow-200'
           }`}>
-            <h3 className="text-xl font-bold text-gray-900 flex items-centre">
+            <h3 className="text-xl font-bold text-gray-900 flex items-center">
               <BarChart3 className="w-6 h-6 mr-2" />
               Test Results
               {currentTest.winner === 'hodilabs' && <CheckCircle className="w-6 h-6 ml-2 text-green-600" />}
@@ -341,7 +341,7 @@ Overall: ${hodiStrengths.length >= selfDecodeStrengths.length ? 'HodieLabs provi
           <div className="p-6 space-y-6">
             {/* Overall Scores */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-centre p-4 bg-blue-50 rounded-lg">
+              <div className="text-center p-4 bg-blue-50 rounded-lg">
                 <h4 className="font-semibold text-blue-900">🏥 HodieLabs</h4>
                 <div className="text-3xl font-bold text-blue-600 mt-2">
                   {currentTest.scores.hodiLabs.overall}
@@ -349,7 +349,7 @@ Overall: ${hodiStrengths.length >= selfDecodeStrengths.length ? 'HodieLabs provi
                 <p className="text-sm text-blue-700">Overall Score</p>
               </div>
 
-              <div className="text-centre p-4 bg-purple-50 rounded-lg">
+              <div className="text-center p-4 bg-purple-50 rounded-lg">
                 <h4 className="font-semibold text-purple-900">🧬 SelfDecode</h4>
                 <div className="text-3xl font-bold text-purple-600 mt-2">
                   {currentTest.scores.selfDecode.overall}
@@ -357,7 +357,7 @@ Overall: ${hodiStrengths.length >= selfDecodeStrengths.length ? 'HodieLabs provi
                 <p className="text-sm text-purple-700">Overall Score</p>
               </div>
 
-              <div className="text-centre p-4 bg-green-50 rounded-lg">
+              <div className="text-center p-4 bg-green-50 rounded-lg">
                 <h4 className="font-semibold text-green-900">🏆 Winner</h4>
                 <div className="text-lg font-bold text-green-600 mt-2">
                   {currentTest.winner === 'hodilabs' ? 'HodieLabs' :
@@ -374,7 +374,7 @@ Overall: ${hodiStrengths.length >= selfDecodeStrengths.length ? 'HodieLabs provi
               {Object.entries(currentTest.scores.hodiLabs).filter(([key]) => key !== 'overall').map(([metric, score]) => (
                 <div key={metric} className="bg-gray-50 rounded-lg p-3">
                   <h4 className="text-sm font-medium text-gray-700 capitalize mb-1">{metric}</h4>
-                  <div className="flex justify-between items-centre">
+                  <div className="flex justify-between items-center">
                     <span className="text-blue-600 font-semibold">{score}</span>
                     <span className="text-purple-600 font-semibold">
                       {currentTest.scores.selfDecode[metric as keyof typeof currentTest.scores.selfDecode]}
@@ -419,7 +419,7 @@ Overall: ${hodiStrengths.length >= selfDecodeStrengths.length ? 'HodieLabs provi
           
           <div className="space-y-3">
             {testHistory.map((test, index) => (
-              <div key={test.id} className="flex items-centre justify-between p-3 bg-gray-50 rounded-lg">
+              <div key={test.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 truncate">
                     {test.query}
@@ -428,7 +428,7 @@ Overall: ${hodiStrengths.length >= selfDecodeStrengths.length ? 'HodieLabs provi
                     HodieLabs: {test.scores.hodiLabs.overall} | SelfDecode: {test.scores.selfDecode.overall}
                   </p>
                 </div>
-                <div className="flex items-centre space-x-2">
+                <div className="flex items-center space-x-2">
                   <span className={`px-2 py-1 text-xs rounded-full ${
                     test.winner === 'hodilabs' ? 'bg-green-100 text-green-800' :
                     test.winner === 'selfdecode' ? 'bg-purple-100 text-purple-800' :

@@ -184,7 +184,7 @@ class LiveRecommendationsService {
         type: 'daily',
         category: 'nutrition',
         priority: 'medium',
-        title: 'Increase Fiber Intake Today',
+        title: 'Increase Fibre Intake Today',
         description: 'Your recent nutrition data suggests low fibre intake. Aim for 25-35g of fibre today.',
         actionItems: [
           'Add 1 cup of berries to breakfast',

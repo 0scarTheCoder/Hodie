@@ -233,20 +233,20 @@ const DeviceIntegration: React.FC<DeviceIntegrationProps> = ({ user }) => {
 
         {/* Connected Devices Summary */}
         <div className="bg-white rounded-2xl p-6 shadow-lg mb-8">
-          <h2 className="text-xl font-semibold mb-4 flex items-centre space-x-2">
+          <h2 className="text-xl font-semibold mb-4 flex items-center space-x-2">
             <Activity className="text-blue-600" size={24} />
             <span>Connected Devices</span>
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-centre p-4 bg-blue-50 rounded-xl">
+            <div className="text-center p-4 bg-blue-50 rounded-xl">
               <div className="text-2xl font-bold text-blue-600">
                 {devices.filter(d => d.connected).length}
               </div>
               <div className="text-sm text-gray-600">Connected</div>
             </div>
             
-            <div className="text-centre p-4 bg-green-50 rounded-xl">
+            <div className="text-center p-4 bg-green-50 rounded-xl">
               <div className="text-2xl font-bold text-green-600">
                 {devices.filter(d => d.lastSync && 
                   new Date().getTime() - d.lastSync.getTime() < 24 * 60 * 60 * 1000
@@ -255,7 +255,7 @@ const DeviceIntegration: React.FC<DeviceIntegrationProps> = ({ user }) => {
               <div className="text-sm text-gray-600">Synced Today</div>
             </div>
             
-            <div className="text-centre p-4 bg-purple-50 rounded-xl">
+            <div className="text-center p-4 bg-purple-50 rounded-xl">
               <div className="text-2xl font-bold text-purple-600">
                 {devices.filter(d => d.supported).length}
               </div>
@@ -282,7 +282,7 @@ const DeviceIntegration: React.FC<DeviceIntegrationProps> = ({ user }) => {
             >
               {/* Device Header */}
               <div className="flex items-start justify-between mb-4">
-                <div className="flex items-centre space-x-3">
+                <div className="flex items-center space-x-3">
                   <div className={`p-3 rounded-xl ${
                     device.connected ? 'bg-green-100' : 'bg-gray-100'
                   }`}>
@@ -293,9 +293,9 @@ const DeviceIntegration: React.FC<DeviceIntegrationProps> = ({ user }) => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900">{device.name}</h3>
-                    <div className="flex items-centre space-x-2">
+                    <div className="flex items-center space-x-2">
                       {device.connected ? (
-                        <span className="text-sm text-green-600 flex items-centre space-x-1">
+                        <span className="text-sm text-green-600 flex items-center space-x-1">
                           <CheckCircle size={16} />
                           <span>Connected</span>
                         </span>
@@ -331,7 +331,7 @@ const DeviceIntegration: React.FC<DeviceIntegrationProps> = ({ user }) => {
                     <button
                       onClick={() => handleSync(device)}
                       disabled={loading === device.id || syncStatus[device.id] === 'syncing'}
-                      className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-centre justify-centre space-x-2"
+                      className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                     >
                       {syncStatus[device.id] === 'syncing' ? (
                         <Loader className="w-4 h-4 animate-spin" />
@@ -353,7 +353,7 @@ const DeviceIntegration: React.FC<DeviceIntegrationProps> = ({ user }) => {
                   <button
                     onClick={() => handleConnect(device)}
                     disabled={loading === device.id || !device.supported}
-                    className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-centre justify-centre space-x-2"
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                   >
                     {loading === device.id ? (
                       <Loader className="w-4 h-4 animate-spin" />

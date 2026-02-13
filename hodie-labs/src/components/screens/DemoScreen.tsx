@@ -33,7 +33,7 @@ const DemoScreen: React.FC<DemoScreenProps> = ({ user }) => {
       color: 'from-purple-600 to-pink-600',
       features: [
         'ACTN3, MTHFR, TCF7L2 variant analysis',
-        'Personalized fitness recommendations',
+        'Personalised fitness recommendations',
         'Precise supplement dosing',
         'Pharmacogenomics insights'
       ],
@@ -55,8 +55,8 @@ const DemoScreen: React.FC<DemoScreenProps> = ({ user }) => {
     },
     {
       id: 'ai-personalization',
-      title: 'Enhanced AI Personalization',
-      description: 'Multi-factor personalization combining genetics, labs, lifestyle, and goals',
+      title: 'Enhanced AI Personalisation',
+      description: 'Multi-factor personalisation combining genetics, labs, lifestyle, and goals',
       icon: Brain,
       color: 'from-orange-600 to-red-600',
       features: [
@@ -87,7 +87,7 @@ const DemoScreen: React.FC<DemoScreenProps> = ({ user }) => {
     {
       id: 'comprehensive-demo',
       title: 'Full Integration Demo',
-      description: 'See all systems working together for complete personalization',
+      description: 'See all systems working together for complete personalisation',
       icon: Target,
       component: 'comprehensive'
     }
@@ -109,7 +109,7 @@ const DemoScreen: React.FC<DemoScreenProps> = ({ user }) => {
 
           {/* Competitive Advantage Overview */}
           <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-xl p-6 mb-8">
-            <div className="flex items-centre space-x-3 mb-4">
+            <div className="flex items-center space-x-3 mb-4">
               <Trophy className="w-6 h-6 text-yellow-400" />
               <h2 className="text-xl font-semibold text-white">Competitive Advantages</h2>
             </div>
@@ -117,7 +117,7 @@ const DemoScreen: React.FC<DemoScreenProps> = ({ user }) => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {competitiveFeatures.map((feature) => (
                 <div key={feature.id} className={`bg-gradient-to-r ${feature.color}/20 rounded-lg p-4 border border-white/10`}>
-                  <div className="flex items-centre space-x-3 mb-3">
+                  <div className="flex items-center space-x-3 mb-3">
                     <feature.icon className="w-6 h-6 text-white" />
                     <h3 className="font-semibold text-white">{feature.title}</h3>
                   </div>
@@ -126,7 +126,7 @@ const DemoScreen: React.FC<DemoScreenProps> = ({ user }) => {
                   
                   <ul className="space-y-1 mb-3">
                     {feature.features.map((item, idx) => (
-                      <li key={idx} className="flex items-centre space-x-2 text-sm text-white/70">
+                      <li key={idx} className="flex items-center space-x-2 text-sm text-white/70">
                         <CheckCircle className="w-3 h-3 text-green-400 flex-shrink-0" />
                         <span>{item}</span>
                       </li>
@@ -150,19 +150,19 @@ const DemoScreen: React.FC<DemoScreenProps> = ({ user }) => {
               <div className="bg-gray-700/50 rounded-lg p-4">
                 <h3 className="font-semibold text-white mb-3">SelfDecode DecodeGPT</h3>
                 <div className="space-y-2 text-sm">
-                  <div className="flex items-centre space-x-2">
+                  <div className="flex items-center space-x-2">
                     <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
                     <span className="text-white/80">$119-894/year pricing</span>
                   </div>
-                  <div className="flex items-centre space-x-2">
+                  <div className="flex items-center space-x-2">
                     <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
                     <span className="text-white/80">50-100 questions/month limit</span>
                   </div>
-                  <div className="flex items-centre space-x-2">
+                  <div className="flex items-center space-x-2">
                     <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
                     <span className="text-white/80">200M+ genetic variants</span>
                   </div>
-                  <div className="flex items-centre space-x-2">
+                  <div className="flex items-center space-x-2">
                     <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
                     <span className="text-white/80">Basic lab integration</span>
                   </div>
@@ -173,27 +173,27 @@ const DemoScreen: React.FC<DemoScreenProps> = ({ user }) => {
               <div className="bg-gradient-to-r from-green-600/30 to-blue-600/30 rounded-lg p-4 border border-green-400/20">
                 <h3 className="font-semibold text-white mb-3">Hodie AI Enhanced</h3>
                 <div className="space-y-2 text-sm">
-                  <div className="flex items-centre space-x-2">
+                  <div className="flex items-center space-x-2">
                     <CheckCircle className="w-4 h-4 text-green-400" />
                     <span className="text-white">Included in subscription</span>
                   </div>
-                  <div className="flex items-centre space-x-2">
+                  <div className="flex items-center space-x-2">
                     <CheckCircle className="w-4 h-4 text-green-400" />
                     <span className="text-white">Unlimited AI conversations</span>
                   </div>
-                  <div className="flex items-centre space-x-2">
+                  <div className="flex items-center space-x-2">
                     <CheckCircle className="w-4 h-4 text-green-400" />
                     <span className="text-white">200M+ genetic variants</span>
                   </div>
-                  <div className="flex items-centre space-x-2">
+                  <div className="flex items-center space-x-2">
                     <CheckCircle className="w-4 h-4 text-green-400" />
                     <span className="text-white">Deep Australian lab integration</span>
                   </div>
-                  <div className="flex items-centre space-x-2">
+                  <div className="flex items-center space-x-2">
                     <CheckCircle className="w-4 h-4 text-green-400" />
-                    <span className="text-white">Multi-factor personalization</span>
+                    <span className="text-white">Multi-factor personalisation</span>
                   </div>
-                  <div className="flex items-centre space-x-2">
+                  <div className="flex items-center space-x-2">
                     <CheckCircle className="w-4 h-4 text-green-400" />
                     <span className="text-white">Real-time health tracking</span>
                   </div>
@@ -212,12 +212,12 @@ const DemoScreen: React.FC<DemoScreenProps> = ({ user }) => {
                   onClick={() => setActiveDemo(demo.component)}
                   className="bg-white/10 hover:bg-white/20 rounded-xl p-6 text-left transition-colors group"
                 >
-                  <div className="flex items-centre space-x-3 mb-3">
+                  <div className="flex items-center space-x-3 mb-3">
                     <demo.icon className="w-6 h-6 text-blue-400" />
                     <h3 className="font-semibold text-white">{demo.title}</h3>
                   </div>
                   <p className="text-white/70 text-sm mb-3">{demo.description}</p>
-                  <div className="flex items-centre space-x-2 text-blue-400 group-hover:text-blue-300">
+                  <div className="flex items-center space-x-2 text-blue-400 group-hover:text-blue-300">
                     <span className="text-sm">Try Demo</span>
                     <ArrowRight className="w-4 h-4" />
                   </div>
@@ -228,31 +228,31 @@ const DemoScreen: React.FC<DemoScreenProps> = ({ user }) => {
 
           {/* Key Benefits */}
           <div className="bg-gradient-to-r from-green-600/20 to-blue-600/20 rounded-xl p-6">
-            <div className="flex items-centre space-x-3 mb-4">
+            <div className="flex items-center space-x-3 mb-4">
               <Sparkles className="w-6 h-6 text-yellow-400" />
               <h2 className="text-xl font-semibold text-white">Why Hodie AI is Better</h2>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="text-centre">
+              <div className="text-center">
                 <Heart className="w-8 h-8 text-red-400 mx-auto mb-2" />
                 <h3 className="font-medium text-white mb-1">No Limits</h3>
                 <p className="text-sm text-white/70">Unlimited AI conversations vs DecodeGPT's 50-100/month</p>
               </div>
               
-              <div className="text-centre">
+              <div className="text-center">
                 <Shield className="w-8 h-8 text-blue-400 mx-auto mb-2" />
                 <h3 className="font-medium text-white mb-1">Australian Focus</h3>
                 <p className="text-sm text-white/70">Local lab integration and Australian health guidelines</p>
               </div>
               
-              <div className="text-centre">
+              <div className="text-center">
                 <Activity className="w-8 h-8 text-green-400 mx-auto mb-2" />
                 <h3 className="font-medium text-white mb-1">Real-time</h3>
                 <p className="text-sm text-white/70">Live health tracking and dynamic recommendations</p>
               </div>
               
-              <div className="text-centre">
+              <div className="text-center">
                 <Zap className="w-8 h-8 text-yellow-400 mx-auto mb-2" />
                 <h3 className="font-medium text-white mb-1">All-in-one</h3>
                 <p className="text-sm text-white/70">Complete health platform, not just genetic analysis</p>
@@ -265,7 +265,7 @@ const DemoScreen: React.FC<DemoScreenProps> = ({ user }) => {
           {/* Back Button */}
           <button
             onClick={() => setActiveDemo(null)}
-            className="mb-4 flex items-centre space-x-2 text-white/70 hover:text-white"
+            className="mb-4 flex items-center space-x-2 text-white/70 hover:text-white"
           >
             <ArrowRight className="w-4 h-4 rotate-180" />
             <span>Back to Overview</span>

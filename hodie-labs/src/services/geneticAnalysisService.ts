@@ -357,7 +357,7 @@ class GeneticAnalysisService {
       geneticBasis: ['MTHFR C677T variant affects folate metabolism'],
       supplementForm: form,
       timing: 'With meals',
-      interactions: ['B12 required for proper utilization'],
+      interactions: ['B12 required for proper utilisation'],
       confidence: 85
     };
   }

@@ -753,7 +753,7 @@ While I'm setting this up, I can still provide evidence-based health guidance. W
     if (!context?.geneticProfile) {
       return `I'd love to help with genetic analysis! Upload your raw DNA data from 23andMe, AncestryDNA, or similar services to get:
 
-🧬 **Personalized Genetic Insights**:
+🧬 **Personalised Genetic Insights**:
 • Fitness optimisation based on ACTN3 and ACE variants
 • Nutrition recommendations from MTHFR and TCF7L2 analysis
 • Supplement dosing based on your genetic variants
@@ -927,7 +927,7 @@ ${pred.recommendations.map(rec => `• ${rec}`).join('\n')}`).join('\n\n')}
   ): string {
     return `🧬 **Comprehensive Genetic Analysis**:
 
-**FITNESS OPTIMIZATION**:
+**FITNESS OPTIMISATION**:
 • Type: ${fitness.powerVsEndurance} training focus
 • Recovery: ${fitness.recoverySpeed}
 • Top exercise: ${fitness.optimalExerciseTypes[0]}
@@ -958,7 +958,7 @@ I found your uploaded ${testType.toLowerCase()} with ${recordCount} records.
 **Data fields**: ${labPanel.results?.[0] ? Object.keys(labPanel.results[0]).join(', ') : 'Loading...'}
 
 To analyse this data, I can:
-• Generate visualizations (just ask for "show me a graph")
+• Generate visualisations (just ask for "show me a graph")
 • Calculate statistical summaries
 • Identify patterns and trends
 • Compare values across time periods
@@ -993,7 +993,7 @@ ${labPanel.followUpRequired ? '📅 Follow-up testing recommended' : '✅ Mainta
   private formatPersonalizedRecommendations(recommendations: PersonalizedRecommendation[], query: string): string {
     const highPriority = recommendations.filter(r => r.priority === 'critical' || r.priority === 'high').slice(0, 3);
     
-    return `🎯 **Personalized Health Recommendations**:
+    return `🎯 **Personalised Health Recommendations**:
 
 ${highPriority.map((rec, index) => `**${index + 1}. ${rec.title}** (${rec.priority} priority)
 📝 ${rec.description}
@@ -1001,7 +1001,7 @@ ${highPriority.map((rec, index) => `**${index + 1}. ${rec.title}** (${rec.priori
 🧬 Based on: ${rec.personalizationFactors.slice(0, 2).join(', ')}
 📊 Confidence: ${rec.confidence}%`).join('\n\n')}
 
-💡 These recommendations integrate your genetic data, lab results, lifestyle factors, and health goals for maximum personalization.
+💡 These recommendations integrate your genetic data, lab results, lifestyle factors, and health goals for maximum personalisation.
 
 Would you like detailed implementation guidance for any of these recommendations?`;
   }
@@ -1181,7 +1181,7 @@ Would you like detailed implementation guidance for any of these recommendations
           messages: [
             {
               role: 'system',
-              content: `You are an expert health data analyst specializing in interpreting medical files and determining optimal database storage strategies. Analyze health data files and provide:
+              content: `You are an expert health data analyst specialising in interpreting medical files and determining optimal database storage strategies. Analyse health data files and provide:
 1. Clear interpretation of what the file contains
 2. Database collection and field mappings (collections: healthMetrics, labResults, geneticData, wearableData, medicalReports)
 3. Clarifying questions if data is ambiguous
@@ -1230,7 +1230,7 @@ Always use Australian English and medical terminology. Format responses in clear
 ${dataPreview}
 \`\`\`
 
-Please analyze this health data file and provide:
+Please analyse this health data file and provide:
 
 1. **Interpretation**: What type of health data is this? What does it tell us about the patient's health?
 
@@ -1341,7 +1341,7 @@ Format your response with clear sections using markdown headers.`;
           fields.biomarkers = [];
           fields.results = parsedData;
           fields.rawData = parsedData;
-          fields.notes = 'Generic health data upload - structure not recognized';
+          fields.notes = 'Generic health data upload - structure not recognised';
         }
         break;
 
@@ -1454,7 +1454,7 @@ Format your response with clear sections using markdown headers.`;
 
     const interpretation = `📊 **${categoryDescriptions[fileCategory] || 'Health data file'}**
 
-This file contains ${fileCategory.replace('_', ' ')} that has been successfully parsed and categorized. The data can be stored in your health profile for tracking and analysis.`;
+This file contains ${fileCategory.replace('_', ' ')} that has been successfully parsed and categorised. The data can be stored in your health profile for tracking and analysis.`;
 
     return {
       interpretation,

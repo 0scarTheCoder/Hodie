@@ -261,19 +261,19 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
       {/* Key Insights */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white/10 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-white mb-4 flex items-centre">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
             <Activity className="w-5 h-5 mr-2" />
             Fitness Highlights {!aiEnabled && <span className="text-xs text-blue-400 ml-2">(AI Loading...)</span>}
           </h3>
           {loading ? (
-            <div className="flex items-centre justify-centre py-4">
+            <div className="flex items-center justify-center py-4">
               <Loader2 className="w-6 h-6 animate-spin text-white/60" />
-              <span className="text-white/60 ml-2">Analyzing genetics...</span>
+              <span className="text-white/60 ml-2">Analysing genetics...</span>
             </div>
           ) : (
             <div className="space-y-3">
               {fitnessInsights.slice(0, 3).map((insight, index) => (
-                <div key={index} className="flex items-centre justify-between">
+                <div key={index} className="flex items-center justify-between">
                   <span className="text-white/80">{insight.trait}</span>
                   <span className={`font-medium ${insight.color.replace('text-', 'text-').replace('-600', '-400')}`}>
                     {insight.impact} impact
@@ -288,14 +288,14 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
         </div>
 
         <div className="bg-white/10 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-white mb-4 flex items-centre">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
             <Heart className="w-5 h-5 mr-2" />
             Health Risks
           </h3>
           {hasGeneticData && healthRisks.length > 0 ? (
             <div className="space-y-3">
               {healthRisks.slice(0, 3).map((risk, index) => (
-                <div key={index} className="flex items-centre justify-between">
+                <div key={index} className="flex items-center justify-between">
                   <span className="text-white/80">{risk.condition}</span>
                   <span className={`font-medium ${
                     risk.color === 'text-green-600' ? 'text-green-400' :
@@ -316,11 +316,11 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
 
       {/* Actionable Recommendations */}
       <div className="bg-white/10 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-white mb-4 flex items-centre">
+        <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
           Top DNA-Based Recommendations
         </h3>
         {loading ? (
-          <div className="flex items-centre justify-centre py-8">
+          <div className="flex items-center justify-center py-8">
             <Loader2 className="w-8 h-8 animate-spin text-white/60" />
             <span className="text-white/60 ml-3">Generating personalised recommendations...</span>
           </div>
@@ -337,7 +337,7 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
               </div>
             ))}
             {[...fitnessInsights, ...nutritionInsights, ...healthInsights].length === 0 && (
-              <div className="text-centre py-4">
+              <div className="text-center py-4">
                 <div className="text-white/60">Upload your genetic data to unlock AI-powered insights</div>
               </div>
             )}
@@ -350,13 +350,13 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
 
   const renderFitness = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-white mb-4 flex items-centre">
+      <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
         Fitness & Exercise Genetics
         {loading && <Loader2 className="w-6 h-6 animate-spin text-white/60 ml-3" />}
         {!aiEnabled && <span className="text-sm text-blue-400 ml-3">(AI Activating...)</span>}
       </h2>
       {loading ? (
-        <div className="flex items-centre justify-centre py-12">
+        <div className="flex items-center justify-center py-12">
           <Loader2 className="w-8 h-8 animate-spin text-white/60" />
           <span className="text-white/60 ml-3">Analysing your fitness genetics...</span>
         </div>
@@ -390,7 +390,7 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
         </div>
       ))}
           {fitnessInsights.length === 0 && (
-            <div className="bg-gray-50 rounded-xl p-8 text-centre">
+            <div className="bg-gray-50 rounded-xl p-8 text-center">
               <div className="text-gray-600 mb-2">No fitness insights available</div>
               <div className="text-gray-500 text-sm">Upload genetic data for AI-generated fitness genetics analysis</div>
             </div>
@@ -402,13 +402,13 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
 
   const renderNutrition = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-white mb-4 flex items-centre">
+      <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
         Nutrition & Metabolism
         {loading && <Loader2 className="w-6 h-6 animate-spin text-white/60 ml-3" />}
         {!aiEnabled && <span className="text-sm text-blue-400 ml-3">(AI Activating...)</span>}
       </h2>
       {loading ? (
-        <div className="flex items-centre justify-centre py-12">
+        <div className="flex items-center justify-center py-12">
           <Loader2 className="w-8 h-8 animate-spin text-white/60" />
           <span className="text-white/60 ml-3">Analysing your nutrition genetics...</span>
         </div>
@@ -442,7 +442,7 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
         </div>
       ))}
           {nutritionInsights.length === 0 && (
-            <div className="bg-gray-50 rounded-xl p-8 text-centre">
+            <div className="bg-gray-50 rounded-xl p-8 text-center">
               <div className="text-gray-600 mb-2">No nutrition insights available</div>
               <div className="text-gray-500 text-sm">Upload genetic data for AI-generated nutrition genetics analysis</div>
             </div>
@@ -633,7 +633,7 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
             <button
               key={category.id}
               onClick={() => setSelectedCategory(category.id)}
-              className={`flex items-centre space-x-2 px-6 py-3 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-center space-x-2 px-6 py-3 rounded-lg text-sm font-medium transition-colors ${
                 selectedCategory === category.id
                   ? 'bg-blue-600 text-white'
                   : 'bg-white text-gray-700 hover:bg-gray-50 shadow-sm border border-gray-200'
@@ -653,7 +653,7 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
             <button
               key={category.id}
               onClick={() => setSelectedCategory(category.id)}
-              className={`flex items-centre space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 selectedCategory === category.id
                   ? 'bg-blue-600 text-white'
                   : 'bg-white/10 text-white/80 hover:bg-white/20'

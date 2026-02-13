@@ -223,7 +223,7 @@ const DataVisualizationScreen: React.FC<DataVisualizationScreenProps> = ({ user 
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
             <RefreshCw className="w-12 h-12 text-blue-500 animate-spin mx-auto mb-4" />
-            <p className="text-white/70">Loading data visualizations...</p>
+            <p className="text-white/70">Loading data visualisations...</p>
           </div>
         </div>
       </div>
@@ -250,7 +250,7 @@ const DataVisualizationScreen: React.FC<DataVisualizationScreenProps> = ({ user 
     return (
       <div className="px-6 pb-6">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-white mb-2">Data Visualizations</h1>
+          <h1 className="text-3xl font-bold text-white mb-2">Data Visualisations</h1>
           <p className="text-white/70">Interactive charts and graphs for your uploaded health data</p>
         </div>
         <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-xl p-6">
@@ -258,7 +258,7 @@ const DataVisualizationScreen: React.FC<DataVisualizationScreenProps> = ({ user 
             <AlertCircle className="w-6 h-6 text-yellow-400" />
             <div>
               <h3 className="text-lg font-semibold text-white">No Data Available</h3>
-              <p className="text-white/70">Upload health data files to see visualizations here.</p>
+              <p className="text-white/70">Upload health data files to see visualisations here.</p>
             </div>
           </div>
         </div>
@@ -270,7 +270,7 @@ const DataVisualizationScreen: React.FC<DataVisualizationScreenProps> = ({ user 
     <div className="px-6 pb-6">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-white mb-2">Data Visualizations</h1>
+        <h1 className="text-3xl font-bold text-white mb-2">Data Visualisations</h1>
         <p className="text-white/70">Interactive charts and graphs for your uploaded health data</p>
       </div>
 

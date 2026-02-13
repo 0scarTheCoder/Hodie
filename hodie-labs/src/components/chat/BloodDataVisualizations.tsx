@@ -74,7 +74,7 @@ const BloodDataVisualizations: React.FC<BloodDataVisualizationsProps> = ({ data 
     <div className="space-y-8 bg-gray-900 p-6 rounded-lg">
       <div className="text-center mb-6">
         <h3 className="text-xl font-bold text-white mb-2">
-          Blood Donation Data Visualizations
+          Blood Donation Data Visualisations
         </h3>
         <p className="text-gray-400 text-sm">
           {data.length} records analysed

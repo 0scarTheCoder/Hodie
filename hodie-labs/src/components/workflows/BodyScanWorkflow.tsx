@@ -78,7 +78,7 @@ const BodyScanWorkflow: React.FC<BodyScanWorkflowProps> = ({ user, onClose }) =>
 
   const renderChooseOption = () => (
     <div className="space-y-6">
-      <div className="text-centre">
+      <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose Your Body Scan</h2>
         <p className="text-gray-600">Select the type of body composition analysis you'd like</p>
       </div>
@@ -99,7 +99,7 @@ const BodyScanWorkflow: React.FC<BodyScanWorkflowProps> = ({ user, onClose }) =>
             )}
             <div className="flex justify-between items-start">
               <div className="flex-1">
-                <div className="flex items-centre space-x-3 mb-2">
+                <div className="flex items-center space-x-3 mb-2">
                   <Camera className="w-6 h-6 text-blue-600" />
                   <h3 className="text-lg font-semibold">{scan.name}</h3>
                 </div>
@@ -112,7 +112,7 @@ const BodyScanWorkflow: React.FC<BodyScanWorkflowProps> = ({ user, onClose }) =>
                   ))}
                 </div>
                 <div className="text-sm text-gray-500">
-                  <span className="flex items-centre">
+                  <span className="flex items-center">
                     <Clock className="w-4 h-4 mr-1" />
                     {scan.duration}
                   </span>
@@ -160,7 +160,7 @@ const BodyScanWorkflow: React.FC<BodyScanWorkflowProps> = ({ user, onClose }) =>
 
     return (
       <div className="space-y-6">
-        <div className="text-centre">
+        <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Choose Partner Gym</h2>
           <p className="text-gray-600">Select a convenient location for your {scanOptions.find(s => s.id === selectedScan)?.name}</p>
         </div>
@@ -176,10 +176,10 @@ const BodyScanWorkflow: React.FC<BodyScanWorkflowProps> = ({ user, onClose }) =>
             >
               <div className="flex justify-between items-start">
                 <div className="flex-1">
-                  <div className="flex items-centre space-x-3 mb-2">
+                  <div className="flex items-center space-x-3 mb-2">
                     <MapPin className="w-5 h-5 text-blue-600" />
                     <h3 className="text-lg font-semibold">{gym.name}</h3>
-                    <div className="flex items-centre text-yellow-500">
+                    <div className="flex items-center text-yellow-500">
                       <span className="text-sm">★ {gym.rating}</span>
                     </div>
                   </div>
@@ -226,7 +226,7 @@ const BodyScanWorkflow: React.FC<BodyScanWorkflowProps> = ({ user, onClose }) =>
 
     return (
       <div className="space-y-6">
-        <div className="text-centre">
+        <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Book Your Appointment</h2>
           <p className="text-gray-600">Select your preferred date and time</p>
         </div>
@@ -324,7 +324,7 @@ const BodyScanWorkflow: React.FC<BodyScanWorkflowProps> = ({ user, onClose }) =>
     const selectedGymData = partnerGyms.find(g => g.id === selectedGym);
 
     return (
-      <div className="text-centre space-y-6">
+      <div className="text-center space-y-6">
         <CheckCircle className="w-16 h-16 text-green-500 mx-auto" />
         <div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Booking Confirmed!</h2>
@@ -353,7 +353,7 @@ const BodyScanWorkflow: React.FC<BodyScanWorkflowProps> = ({ user, onClose }) =>
           </div>
         </div>
 
-        <div className="flex space-x-4 justify-centre">
+        <div className="flex space-x-4 justify-center">
           <button 
             onClick={onClose}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -372,10 +372,10 @@ const BodyScanWorkflow: React.FC<BodyScanWorkflowProps> = ({ user, onClose }) =>
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-centre justify-centre z-50 p-4">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         <div className="p-6">
-          <div className="flex justify-between items-centre mb-6">
+          <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold text-gray-900">Body Scan Booking</h1>
             <button 
               onClick={onClose}

@@ -28,39 +28,34 @@ const BrandHeader: React.FC<BrandHeaderProps> = ({
   };
 
   return (
-    <header className="bg-white/10 backdrop-blur-sm border-b border-white/20 font-poppins">
+    <header className="bg-blue-900/80 backdrop-blur-md border-b border-white/20 font-poppins">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-centre h-16">
+        <div className="flex justify-between items-center h-16">
           
           {/* Logo Section - Clickable to return to overview */}
-          <div className="flex items-centre space-x-4">
+          <div className="flex items-center space-x-4">
             <button 
               onClick={() => onScreenChange && onScreenChange('home')}
-              className="flex items-centre space-x-3 hover:opacity-80 transition-opacity cursor-pointer"
+              className="flex items-center space-x-3 hover:opacity-80 transition-opacity cursor-pointer"
             >
               <img
                 src="/hodie_transparent_logo.png"
                 alt="HodieLabs"
                 className="h-8 w-auto"
                 onError={(e) => {
-                  const target = e.currentTarget;
-                  target.style.display = 'none';
-                  const textFallback = document.createElement('div');
-                  textFallback.textContent = 'HodieLabs';
-                  textFallback.className = 'text-xl font-bold text-white font-poppins drop-shadow-lg';
-                  target.parentNode?.appendChild(textFallback);
+                  e.currentTarget.style.display = 'none';
                 }}
               />
               <div className="flex flex-col">
-                <div className="text-xl font-bold text-white drop-shadow-lg">HodieLabs</div>
-                <div className="text-xs text-white/90 -mt-1 drop-shadow-sm hidden sm:block">Health Dashboard</div>
+                <div className="text-xl font-bold text-white">HodieLabs</div>
+                <div className="text-xs text-white/90 -mt-1 hidden sm:block">Health Dashboard</div>
               </div>
             </button>
           </div>
 
           {/* Navigation - only show if enabled */}
           {showNavigation && onScreenChange && (
-            <nav className="hidden md:flex items-centre space-x-8">
+            <nav className="hidden md:flex items-center space-x-8">
               {[
                 { id: 'home', label: 'Overview' },
                 { id: 'chat', label: 'Chat' },
@@ -87,13 +82,13 @@ const BrandHeader: React.FC<BrandHeaderProps> = ({
           )}
 
           {/* User Section */}
-          <div className="flex items-centre space-x-4">
+          <div className="flex items-center space-x-4">
             {/* Help Button */}
             <a
               href="https://hodielabs.com/contact/"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-centre space-x-1 px-3 py-2 text-white/70 text-sm font-medium rounded-full hover:bg-white/10 hover:text-white transition-colors duration-200"
+              className="flex items-center space-x-1 px-3 py-2 text-white/70 text-sm font-medium rounded-full hover:bg-white/10 hover:text-white transition-colors duration-200"
               title="Get Help & Support"
             >
               <HelpCircle className="w-4 h-4" />
@@ -102,7 +97,7 @@ const BrandHeader: React.FC<BrandHeaderProps> = ({
 
             {/* User Info */}
             {user && (
-              <div className="flex items-centre space-x-3">
+              <div className="flex items-center space-x-3">
                 <div className="hidden sm:block text-right">
                   <div className="text-sm font-medium text-white">
                     {user.name || user.email?.split('@')[0] || 'User'}
@@ -113,7 +108,7 @@ const BrandHeader: React.FC<BrandHeaderProps> = ({
                 </div>
                 
                 <div className="relative group">
-                  <button className="flex items-centre justify-centre w-10 h-10 rounded-full bg-white/20 text-white font-medium text-sm hover:bg-white/30 transition-colors">
+                  <button className="flex items-center justify-center w-10 h-10 rounded-full bg-white/20 text-white font-medium text-sm hover:bg-white/30 transition-colors">
                     {(user.name || user.email || 'U')[0].toUpperCase()}
                   </button>
                   
@@ -126,7 +121,7 @@ const BrandHeader: React.FC<BrandHeaderProps> = ({
                     
                     <button
                       onClick={() => onScreenChange && onScreenChange('settings')}
-                      className="flex items-centre space-x-2 w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100/50"
+                      className="flex items-center space-x-2 w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100/50"
                     >
                       <Settings className="w-4 h-4" />
                       <span>Settings</span>
@@ -134,7 +129,7 @@ const BrandHeader: React.FC<BrandHeaderProps> = ({
                     
                     <button
                       onClick={() => onScreenChange && onScreenChange('testing')}
-                      className="flex items-centre space-x-2 w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100/50"
+                      className="flex items-center space-x-2 w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100/50"
                     >
                       <TestTube className="w-4 h-4" />
                       <span>AI Testing</span>
@@ -142,7 +137,7 @@ const BrandHeader: React.FC<BrandHeaderProps> = ({
                     
                     <button
                       onClick={() => onScreenChange && onScreenChange('demo')}
-                      className="flex items-centre space-x-2 w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100/50"
+                      className="flex items-center space-x-2 w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100/50"
                     >
                       <Zap className="w-4 h-4" />
                       <span>AI Demo</span>
@@ -152,7 +147,7 @@ const BrandHeader: React.FC<BrandHeaderProps> = ({
                       href="https://hodielabs.com/contact/"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-centre space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100/50"
+                      className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100/50"
                     >
                       <HelpCircle className="w-4 h-4" />
                       <span>Help & Support</span>

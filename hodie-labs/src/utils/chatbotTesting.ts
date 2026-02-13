@@ -352,7 +352,7 @@ ${this.generateRecommendations(results)}
     
     const slowResults = results.filter(r => r.responseTime > 3000);
     if (slowResults.length > 0) {
-      recommendations.push(`Optimize response time for ${slowResults.length} slow responses`);
+      recommendations.push(`Optimise response time for ${slowResults.length} slow responses`);
     }
     
     return recommendations.length > 0 ? recommendations.map(r => `- ${r}`).join('\n') : '- Overall performance is strong!';

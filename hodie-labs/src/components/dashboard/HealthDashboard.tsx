@@ -21,9 +21,9 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
               {/* 5 Day Streak Card */}
               <div className="bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl p-6 text-white relative overflow-hidden">
                 <div className="relative z-10">
-                  <div className="flex items-centre justify-between mb-4">
+                  <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold">5 Day Streak</h3>
-                    <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-centre justify-centre">
+                    <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
                       <div className="w-6 h-6 bg-white rounded-full"></div>
                     </div>
                   </div>
@@ -41,7 +41,7 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
               <div className="bg-gradient-to-br from-teal-400 to-teal-600 rounded-2xl p-6 text-white relative overflow-hidden">
                 <div className="relative z-10">
                   <h3 className="text-lg font-semibold mb-2">Your Health Score</h3>
-                  <div className="flex items-centre justify-between mb-4">
+                  <div className="flex items-center justify-between mb-4">
                     <div className="text-4xl font-bold">48</div>
                     <div className="text-right">
                       <div className="text-sm opacity-90">Last 7 days</div>
@@ -64,20 +64,20 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
               <h3 className="text-xl font-semibold text-gray-900 mb-6">Top 3 Recommendations</h3>
               <div className="space-y-4">
                 
-                <div className="flex items-centre justify-between p-4 bg-green-50 rounded-xl">
-                  <div className="flex items-centre space-x-3">
+                <div className="flex items-center justify-between p-4 bg-green-50 rounded-xl">
+                  <div className="flex items-center space-x-3">
                     <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                     <span className="text-green-800 font-medium">Drink enough water daily</span>
                   </div>
                   <span className="text-green-600 text-sm font-medium">Complete</span>
                 </div>
 
-                <div className="flex items-centre justify-between p-4 bg-blue-50 rounded-xl">
-                  <div className="flex items-centre space-x-3">
+                <div className="flex items-center justify-between p-4 bg-blue-50 rounded-xl">
+                  <div className="flex items-center space-x-3">
                     <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                     <span className="text-blue-800 font-medium">Take 10,000+ steps daily</span>
                   </div>
-                  <div className="flex items-centre space-x-2">
+                  <div className="flex items-center space-x-2">
                     <div className="w-24 h-2 bg-blue-200 rounded-full">
                       <div className="w-3/4 h-2 bg-blue-500 rounded-full"></div>
                     </div>
@@ -85,12 +85,12 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
                   </div>
                 </div>
 
-                <div className="flex items-centre justify-between p-4 bg-purple-50 rounded-xl">
-                  <div className="flex items-centre space-x-3">
+                <div className="flex items-center justify-between p-4 bg-purple-50 rounded-xl">
+                  <div className="flex items-center space-x-3">
                     <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
                     <span className="text-purple-800 font-medium">Take Omega-3 supplements with meals</span>
                   </div>
-                  <div className="flex items-centre space-x-2">
+                  <div className="flex items-center space-x-2">
                     <div className="w-24 h-2 bg-purple-200 rounded-full">
                       <div className="w-1/2 h-2 bg-purple-500 rounded-full"></div>
                     </div>
@@ -105,7 +105,7 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
               
               {/* Daily Activity */}
               <div className="bg-white rounded-2xl p-6 shadow-sm">
-                <div className="flex items-centre justify-between mb-4">
+                <div className="flex items-center justify-between mb-4">
                   <h4 className="text-lg font-semibold text-gray-900">Daily Activity</h4>
                   <div className="text-xs text-gray-500">Today</div>
                 </div>
@@ -130,11 +130,11 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
 
               {/* Mood Check */}
               <div className="bg-white rounded-2xl p-6 shadow-sm">
-                <div className="flex items-centre justify-between mb-4">
+                <div className="flex items-center justify-between mb-4">
                   <h4 className="text-lg font-semibold text-gray-900">Mood check</h4>
                   <div className="text-xs text-gray-500">Today</div>
                 </div>
-                <div className="text-centre py-4">
+                <div className="text-center py-4">
                   <div className="text-3xl mb-2">😊</div>
                   <div className="text-sm text-gray-600 mb-4">How are you feeling today?</div>
                 </div>
@@ -145,7 +145,7 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
 
               {/* Sleep Tracker */}
               <div className="bg-white rounded-2xl p-6 shadow-sm">
-                <div className="flex items-centre justify-between mb-4">
+                <div className="flex items-center justify-between mb-4">
                   <h4 className="text-lg font-semibold text-gray-900">Last night</h4>
                   <div className="text-xs text-gray-500">Sleep Quality</div>
                 </div>
@@ -178,42 +178,42 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({ user }) => {
               <h3 className="text-xl font-semibold text-gray-900 mb-6">Discover Your Risks</h3>
               <div className="space-y-4">
                 
-                <div className="flex items-centre justify-between py-2">
+                <div className="flex items-center justify-between py-2">
                   <span className="text-sm text-gray-700">Diabetes & Obesity</span>
                   <span className="text-xs text-gray-500">3 Risks</span>
                 </div>
                 
-                <div className="flex items-centre justify-between py-2">
+                <div className="flex items-center justify-between py-2">
                   <span className="text-sm text-gray-700">Nutrition & Supplements</span>
                   <span className="text-xs text-gray-500">8 Risks</span>
                 </div>
                 
-                <div className="flex items-centre justify-between py-2">
+                <div className="flex items-center justify-between py-2">
                   <span className="text-sm text-gray-700">Disease</span>
                   <span className="text-xs text-gray-500">12 Risks</span>
                 </div>
                 
-                <div className="flex items-centre justify-between py-2">
+                <div className="flex items-center justify-between py-2">
                   <span className="text-sm text-gray-700">Heart Health (Alcohol)</span>
                   <span className="text-xs text-gray-500">4 Risks</span>
                 </div>
                 
-                <div className="flex items-centre justify-between py-2">
+                <div className="flex items-center justify-between py-2">
                   <span className="text-sm text-gray-700">Liver Health</span>
                   <span className="text-xs text-gray-500">6 Risks</span>
                 </div>
                 
-                <div className="flex items-centre justify-between py-2">
+                <div className="flex items-center justify-between py-2">
                   <span className="text-sm text-gray-700">Mental Health</span>
                   <span className="text-xs text-gray-500">2 Risks</span>
                 </div>
                 
-                <div className="flex items-centre justify-between py-2">
+                <div className="flex items-center justify-between py-2">
                   <span className="text-sm text-gray-700">Family Planning</span>
                   <span className="text-xs text-gray-500">14 Risks</span>
                 </div>
                 
-                <div className="flex items-centre justify-between py-2">
+                <div className="flex items-center justify-between py-2">
                   <span className="text-sm text-gray-700">Body Scan</span>
                   <span className="text-xs text-gray-500">16 Risks</span>
                 </div>

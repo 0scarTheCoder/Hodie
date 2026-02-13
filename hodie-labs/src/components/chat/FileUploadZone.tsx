@@ -363,7 +363,7 @@ const FileUploadZone: React.FC<FileUploadZoneProps> = ({
                   </span>
                   
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-centre space-x-2">
+                    <div className="flex items-center space-x-2">
                       <p className="text-sm font-medium text-gray-900 truncate">
                         {file.name}
                       </p>
@@ -386,7 +386,7 @@ const FileUploadZone: React.FC<FileUploadZoneProps> = ({
                       )}
                     </div>
 
-                    <div className="flex items-centre space-x-2 mt-1">
+                    <div className="flex items-center space-x-2 mt-1">
                       <span className="text-xs px-2 py-1 bg-white rounded-full border">
                         {file.category.replace('_', ' ')}
                       </span>
