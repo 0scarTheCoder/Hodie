@@ -104,7 +104,8 @@ class Client {
     // Only allow updating specific fields
     const allowedFields = [
       'phoneNumber', 'age', 'sex', 'height', 'weight',
-      'exerciseLevel', 'subscriptionLevel', 'amountPaid', 'amountDue'
+      'exerciseLevel', 'subscriptionLevel', 'amountPaid', 'amountDue',
+      'healthGoals', 'preferences'
     ];
 
     const filteredUpdates = {};

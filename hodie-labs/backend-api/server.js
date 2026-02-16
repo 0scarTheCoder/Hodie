@@ -38,6 +38,10 @@ const {
 // Import error handlers
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 
+// Import auth middleware for inline routes
+const { authenticateUser, ensureClient } = require('./middleware/authMiddleware');
+const Client = require('./models/Client');
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -448,17 +452,55 @@ app.use('/api', dataRoutes); // General data routes
 app.use('/api/recommendations', recommendationsLimiter, recommendationsRoutes);
 
 // User profile route (for onboarding)
-app.post('/api/users/:userId/profile', async (req, res) => {
+// Creates/updates the client record in the clients collection with onboarding data
+app.post('/api/users/:userId/profile', authenticateUser, ensureClient, async (req, res) => {
   try {
     const { userId } = req.params;
     const profileData = req.body;
+
+    // Also save to user_profiles for backwards compatibility
     const usersCollection = db.collection('user_profiles');
     await usersCollection.updateOne(
       { userId },
       { $set: { ...profileData, userId, updatedAt: new Date() } },
       { upsert: true }
     );
-    res.json({ success: true, userId });
+
+    // Map onboarding profile data to client fields and update the clients collection
+    const clientUpdates = {};
+    if (profileData.basicInfo) {
+      if (profileData.basicInfo.age) clientUpdates.age = parseInt(profileData.basicInfo.age) || null;
+      if (profileData.basicInfo.gender) clientUpdates.sex = profileData.basicInfo.gender;
+      if (profileData.basicInfo.height) clientUpdates.height = parseFloat(profileData.basicInfo.height) || null;
+      if (profileData.basicInfo.weight) clientUpdates.weight = parseFloat(profileData.basicInfo.weight) || null;
+      if (profileData.basicInfo.activityLevel) {
+        // Map onboarding activity levels to Client model values
+        const activityMap = {
+          'sedentary': 'Low',
+          'light': 'Low',
+          'moderate': 'Moderate',
+          'very': 'High',
+          'extra': 'Very High'
+        };
+        clientUpdates.exerciseLevel = activityMap[profileData.basicInfo.activityLevel] || 'Moderate';
+      }
+    }
+
+    // Store health goals and preferences on the client record
+    if (profileData.healthGoals) clientUpdates.healthGoals = profileData.healthGoals;
+    if (profileData.preferences) clientUpdates.preferences = profileData.preferences;
+
+    // Update the client record if we have any data to update
+    if (Object.keys(clientUpdates).length > 0 && req.auth.clientID) {
+      const clientsCollection = db.collection('clients');
+      await clientsCollection.updateOne(
+        { clientID: req.auth.clientID },
+        { $set: { ...clientUpdates, updatedAt: new Date() } }
+      );
+      console.log(`✅ Updated client ${req.auth.clientID} with onboarding profile data`);
+    }
+
+    res.json({ success: true, userId, clientID: req.auth.clientID || null });
   } catch (error) {
     console.error('Error saving user profile:', error);
     res.status(500).json({ error: 'Failed to save profile' });

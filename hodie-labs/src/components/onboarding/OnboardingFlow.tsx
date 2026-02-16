@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { User } from 'firebase/auth';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ChevronRight, 
+import { useAuth } from '../../contexts/AuthContext';
+import {
+  ChevronRight,
   ChevronLeft,
   User as UserIcon,
   Target,
@@ -34,6 +35,7 @@ interface UserProfile {
 }
 
 const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ user, onComplete }) => {
+  const { getAccessToken } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [profile, setProfile] = useState<UserProfile>({
     basicInfo: {
@@ -119,18 +121,23 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ user, onComplete }) => 
 
   const handleComplete = async () => {
     try {
-      // Save profile to backend
+      // Get auth token for authenticated backend request
+      const token = await getAccessToken().catch(() => null);
+      const headers: HeadersInit = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      // Save profile to backend (creates/updates client record)
       await fetch(`${process.env.REACT_APP_API_BASE_URL}/users/${user.uid}/profile`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify(profile),
       });
 
       // Mark onboarding as complete
       localStorage.setItem(`hodie_onboarding_${user.uid}`, 'completed');
-      
+
       onComplete();
     } catch (error) {
       console.error('Failed to save profile:', error);

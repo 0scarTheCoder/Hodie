@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { User } from 'firebase/auth';
 import { useAuth } from '../../contexts/AuthContext';
 import {
@@ -6,16 +6,16 @@ import {
   Target,
   Shield,
   Heart,
-  Zap,
   CheckCircle,
   Clock,
   Star,
   TrendingUp,
   Loader2,
   AlertCircle,
-  Upload
+  Upload,
+  RefreshCw
 } from 'lucide-react';
-import type { HealthRecommendation, HealthContext } from '../../services/kimiK2Service';
+import type { HealthRecommendation } from '../../services/kimiK2Service';
 
 interface RecommendationsScreenProps {
   user: User;
@@ -23,19 +23,23 @@ interface RecommendationsScreenProps {
   onScreenChange?: (screen: string) => void;
 }
 
+interface BiomarkerData {
+  name: string;
+  value: number;
+  unit: string;
+  referenceRange?: string;
+  flagged?: boolean;
+  category?: string;
+}
+
 const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, healthScore, onScreenChange }) => {
   const { getAccessToken } = useAuth();
   const [selectedFilter, setSelectedFilter] = useState<string>('All');
   const [recommendations, setRecommendations] = useState<HealthRecommendation[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [aiEnabled, setAiEnabled] = useState<boolean>(false);
   const [isLoadingFromDB, setIsLoadingFromDB] = useState<boolean>(true);
   const [dbError, setDbError] = useState<string | null>(null);
-
-  // AI is enabled via backend for all users
-  const checkUserApiKey = (): boolean => {
-    return true;
-  };
+  const [generatingAI, setGeneratingAI] = useState<boolean>(false);
+  const hasGeneratedRef = useRef(false);
 
   // Fetch saved recommendations from MongoDB on mount
   useEffect(() => {
@@ -46,9 +50,8 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
       try {
         const userId = (user as any).sub || user.uid;
 
-        // Get Auth0 token
         const token = await getAccessToken().catch((error) => {
-          console.warn('⚠️ Could not get Auth0 token for recommendations:', error);
+          console.warn('⚠️ Could not get token for recommendations:', error);
           return null;
         });
 
@@ -86,14 +89,155 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
     fetchSavedRecommendations();
   }, [user, getAccessToken]);
 
-  // AI is enabled via backend for all users
+  // Generate AI recommendations from lab data if none saved
   useEffect(() => {
-    if (isLoadingFromDB) return;
-    setAiEnabled(true);
-  }, [user.uid, healthScore, isLoadingFromDB]);
+    if (isLoadingFromDB || recommendations.length > 0 || hasGeneratedRef.current) return;
 
-  // Recommendations are loaded from the database on mount
-  // No client-side AI generation needed
+    const generateFromLabData = async () => {
+      hasGeneratedRef.current = true;
+      setGeneratingAI(true);
+
+      try {
+        const userId = (user as any).sub || user.uid;
+        const token = await getAccessToken().catch(() => null);
+        const headers: HeadersInit = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        // Fetch lab results
+        const labResponse = await fetch(
+          `${process.env.REACT_APP_API_BASE_URL}/lab-results/${userId}`,
+          { headers }
+        );
+
+        if (!labResponse.ok) {
+          console.log('💡 No lab data available for recommendations');
+          return;
+        }
+
+        const labResults = await labResponse.json();
+        if (!labResults || labResults.length === 0) {
+          console.log('💡 No lab results found, cannot generate recommendations');
+          return;
+        }
+
+        // Extract all biomarkers from lab results
+        const allBiomarkers: BiomarkerData[] = [];
+        labResults.forEach((result: any) => {
+          if (result.biomarkers && Array.isArray(result.biomarkers)) {
+            result.biomarkers.forEach((bm: any) => {
+              if (bm.name && bm.value) {
+                allBiomarkers.push({
+                  name: bm.name,
+                  value: parseFloat(bm.value),
+                  unit: bm.unit || '',
+                  referenceRange: bm.referenceRange || '',
+                  flagged: bm.flagged || false,
+                  category: bm.category || ''
+                });
+              }
+            });
+          }
+        });
+
+        if (allBiomarkers.length === 0) {
+          console.log('💡 No biomarkers found in lab results');
+          return;
+        }
+
+        console.log(`💡 Generating AI recommendations from ${allBiomarkers.length} biomarkers`);
+
+        // Build a summary of the biomarkers for the AI prompt
+        const biomarkerSummary = allBiomarkers.map(bm =>
+          `${bm.name}: ${bm.value} ${bm.unit} (Reference: ${bm.referenceRange || 'N/A'})${bm.flagged ? ' [FLAGGED]' : ''}`
+        ).join('\n');
+
+        const prompt = `Based on these blood test results, generate exactly 6 personalised health recommendations. Each recommendation should be actionable and specific to the biomarker values shown.
+
+Blood test results:
+${biomarkerSummary}
+
+Return your response as a JSON array with exactly 6 objects. Each object must have these exact fields:
+- "id": a unique string (e.g. "ai-1", "ai-2", etc.)
+- "category": one of "Fitness", "Nutrition", "Supplements", "Sleep", "Stress Management"
+- "priority": "High", "Medium", or "Low"
+- "title": a short actionable recommendation (max 10 words)
+- "description": 1-2 sentences explaining why this matters based on their results
+- "impact": what improvement to expect
+- "timeframe": how long until results (e.g. "2-4 weeks")
+- "difficulty": "Easy", "Medium", or "Hard"
+- "completed": false
+
+Return ONLY the JSON array, no other text.`;
+
+        // Call the backend chat API to generate recommendations
+        const chatResponse = await fetch(
+          `${process.env.REACT_APP_API_BASE_URL}/chat`,
+          {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({
+              message: prompt,
+              conversationHistory: [],
+              healthContext: { userId }
+            })
+          }
+        );
+
+        if (!chatResponse.ok) {
+          console.warn('💡 Chat API failed for recommendation generation');
+          return;
+        }
+
+        const chatData = await chatResponse.json();
+        const responseText = chatData.response || '';
+
+        // Parse the AI response as JSON
+        let aiRecommendations: HealthRecommendation[] = [];
+        try {
+          // Extract JSON array from the response (handle markdown code blocks)
+          const jsonMatch = responseText.match(/\[[\s\S]*\]/);
+          if (jsonMatch) {
+            aiRecommendations = JSON.parse(jsonMatch[0]);
+          }
+        } catch (parseErr) {
+          console.error('💡 Failed to parse AI recommendations:', parseErr);
+          return;
+        }
+
+        if (aiRecommendations.length === 0) {
+          console.warn('💡 AI returned no valid recommendations');
+          return;
+        }
+
+        // Ensure all fields are present and valid
+        aiRecommendations = aiRecommendations.map((rec, idx) => ({
+          id: rec.id || `ai-${idx + 1}`,
+          category: rec.category || 'Nutrition',
+          priority: (['High', 'Medium', 'Low'].includes(rec.priority) ? rec.priority : 'Medium') as 'High' | 'Medium' | 'Low',
+          title: rec.title || 'Health recommendation',
+          description: rec.description || '',
+          impact: rec.impact || 'May improve overall health',
+          timeframe: rec.timeframe || '2-4 weeks',
+          difficulty: (['Easy', 'Medium', 'Hard'].includes(rec.difficulty) ? rec.difficulty : 'Medium') as 'Easy' | 'Medium' | 'Hard',
+          completed: false
+        }));
+
+        console.log(`💡 Generated ${aiRecommendations.length} AI recommendations`);
+        setRecommendations(aiRecommendations);
+
+        // Save to MongoDB for future visits
+        await saveRecommendationsToMongoDB(aiRecommendations);
+
+      } catch (err) {
+        console.error('Error generating AI recommendations:', err);
+      } finally {
+        setGeneratingAI(false);
+      }
+    };
+
+    generateFromLabData();
+  }, [isLoadingFromDB, recommendations.length, user, getAccessToken]);
+
 
   // Save recommendations to MongoDB
   const saveRecommendationsToMongoDB = async (recs: HealthRecommendation[]) => {
@@ -169,79 +313,30 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
     }
   };
 
-  const staticRecommendations: HealthRecommendation[] = [
-    {
-      id: '1',
-      category: 'Fitness',
-      priority: 'High',
-      title: 'Do 30 min of light cardio before breakfast',
-      description: 'Morning cardio helps boost metabolism and improves insulin sensitivity throughout the day.',
-      impact: 'May improve glucose control and energy levels',
-      timeframe: '2-4 weeks',
-      difficulty: 'Easy',
-      completed: false
-    },
-    {
-      id: '2',
-      category: 'Nutrition', 
-      priority: 'High',
-      title: 'Increase your magnesium intake with leafy greens',
-      description: 'Low magnesium levels can contribute to inflammation and poor sleep quality.',
-      impact: 'May reduce inflammation by 15-20%',
-      timeframe: '3-6 weeks', 
-      difficulty: 'Easy',
-      completed: false
-    },
-    {
-      id: '3',
-      category: 'Supplements',
-      priority: 'Medium', 
-      title: 'Take Omega-3 supplement with lunch',
-      description: 'Omega-3 fatty acids support heart health and may reduce inflammation markers.',
-      impact: 'May improve HRV and reduce CRP levels',
-      timeframe: '4-8 weeks',
-      difficulty: 'Easy',
-      completed: false
-    },
-    {
-      id: '4',
-      category: 'Sleep',
-      priority: 'High',
-      title: 'Establish consistent sleep schedule',
-      description: 'Going to bed and waking up at the same time improves sleep quality and metabolic health.',
-      impact: 'May improve glucose tolerance and HRV',
-      timeframe: '1-2 weeks',
-      difficulty: 'Medium',
-      completed: true
-    },
-    {
-      id: '5', 
-      category: 'Stress Management',
-      priority: 'Medium',
-      title: 'Practice 10 minutes daily meditation',
-      description: 'Mindfulness meditation can reduce cortisol levels and improve heart rate variability.',
-      impact: 'May reduce stress hormones by 25%',
-      timeframe: '2-4 weeks',
-      difficulty: 'Medium',
-      completed: false
-    },
-    {
-      id: '6',
-      category: 'Fitness',
-      priority: 'Medium',
-      title: 'Add 2 strength training sessions weekly',
-      description: 'Resistance exercise improves muscle mass, bone density, and insulin sensitivity.',
-      impact: 'May increase muscle mass and improve glucose control',
-      timeframe: '6-12 weeks',
-      difficulty: 'Hard',
-      completed: false
+  // Regenerate recommendations from lab data
+  const regenerateRecommendations = async () => {
+    hasGeneratedRef.current = false;
+    setRecommendations([]);
+
+    // Delete existing recommendations from DB first
+    try {
+      const userId = (user as any).sub || user.uid;
+      const token = await getAccessToken().catch(() => null);
+      const headers: HeadersInit = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      await fetch(
+        `${process.env.REACT_APP_API_BASE_URL}/recommendations/${userId}`,
+        { method: 'DELETE', headers }
+      );
+    } catch (err) {
+      console.error('Error clearing old recommendations:', err);
     }
-  ];
+  };
 
   const filterCategories = ['All', 'Fitness', 'Nutrition', 'Supplements', 'Sleep', 'Stress Management'];
-  
-  // Use AI recommendations if available, otherwise fallback to static
-  const displayRecommendations = recommendations.length > 0 ? recommendations : staticRecommendations;
+
+  const displayRecommendations = recommendations;
   
   const filteredRecommendations = selectedFilter === 'All' 
     ? displayRecommendations 
@@ -291,14 +386,19 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
   const totalCount = filteredRecommendations.length;
   const completionRate = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
-  // Loading state (initial DB load)
-  if (isLoadingFromDB) {
+  // Loading state (initial DB load or AI generation)
+  if (isLoadingFromDB || generatingAI) {
     return (
       <div className="px-6 pb-6">
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
             <Loader2 className="w-12 h-12 text-blue-500 animate-spin mx-auto mb-4" />
-            <p className="text-white/70">Loading recommendations...</p>
+            <p className="text-white/70">
+              {generatingAI ? 'Generating personalised recommendations from your lab data...' : 'Loading recommendations...'}
+            </p>
+            {generatingAI && (
+              <p className="text-white/50 text-sm mt-2">This may take a moment while our AI analyses your biomarkers</p>
+            )}
           </div>
         </div>
       </div>
@@ -323,7 +423,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
   };
 
   // Empty state (no recommendations available)
-  if (displayRecommendations.length === 0 && !loading) {
+  if (displayRecommendations.length === 0) {
     return (
       <div className="px-6 pb-6">
         <div className="mb-6">
@@ -357,13 +457,11 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2 flex items-center">
+            <h1 className="text-3xl font-bold text-white mb-2">
               Your Health Recommendations
-              {loading && <Loader2 className="w-6 h-6 animate-spin text-white/60 ml-3" />}
-              {!aiEnabled && <span className="text-sm text-blue-400 ml-3">(AI Connecting...)</span>}
             </h1>
             <p className="text-white/70">
-              {aiEnabled ? 'AI-powered personalised recommendations based on your health data' : 'Upload your health data to receive personalised AI-powered recommendations'}
+              AI-powered personalised recommendations based on your health data
             </p>
           </div>
           <div className="text-right space-y-2">
@@ -371,6 +469,14 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
               <div className="text-2xl font-bold text-white">{completedCount}/{totalCount}</div>
               <div className="text-sm text-white/70">Completed</div>
             </div>
+            <button
+              onClick={regenerateRecommendations}
+              className="flex items-center space-x-1 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white/80 rounded-lg text-sm transition-colors"
+              title="Regenerate recommendations from latest lab data"
+            >
+              <RefreshCw className="w-4 h-4" />
+              <span>Refresh</span>
+            </button>
           </div>
         </div>
 
@@ -400,7 +506,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
             <div className="flex items-center space-x-3">
               <Target className="w-8 h-8 text-white" />
               <div>
-                <div className="text-2xl font-bold text-white drop-shadow-sm">{recommendations.filter(r => r.priority === 'High').length}</div>
+                <div className="text-2xl font-bold text-white drop-shadow-sm">{displayRecommendations.filter(r => r.priority === 'High').length}</div>
                 <div className="text-sm text-white/90">High Priority</div>
               </div>
             </div>

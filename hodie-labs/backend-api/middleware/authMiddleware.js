@@ -155,6 +155,51 @@ async function authenticateUser(req, res, next) {
 }
 
 /**
+ * Ensure a client record exists for the authenticated user.
+ * Creates one automatically if missing. Attaches client info to req.auth.
+ * Must run AFTER authenticateUser.
+ */
+async function ensureClient(req, res, next) {
+  try {
+    if (!req.auth || !req.auth.userId) {
+      return next(); // No auth - skip
+    }
+
+    const db = req.app.locals.db;
+    if (!db) {
+      return next(); // No DB connection - skip
+    }
+
+    const Client = require('../models/Client');
+
+    let client = await Client.findByAuthProviderUserId(db, req.auth.userId);
+
+    if (!client) {
+      // Auto-create client on first authenticated request
+      const clientData = {
+        email: req.auth.email,
+        authProvider: req.auth.provider,
+        authProviderUserId: req.auth.userId,
+        subscriptionLevel: 'Free'
+      };
+
+      client = await Client.create(db, clientData);
+      console.log(`✅ Auto-created client: ${client.clientID} for user ${req.auth.userId}`);
+    }
+
+    // Attach clientID to req.auth for downstream routes
+    req.auth.clientID = client.clientID;
+    req.auth.client = client;
+
+    next();
+  } catch (error) {
+    // Non-blocking: log error but don't fail the request
+    console.error('⚠️ ensureClient error (non-blocking):', error.message);
+    next();
+  }
+}
+
+/**
  * Optional authentication (doesn't fail if no token)
  */
 async function optionalAuth(req, res, next) {
@@ -215,6 +260,7 @@ function requireAdmin(req, res, next) {
 
 module.exports = {
   authenticateUser,
+  ensureClient,
   optionalAuth,
   authorizeOwner,
   requireAdmin

@@ -6,7 +6,7 @@
 const express = require('express');
 const router = express.Router();
 const Client = require('../models/Client');
-const { authenticateUser } = require('../middleware/authMiddleware');
+const { authenticateUser, ensureClient } = require('../middleware/authMiddleware');
 
 /**
  * GET /api/lab-results/:userId
@@ -46,7 +46,7 @@ router.get('/lab-results/:userId', authenticateUser, async (req, res) => {
  * POST /api/lab-results
  * Save new lab results for authenticated user
  */
-router.post('/lab-results', authenticateUser, async (req, res) => {
+router.post('/lab-results', authenticateUser, ensureClient, async (req, res) => {
   try {
     const userId = req.auth.userId;
     const labData = req.body;
@@ -61,10 +61,11 @@ router.post('/lab-results', authenticateUser, async (req, res) => {
 
     const labResultsCollection = req.app.locals.db.collection('labresults');
 
-    // Add metadata
+    // Add metadata including clientID
     const document = {
       ...labData,
       userId: userId,
+      clientID: req.auth.clientID || null,
       uploadDate: new Date(),
       createdAt: new Date(),
       source: 'chat_interface'
@@ -72,7 +73,12 @@ router.post('/lab-results', authenticateUser, async (req, res) => {
 
     const result = await labResultsCollection.insertOne(document);
 
-    console.log(`✅ Saved lab results for user ${userId}`);
+    // Increment client upload count
+    if (req.auth.clientID) {
+      await Client.incrementUploads(req.app.locals.db, req.auth.clientID);
+    }
+
+    console.log(`✅ Saved lab results for user ${userId} (client: ${req.auth.clientID || 'N/A'})`);
 
     res.status(201).json({
       success: true,
@@ -125,7 +131,7 @@ router.get('/genetic-data/:userId', authenticateUser, async (req, res) => {
  * POST /api/genetic-data
  * Save new genetic data for authenticated user
  */
-router.post('/genetic-data', authenticateUser, async (req, res) => {
+router.post('/genetic-data', authenticateUser, ensureClient, async (req, res) => {
   try {
     const userId = req.auth.userId;
     const geneticData = req.body;
@@ -142,6 +148,7 @@ router.post('/genetic-data', authenticateUser, async (req, res) => {
     const document = {
       ...geneticData,
       userId: userId,
+      clientID: req.auth.clientID || null,
       uploadDate: new Date(),
       createdAt: new Date(),
       source: 'chat_interface'
@@ -149,7 +156,11 @@ router.post('/genetic-data', authenticateUser, async (req, res) => {
 
     const result = await geneticDataCollection.insertOne(document);
 
-    console.log(`✅ Saved genetic data for user ${userId}`);
+    if (req.auth.clientID) {
+      await Client.incrementUploads(req.app.locals.db, req.auth.clientID);
+    }
+
+    console.log(`✅ Saved genetic data for user ${userId} (client: ${req.auth.clientID || 'N/A'})`);
 
     res.status(201).json({
       success: true,
@@ -205,7 +216,7 @@ router.get('/wearable-data/:userId', authenticateUser, async (req, res) => {
  * POST /api/wearable-data
  * Save new wearable data for authenticated user
  */
-router.post('/wearable-data', authenticateUser, async (req, res) => {
+router.post('/wearable-data', authenticateUser, ensureClient, async (req, res) => {
   try {
     const userId = req.auth.userId;
     const wearableData = req.body;
@@ -222,6 +233,7 @@ router.post('/wearable-data', authenticateUser, async (req, res) => {
     const document = {
       ...wearableData,
       userId: userId,
+      clientID: req.auth.clientID || null,
       uploadDate: new Date(),
       createdAt: new Date(),
       source: 'chat_interface'
@@ -229,7 +241,11 @@ router.post('/wearable-data', authenticateUser, async (req, res) => {
 
     const result = await wearableDataCollection.insertOne(document);
 
-    console.log(`✅ Saved wearable data for user ${userId}`);
+    if (req.auth.clientID) {
+      await Client.incrementUploads(req.app.locals.db, req.auth.clientID);
+    }
+
+    console.log(`✅ Saved wearable data for user ${userId} (client: ${req.auth.clientID || 'N/A'})`);
 
     res.status(201).json({
       success: true,
@@ -285,7 +301,7 @@ router.get('/health-metrics/:userId', authenticateUser, async (req, res) => {
  * POST /api/health-metrics
  * Save new health metrics for authenticated user
  */
-router.post('/health-metrics', authenticateUser, async (req, res) => {
+router.post('/health-metrics', authenticateUser, ensureClient, async (req, res) => {
   try {
     const userId = req.auth.userId;
     const metricsData = req.body;
@@ -302,6 +318,7 @@ router.post('/health-metrics', authenticateUser, async (req, res) => {
     const document = {
       ...metricsData,
       userId: userId,
+      clientID: req.auth.clientID || null,
       uploadDate: new Date(),
       timestamp: metricsData.timestamp || new Date(),
       createdAt: new Date(),
@@ -310,7 +327,11 @@ router.post('/health-metrics', authenticateUser, async (req, res) => {
 
     const result = await healthMetricsCollection.insertOne(document);
 
-    console.log(`✅ Saved health metrics for user ${userId}`);
+    if (req.auth.clientID) {
+      await Client.incrementUploads(req.app.locals.db, req.auth.clientID);
+    }
+
+    console.log(`✅ Saved health metrics for user ${userId} (client: ${req.auth.clientID || 'N/A'})`);
 
     res.status(201).json({
       success: true,
@@ -363,7 +384,7 @@ router.get('/medical-reports/:userId', authenticateUser, async (req, res) => {
  * POST /api/medical-reports
  * Save new medical report for authenticated user
  */
-router.post('/medical-reports', authenticateUser, async (req, res) => {
+router.post('/medical-reports', authenticateUser, ensureClient, async (req, res) => {
   try {
     const userId = req.auth.userId;
     const reportData = req.body;
@@ -380,6 +401,7 @@ router.post('/medical-reports', authenticateUser, async (req, res) => {
     const document = {
       ...reportData,
       userId: userId,
+      clientID: req.auth.clientID || null,
       uploadDate: new Date(),
       createdAt: new Date(),
       source: 'chat_interface'
@@ -387,7 +409,11 @@ router.post('/medical-reports', authenticateUser, async (req, res) => {
 
     const result = await medicalReportsCollection.insertOne(document);
 
-    console.log(`✅ Saved medical report for user ${userId}`);
+    if (req.auth.clientID) {
+      await Client.incrementUploads(req.app.locals.db, req.auth.clientID);
+    }
+
+    console.log(`✅ Saved medical report for user ${userId} (client: ${req.auth.clientID || 'N/A'})`);
 
     res.status(201).json({
       success: true,
@@ -440,7 +466,7 @@ router.get('/miscellaneous/:userId', authenticateUser, async (req, res) => {
  * POST /api/miscellaneous
  * Save new miscellaneous data for authenticated user
  */
-router.post('/miscellaneous', authenticateUser, async (req, res) => {
+router.post('/miscellaneous', authenticateUser, ensureClient, async (req, res) => {
   try {
     const userId = req.auth.userId;
     const miscData = req.body;
@@ -457,6 +483,7 @@ router.post('/miscellaneous', authenticateUser, async (req, res) => {
     const document = {
       ...miscData,
       userId: userId,
+      clientID: req.auth.clientID || null,
       uploadDate: new Date(),
       createdAt: new Date(),
       source: 'chat_interface'
@@ -464,7 +491,11 @@ router.post('/miscellaneous', authenticateUser, async (req, res) => {
 
     const result = await miscCollection.insertOne(document);
 
-    console.log(`✅ Saved miscellaneous data for user ${userId}`);
+    if (req.auth.clientID) {
+      await Client.incrementUploads(req.app.locals.db, req.auth.clientID);
+    }
+
+    console.log(`✅ Saved miscellaneous data for user ${userId} (client: ${req.auth.clientID || 'N/A'})`);
 
     res.status(201).json({
       success: true,
