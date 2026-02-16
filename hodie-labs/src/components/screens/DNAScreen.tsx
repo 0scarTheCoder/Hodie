@@ -16,8 +16,17 @@ import {
   Loader2,
   Upload
 } from 'lucide-react';
-import type { DNAInsight, HealthContext } from '../../services/kimiK2Service';
 import FileUpload from '../common/FileUpload';
+
+interface DNAInsight {
+  gene: string;
+  variant: string;
+  trait: string;
+  description: string;
+  recommendation: string;
+  impact: string;
+  color: string;
+}
 
 interface DNAScreenProps {
   user: User;
@@ -90,6 +99,7 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
           const extractedTraits = extractTraits(geneticData);
           setHealthRisks(extractedRisks);
           setTraits(extractedTraits);
+          generateInsightsFromGeneticData(extractedRisks, extractedTraits);
         } else {
           // No genetic data - leave arrays empty
           setHealthRisks([]);
@@ -169,6 +179,67 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
     });
 
     return traitsList;
+  };
+
+  // Generate DNA insights from health risks and traits
+  const generateInsightsFromGeneticData = (risks: HealthRisk[], traitsList: Trait[]) => {
+    const fitness: DNAInsight[] = [];
+    const nutrition: DNAInsight[] = [];
+    const health: DNAInsight[] = [];
+
+    // Map health risks to insights by category
+    risks.forEach((risk) => {
+      const condition = risk.condition.toLowerCase();
+      const insight: DNAInsight = {
+        gene: 'Multiple',
+        variant: risk.risk,
+        trait: risk.condition,
+        description: `Your genetic profile indicates a ${risk.risk.toLowerCase()} risk for ${risk.condition}. Genetic contribution: ${risk.genetic}%, lifestyle contribution: ${risk.lifestyle}%.`,
+        recommendation: '',
+        impact: risk.genetic > 40 ? 'High' : risk.genetic > 20 ? 'Medium' : 'Low',
+        color: risk.color
+      };
+
+      if (condition.includes('heart') || condition.includes('cardio') || condition.includes('blood pressure')) {
+        insight.recommendation = 'Regular cardiovascular exercise (150+ minutes/week) can significantly reduce this risk regardless of genetic predisposition.';
+        fitness.push(insight);
+      } else if (condition.includes('diabetes') || condition.includes('obesity') || condition.includes('metabol') || condition.includes('cholesterol')) {
+        insight.recommendation = 'A balanced diet rich in fibre, whole grains, and lean protein can help manage this genetic predisposition.';
+        nutrition.push(insight);
+      } else {
+        insight.recommendation = 'Consult with your GP about monitoring and prevention strategies for this condition.';
+        health.push(insight);
+      }
+    });
+
+    // Map traits to insights
+    traitsList.forEach((trait) => {
+      const traitName = trait.trait.toLowerCase();
+      const insight: DNAInsight = {
+        gene: trait.gene,
+        variant: 'Identified',
+        trait: trait.trait,
+        description: trait.result,
+        recommendation: '',
+        impact: 'Medium',
+        color: 'text-blue-600'
+      };
+
+      if (traitName.includes('sleep') || traitName.includes('endurance') || traitName.includes('muscle') || traitName.includes('recovery') || traitName.includes('exercise')) {
+        insight.recommendation = 'Tailor your exercise routine to align with your genetic strengths.';
+        fitness.push(insight);
+      } else if (traitName.includes('caffeine') || traitName.includes('lactose') || traitName.includes('vitamin') || traitName.includes('metabolism') || traitName.includes('diet') || traitName.includes('food')) {
+        insight.recommendation = 'Adjust your dietary choices based on your genetic metabolism profile.';
+        nutrition.push(insight);
+      } else if (traitName.includes('stress') || traitName.includes('mood') || traitName.includes('immune') || traitName.includes('inflammation')) {
+        insight.recommendation = 'Consider lifestyle modifications that support your genetic profile.';
+        health.push(insight);
+      }
+    });
+
+    setFitnessInsights(fitness);
+    setNutritionInsights(nutrition);
+    setHealthInsights(health);
   };
 
   // Determine risk color based on risk level

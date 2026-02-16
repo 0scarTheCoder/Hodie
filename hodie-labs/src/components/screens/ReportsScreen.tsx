@@ -128,21 +128,21 @@ const ReportsScreen: React.FC<ReportsScreenProps> = ({ user }) => {
           setAchievements(extractedAchievements);
           setUpcomingReports(extractedUpcoming);
         } else {
-          // Use default data if no reports available
-          setReports(getDefaultReports());
-          setHealthMetrics(getDefaultHealthMetrics());
-          setAchievements(getDefaultAchievements());
-          setUpcomingReports(getDefaultUpcomingReports());
+          // No reports available - show empty state
+          setReports([]);
+          setHealthMetrics([]);
+          setAchievements([]);
+          setUpcomingReports([]);
         }
 
       } catch (err) {
         console.error('Error fetching medical reports:', err);
         setReportsError(err instanceof Error ? err.message : 'Failed to load medical reports');
-        // Use default data on error
-        setReports(getDefaultReports());
-        setHealthMetrics(getDefaultHealthMetrics());
-        setAchievements(getDefaultAchievements());
-        setUpcomingReports(getDefaultUpcomingReports());
+        // Show empty state on error
+        setReports([]);
+        setHealthMetrics([]);
+        setAchievements([]);
+        setUpcomingReports([]);
       } finally {
         setIsLoadingReports(false);
       }

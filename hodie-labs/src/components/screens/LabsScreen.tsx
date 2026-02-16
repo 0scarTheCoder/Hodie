@@ -466,17 +466,47 @@ const LabsScreen: React.FC<LabsScreenProps> = ({ user }) => {
           <h1 className="text-3xl font-bold text-white mb-2">Lab Results & Biomarkers</h1>
           <p className="text-white/70">Track your biomarker trends and health improvements over time</p>
         </div>
-        <div className="bg-blue-500/20 border border-blue-500/50 rounded-xl p-8 text-center">
-          <Stethoscope className="w-16 h-16 text-blue-400 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-white mb-2">No Lab Results Available</h3>
-          <p className="text-white/70 mb-6">
-            Upload your lab results to see personalised biomarker analysis and AI-powered health insights.
-          </p>
-          <button className="flex items-center space-x-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg mx-auto">
-            <Upload className="w-5 h-5" />
-            <span>Upload Lab Results</span>
-          </button>
-        </div>
+
+        {/* Upload Modal */}
+        {showUploadModal && (
+          <div className="mb-6 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-xl p-6 border border-white/10">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-white">Upload Lab Results</h3>
+              <button
+                onClick={() => setShowUploadModal(false)}
+                className="text-white/70 hover:text-white"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <FileUpload
+              category="lab_results"
+              onUploadSuccess={() => {
+                setShowUploadModal(false);
+                window.location.reload();
+              }}
+            />
+          </div>
+        )}
+
+        {!showUploadModal && (
+          <div className="bg-blue-500/20 border border-blue-500/50 rounded-xl p-8 text-center">
+            <Stethoscope className="w-16 h-16 text-blue-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-white mb-2">No Lab Results Available</h3>
+            <p className="text-white/70 mb-6">
+              Upload your lab results to see personalised biomarker analysis and AI-powered health insights.
+            </p>
+            <button
+              onClick={() => setShowUploadModal(true)}
+              className="flex items-center space-x-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg mx-auto"
+            >
+              <Upload className="w-5 h-5" />
+              <span>Upload Lab Results</span>
+            </button>
+          </div>
+        )}
       </div>
     );
   }
@@ -635,7 +665,11 @@ const LabsScreen: React.FC<LabsScreenProps> = ({ user }) => {
           <div className="flex items-center space-x-3">
             <Calendar className="w-8 h-8 text-purple-400" />
             <div>
-              <div className="text-2xl font-bold text-white">Oct 15</div>
+              <div className="text-2xl font-bold text-white">
+                {biomarkers.length > 0
+                  ? new Date(Math.max(...biomarkers.map(b => new Date(b.lastTest).getTime()))).toLocaleDateString('en-AU', { month: 'short', day: 'numeric' })
+                  : 'N/A'}
+              </div>
               <div className="text-sm text-white/70">Last Test</div>
             </div>
           </div>
@@ -751,41 +785,51 @@ const LabsScreen: React.FC<LabsScreenProps> = ({ user }) => {
             <div className="bg-gray-100 rounded-lg p-3">
               <div className="text-xs text-gray-600 mb-2">6-month trend</div>
               <div className="relative h-12 w-full">
-                <svg className="w-full h-full" viewBox="0 0 100 40" preserveAspectRatio="none">
-                  <polyline
-                    fill="none"
-                    stroke="#60a5fa"
-                    strokeWidth="2"
-                    points={biomarker.history.map((value, idx) => {
+                {biomarker.history.length <= 1 ? (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="flex items-center space-x-2">
+                      <svg className="w-full h-full" viewBox="0 0 100 40">
+                        <circle cx="50" cy="20" r="3" fill="#60a5fa" />
+                      </svg>
+                      <span className="text-xs text-gray-500">Single reading</span>
+                    </div>
+                  </div>
+                ) : (
+                  <svg className="w-full h-full" viewBox="0 0 100 40" preserveAspectRatio="none">
+                    <polyline
+                      fill="none"
+                      stroke="#60a5fa"
+                      strokeWidth="2"
+                      points={biomarker.history.map((value, idx) => {
+                        const maxVal = Math.max(...biomarker.history);
+                        const minVal = Math.min(...biomarker.history);
+                        const range = maxVal - minVal || 1;
+                        const x = (idx / (biomarker.history.length - 1)) * 100;
+                        const y = 40 - ((value - minVal) / range) * 30;
+                        return `${x},${y}`;
+                      }).join(' ')}
+                    />
+                    {biomarker.history.map((value, idx) => {
                       const maxVal = Math.max(...biomarker.history);
                       const minVal = Math.min(...biomarker.history);
                       const range = maxVal - minVal || 1;
                       const x = (idx / (biomarker.history.length - 1)) * 100;
                       const y = 40 - ((value - minVal) / range) * 30;
-                      return `${x},${y}`;
-                    }).join(' ')}
-                  />
-                  {/* Data points */}
-                  {biomarker.history.map((value, idx) => {
-                    const maxVal = Math.max(...biomarker.history);
-                    const minVal = Math.min(...biomarker.history);
-                    const range = maxVal - minVal || 1;
-                    const x = (idx / (biomarker.history.length - 1)) * 100;
-                    const y = 40 - ((value - minVal) / range) * 30;
-                    return (
-                      <circle
-                        key={idx}
-                        cx={x}
-                        cy={y}
-                        r="2"
-                        fill="#60a5fa"
-                        className="hover:fill-blue-300"
-                      >
-                        <title>{`${value} ${biomarker.unit}`}</title>
-                      </circle>
-                    );
-                  })}
-                </svg>
+                      return (
+                        <circle
+                          key={idx}
+                          cx={x}
+                          cy={y}
+                          r="2"
+                          fill="#60a5fa"
+                          className="hover:fill-blue-300"
+                        >
+                          <title>{`${value} ${biomarker.unit}`}</title>
+                        </circle>
+                      );
+                    })}
+                  </svg>
+                )}
               </div>
             </div>
 

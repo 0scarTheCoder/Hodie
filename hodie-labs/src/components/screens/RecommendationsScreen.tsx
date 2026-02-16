@@ -20,9 +20,10 @@ import type { HealthRecommendation, HealthContext } from '../../services/kimiK2S
 interface RecommendationsScreenProps {
   user: User;
   healthScore: number;
+  onScreenChange?: (screen: string) => void;
 }
 
-const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, healthScore }) => {
+const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, healthScore, onScreenChange }) => {
   const { getAccessToken } = useAuth();
   const [selectedFilter, setSelectedFilter] = useState<string>('All');
   const [recommendations, setRecommendations] = useState<HealthRecommendation[]>([]);
@@ -336,6 +337,7 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
             Complete health assessments and upload data to receive personalised AI-powered health recommendations.
           </p>
           <button
+            onClick={() => onScreenChange && onScreenChange('labs')}
             className="flex items-center space-x-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg mx-auto"
           >
             <Upload className="w-5 h-5" />

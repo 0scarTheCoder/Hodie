@@ -36,6 +36,7 @@ import ChatbotTester from '../testing/ChatbotTester';
 import DemoScreen from '../screens/DemoScreen';
 import HealthDataUploadTester from '../testing/HealthDataUploadTester';
 import { userMetricsService, HealthScoreMetrics, UserLoginData } from '../../services/userMetricsService';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface DashboardProps {
   user: User;
@@ -66,11 +67,13 @@ interface RiskCategory {
 }
 
 const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
+  const { getAccessToken } = useAuth();
   const [healthScore, setHealthScore] = useState<HealthScoreMetrics | null>(null);
   const [loginData, setLoginData] = useState<UserLoginData | null>(null);
   const [loading, setLoading] = useState(true);
   const [showChat, setShowChat] = useState(false);
   const [initialChatQuery, setInitialChatQuery] = useState<string>('');
+  const [labBiomarkers, setLabBiomarkers] = useState<Record<string, { value: number; unit: string; date: string }>>({});
 
   // Lock body scroll when chat is open
   useEffect(() => {
@@ -102,14 +105,44 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
   // API access is now guaranteed for all users with hardcoded key
   const hasApiAccess = true;
 
-  // Static health metrics for demo - these would come from blood tests/body scans
-  const healthMetrics = {
-    systolic: 120,
-    diastolic: 80,
-    heartRate: 72,
-    cholesterol: 1.78,
-    psaLevel: 0.57
-  };
+  // Fetch lab biomarkers for dashboard display
+  useEffect(() => {
+    const fetchLabData = async () => {
+      try {
+        const userId = (user as any).sub || (user as any).uid;
+        const token = await getAccessToken().catch(() => null);
+        const headers: HeadersInit = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        const response = await fetch(
+          `${process.env.REACT_APP_API_BASE_URL}/lab-results/${userId}`,
+          { headers }
+        );
+        if (!response.ok) return;
+
+        const labResults = await response.json();
+        if (!labResults || labResults.length === 0) return;
+
+        // Extract latest biomarker values by name
+        const latest: Record<string, { value: number; unit: string; date: string }> = {};
+        labResults.forEach((result: any) => {
+          const date = result.testDate || result.uploadDate || new Date().toISOString();
+          if (result.biomarkers && Array.isArray(result.biomarkers)) {
+            result.biomarkers.forEach((bm: any) => {
+              const key = (bm.name || '').toLowerCase().replace(/\s+/g, '');
+              if (bm.value && !latest[key]) {
+                latest[key] = { value: parseFloat(bm.value), unit: bm.unit || '', date };
+              }
+            });
+          }
+        });
+        setLabBiomarkers(latest);
+      } catch (err) {
+        // Silent fail - dashboard will show empty state
+      }
+    };
+    fetchLabData();
+  }, [user, getAccessToken]);
 
   useEffect(() => {
     const initialiseUserMetrics = async () => {
@@ -322,7 +355,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
   const renderScreenContent = () => {
     switch (currentScreen) {
       case 'recommendations':
-        return <RecommendationsScreen user={user} healthScore={healthScore?.currentScore || 50} />;
+        return <RecommendationsScreen user={user} healthScore={healthScore?.currentScore || 50} onScreenChange={(screen) => setCurrentScreen(screen as any)} />;
       case 'dna':
         return <DNAScreen user={user} />;
       case 'labs':
@@ -508,30 +541,35 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
         <div className="bg-white/10 rounded-2xl p-6 shadow-xl flex flex-col h-full border border-white/20 backdrop-blur-sm">
           <div className="flex-1">
             <h3 className="text-lg font-semibold mb-4 text-white">Your Health Summary</h3>
-            <p className="text-sm text-white/70 mb-4">Latest Readings</p>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-white/80">Systolic</span>
-                {renderMiniGauge(`${healthMetrics.systolic}`, 'optimal')}
+            {Object.keys(labBiomarkers).length > 0 ? (
+              <>
+                <p className="text-sm text-white/70 mb-4">Latest Readings</p>
+                <div className="space-y-4">
+                  {['glucose', 'hemoglobin', 'totalcholesterol', 'hdlcholesterol', 'vitamind'].map(key => {
+                    const bm = labBiomarkers[key];
+                    if (!bm) return null;
+                    const labels: Record<string, string> = { glucose: 'Glucose', hemoglobin: 'Haemoglobin', totalcholesterol: 'Total Cholesterol', hdlcholesterol: 'HDL Cholesterol', vitamind: 'Vitamin D' };
+                    return (
+                      <div key={key} className="flex justify-between items-center">
+                        <span className="text-white/80">{labels[key] || key}</span>
+                        {renderMiniGauge(`${bm.value}`, 'optimal')}
+                      </div>
+                    );
+                  }).filter(Boolean).slice(0, 4)}
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-4">
+                <Stethoscope className="w-10 h-10 text-white/30 mx-auto mb-3" />
+                <p className="text-sm text-white/60">Upload your lab results to see your health summary</p>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-white/80">Diastolic</span>
-                {renderMiniGauge(`${healthMetrics.diastolic}`, 'optimal')}
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-white/80">Heart Rate</span>
-                {renderMiniGauge(`${healthMetrics.heartRate}`, 'optimal')}
-              </div>
-            </div>
-            <div className="mt-6 h-2 bg-white/20 rounded-full">
-              <div className="h-2 bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 rounded-full" style={{ width: '60%' }}></div>
-            </div>
+            )}
           </div>
-          <button 
+          <button
             onClick={() => setCurrentScreen('labs')}
             className="w-full mt-4 bg-white/20 hover:bg-white/30 text-white py-2 rounded-lg text-sm transition-colors"
           >
-            View Full Labs →
+            {Object.keys(labBiomarkers).length > 0 ? 'View Full Labs →' : 'Upload Lab Results →'}
           </button>
         </div>
 
@@ -540,24 +578,43 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
           <div className="flex-1">
             <h3 className="text-lg font-semibold mb-2 text-white">Heart Health</h3>
             <p className="text-sm text-white/70 mb-4">Measures blood pressure and cholesterols for assessing heart disease risk.</p>
-            <div className="space-y-3">
-              <div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-white/80">Resting Heart Rate</span>
-                  <span className="text-green-400 font-medium">OPTIMAL</span>
-                </div>
-                <div className="text-xs text-white/60">45 bpm • Aug 2025</div>
+            {(labBiomarkers['hdlcholesterol'] || labBiomarkers['ldlcholesterol'] || labBiomarkers['triglycerides']) ? (
+              <div className="space-y-3">
+                {labBiomarkers['hdlcholesterol'] && (
+                  <div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-white/80">HDL Cholesterol</span>
+                      <span className="text-green-400 font-medium">OPTIMAL</span>
+                    </div>
+                    <div className="text-xs text-white/60">{labBiomarkers['hdlcholesterol'].value} {labBiomarkers['hdlcholesterol'].unit} • {new Date(labBiomarkers['hdlcholesterol'].date).toLocaleDateString('en-AU', { month: 'short', year: 'numeric' })}</div>
+                  </div>
+                )}
+                {labBiomarkers['ldlcholesterol'] && (
+                  <div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-white/80">LDL Cholesterol</span>
+                      <span className="text-green-400 font-medium">OPTIMAL</span>
+                    </div>
+                    <div className="text-xs text-white/60">{labBiomarkers['ldlcholesterol'].value} {labBiomarkers['ldlcholesterol'].unit} • {new Date(labBiomarkers['ldlcholesterol'].date).toLocaleDateString('en-AU', { month: 'short', year: 'numeric' })}</div>
+                  </div>
+                )}
+                {labBiomarkers['triglycerides'] && (
+                  <div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-white/80">Triglycerides</span>
+                      <span className="text-green-400 font-medium">OPTIMAL</span>
+                    </div>
+                    <div className="text-xs text-white/60">{labBiomarkers['triglycerides'].value} {labBiomarkers['triglycerides'].unit} • {new Date(labBiomarkers['triglycerides'].date).toLocaleDateString('en-AU', { month: 'short', year: 'numeric' })}</div>
+                  </div>
+                )}
               </div>
-              <div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-white/80">HDL Cholesterol</span>
-                  <span className="text-green-400 font-medium">OPTIMAL</span>
-                </div>
-                <div className="text-xs text-white/60">{healthMetrics.cholesterol} mmol/L • Aug 2025</div>
+            ) : (
+              <div className="text-center py-2">
+                <p className="text-sm text-white/60">Upload blood test results to see your cardiovascular markers</p>
               </div>
-            </div>
+            )}
           </div>
-          <button 
+          <button
             onClick={() => setCurrentScreen('labs')}
             className="w-full mt-4 bg-white/20 hover:bg-white/30 text-white py-2 rounded-lg text-sm transition-colors"
           >
@@ -565,20 +622,48 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
           </button>
         </div>
 
-        {/* Tumour Markers */}
+        {/* Kidney & Liver */}
         <div className="bg-white/10 rounded-2xl p-6 shadow-xl flex flex-col h-full border border-white/20 backdrop-blur-sm">
           <div className="flex-1">
-            <h3 className="text-lg font-semibold mb-2 text-white">Tumour Markers</h3>
-            <p className="text-sm text-white/70 mb-4">Biomarkers for early detection of various types of cancers.</p>
-            <div>
-              <div className="flex justify-between text-sm">
-                <span className="text-white/80">Prostate sp.antigen (PSA)</span>
-                <span className="text-green-400 font-medium">OPTIMAL</span>
+            <h3 className="text-lg font-semibold mb-2 text-white">Kidney & Liver</h3>
+            <p className="text-sm text-white/70 mb-4">Key biomarkers for organ function and metabolic health.</p>
+            {(labBiomarkers['creatinine'] || labBiomarkers['egfr'] || labBiomarkers['alt']) ? (
+              <div className="space-y-3">
+                {labBiomarkers['egfr'] && (
+                  <div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-white/80">eGFR</span>
+                      <span className="text-green-400 font-medium">OPTIMAL</span>
+                    </div>
+                    <div className="text-xs text-white/60">{labBiomarkers['egfr'].value} {labBiomarkers['egfr'].unit} • {new Date(labBiomarkers['egfr'].date).toLocaleDateString('en-AU', { month: 'short', year: 'numeric' })}</div>
+                  </div>
+                )}
+                {labBiomarkers['alt'] && (
+                  <div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-white/80">ALT</span>
+                      <span className="text-green-400 font-medium">OPTIMAL</span>
+                    </div>
+                    <div className="text-xs text-white/60">{labBiomarkers['alt'].value} {labBiomarkers['alt'].unit} • {new Date(labBiomarkers['alt'].date).toLocaleDateString('en-AU', { month: 'short', year: 'numeric' })}</div>
+                  </div>
+                )}
+                {labBiomarkers['creatinine'] && (
+                  <div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-white/80">Creatinine</span>
+                      <span className="text-green-400 font-medium">OPTIMAL</span>
+                    </div>
+                    <div className="text-xs text-white/60">{labBiomarkers['creatinine'].value} {labBiomarkers['creatinine'].unit} • {new Date(labBiomarkers['creatinine'].date).toLocaleDateString('en-AU', { month: 'short', year: 'numeric' })}</div>
+                  </div>
+                )}
               </div>
-              <div className="text-xs text-white/60">{healthMetrics.psaLevel} ug/L • Jun 2024</div>
-            </div>
+            ) : (
+              <div className="text-center py-2">
+                <p className="text-sm text-white/60">Upload blood test results to see your organ function markers</p>
+              </div>
+            )}
           </div>
-          <button 
+          <button
             onClick={() => setCurrentScreen('labs')}
             className="w-full mt-4 bg-white/20 hover:bg-white/30 text-white py-2 rounded-lg text-sm transition-colors"
           >
