@@ -209,7 +209,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
         left: ${Math.random() * 100}vw;
         top: -10px;
         z-index: 10000;
-        animation: confetti-fall ${2 + Math.random() * 3}s linear forwardss;
+        animation: confetti-fall ${2 + Math.random() * 3}s linear forwards;
         border-radius: 50%;
       `;
       
@@ -844,7 +844,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
   return (
     <div className="bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white font-poppins" style={{ minHeight: '100vh' }}>
       {/* Brand Header */}
-      <BrandHeader 
+      <BrandHeader
         user={user}
         currentScreen={currentScreen}
         onScreenChange={(screen) => {
@@ -855,6 +855,8 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
           }
         }}
         showNavigation={true}
+        mobileMenuOpen={mobileMenuOpen}
+        onMobileMenuToggle={() => setMobileMenuOpen(!mobileMenuOpen)}
       />
 
       {/* Mobile Navigation Menu */}

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User } from 'firebase/auth';
-import { 
+import { useAuth } from '../../contexts/AuthContext';
+import {
   User as UserIcon,
   Mail,
   Phone,
@@ -91,21 +92,66 @@ interface AISettings {
 }
 
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
+  const { getAccessToken } = useAuth();
   const [activeTab, setActiveTab] = useState<'profile' | 'privacy' | 'notifications' | 'payment' | 'ai' | 'account'>('profile');
   const [isEditing, setIsEditing] = useState(false);
-  
+  const [clientID, setClientID] = useState<string | null>(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+
   const [userProfile, setUserProfile] = useState<UserProfile>({
     displayName: user.displayName || '',
     email: user.email || '',
-    phone: '+61 400 000 000',
-    dateOfBirth: '1985-03-15',
-    gender: 'Male',
-    location: 'Sydney, Australia',
-    emergencyContact: 'Jane Doe - +61 400 111 222',
-    medicalConditions: ['Hypertension', 'Type 2 Diabetes'],
-    medications: ['Metformin 500mg', 'Lisinopril 10mg'],
-    allergies: ['Penicillin', 'Shellfish']
+    phone: '',
+    dateOfBirth: '',
+    gender: '',
+    location: '',
+    emergencyContact: '',
+    medicalConditions: [],
+    medications: [],
+    allergies: []
   });
+
+  // Fetch client data from backend on mount
+  useEffect(() => {
+    const fetchClientData = async () => {
+      try {
+        const token = await getAccessToken().catch(() => null);
+        if (!token) {
+          setLoadingProfile(false);
+          return;
+        }
+
+        const response = await fetch(
+          `${process.env.REACT_APP_API_BASE_URL?.replace(/\/api$/, '')}/api/clients/me`,
+          { headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' } }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          const client = data.client;
+          setClientID(client.clientID || null);
+          setUserProfile(prev => ({
+            ...prev,
+            displayName: user.displayName || client.email?.split('@')[0] || '',
+            email: user.email || client.email || '',
+            phone: client.phoneNumber || '',
+            gender: client.sex || '',
+            location: '',
+            emergencyContact: '',
+            medicalConditions: [],
+            medications: [],
+            allergies: []
+          }));
+        }
+      } catch (err) {
+        console.error('Failed to fetch client data:', err);
+      } finally {
+        setLoadingProfile(false);
+      }
+    };
+    fetchClientData();
+  }, [user, getAccessToken]);
 
   const [privacySettings, setPrivacySettings] = useState<PrivacySettings>({
     dataSharing: true,
@@ -141,30 +187,65 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
 
   const [paymentDetails, setPaymentDetails] = useState<PaymentDetails>({
     subscription: {
-      plan: 'premium',
+      plan: 'basic',
       status: 'active',
-      nextBilling: '2025-01-15',
-      amount: 29.99
+      nextBilling: '',
+      amount: 0
     },
     paymentMethod: {
       type: 'card',
-      last4: '4242',
-      expiry: '12/26',
-      brand: 'Visa'
+      last4: '',
+      expiry: '',
+      brand: ''
     },
     billingAddress: {
-      name: 'John Doe',
-      address: '123 Health Street',
-      city: 'Sydney',
-      country: 'Australia',
-      postal: '2000'
+      name: '',
+      address: '',
+      city: '',
+      country: '',
+      postal: ''
     }
   });
 
-  const handleSave = () => {
-    // Here you would save to your backend/database
-    setIsEditing(false);
-    // Show success message
+  const handleSave = async () => {
+    if (!clientID) {
+      setSaveStatus('error');
+      return;
+    }
+    setSaveStatus('saving');
+    try {
+      const token = await getAccessToken().catch(() => null);
+      if (!token) {
+        setSaveStatus('error');
+        return;
+      }
+
+      const updates: Record<string, any> = {};
+      if (userProfile.phone) updates.phoneNumber = userProfile.phone;
+      if (userProfile.gender) updates.sex = userProfile.gender;
+
+      const response = await fetch(
+        `${process.env.REACT_APP_API_BASE_URL?.replace(/\/api$/, '')}/api/clients/${clientID}`,
+        {
+          method: 'PATCH',
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(updates)
+        }
+      );
+
+      if (response.ok) {
+        setSaveStatus('saved');
+        setIsEditing(false);
+        setTimeout(() => setSaveStatus('idle'), 3000);
+      } else {
+        setSaveStatus('error');
+        setTimeout(() => setSaveStatus('idle'), 3000);
+      }
+    } catch (err) {
+      console.error('Failed to save profile:', err);
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    }
   };
 
   const handleExportData = () => {
@@ -316,7 +397,13 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
         {/* Content */}
         <div className="bg-white/10 rounded-2xl p-8 backdrop-blur-sm border border-white/20">
           {/* Profile Tab */}
-          {activeTab === 'profile' && (
+          {activeTab === 'profile' && loadingProfile && (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-white/50" />
+              <span className="ml-3 text-white/50">Loading profile...</span>
+            </div>
+          )}
+          {activeTab === 'profile' && !loadingProfile && (
             <div className="space-y-6">
               <div className="flex justify-between items-center">
                 <h2 className="text-xl font-semibold">Profile Information</h2>
@@ -415,7 +502,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
               </div>
 
               {isEditing && (
-                <div className="flex justify-end space-x-4">
+                <div className="flex justify-end items-center space-x-4">
+                  {saveStatus === 'saved' && <span className="text-green-400 text-sm">Saved successfully</span>}
+                  {saveStatus === 'error' && <span className="text-red-400 text-sm">Failed to save</span>}
                   <button
                     onClick={() => setIsEditing(false)}
                     className="px-6 py-2 border border-white/20 text-white rounded-lg hover:bg-white/10 transition-colors"
@@ -424,10 +513,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
                   </button>
                   <button
                     onClick={handleSave}
-                    className="flex items-center space-x-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                    disabled={saveStatus === 'saving'}
+                    className="flex items-center space-x-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50"
                   >
-                    <Save className="w-4 h-4" />
-                    <span>Save Changes</span>
+                    {saveStatus === 'saving' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                    <span>{saveStatus === 'saving' ? 'Saving...' : 'Save Changes'}</span>
                   </button>
                 </div>
               )}
@@ -608,31 +698,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
                     <h3 className="font-medium">Recent Invoices</h3>
                   </div>
                   
-                  <div className="space-y-3">
-                    {[
-                      { date: '2024-12-15', amount: 29.99, status: 'paid' },
-                      { date: '2024-11-15', amount: 29.99, status: 'paid' },
-                      { date: '2024-10-15', amount: 29.99, status: 'paid' }
-                    ].map((invoice, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-white/5 rounded">
-                        <div className="flex items-center space-x-4">
-                          <div>
-                            <div className="font-medium">${invoice.amount}</div>
-                            <div className="text-sm text-white/60">{new Date(invoice.date).toLocaleDateString()}</div>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-3">
-                          <span className={`px-2 py-1 rounded-full text-xs ${
-                            invoice.status === 'paid' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-                          }`}>
-                            {invoice.status.toUpperCase()}
-                          </span>
-                          <button className="text-blue-400 text-sm hover:underline">
-                            Download
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+                  <div className="text-center py-4 text-white/50 text-sm">
+                    No billing history yet.
                   </div>
                 </div>
 
@@ -757,19 +824,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
               {/* Usage Stats */}
               <div className="p-6 bg-white/5 rounded-lg border border-white/10">
                 <h3 className="font-semibold mb-4 text-white">📈 Usage Overview</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-blue-400">47</div>
-                    <div className="text-sm text-white/60">AI Conversations</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-green-400">12</div>
-                    <div className="text-sm text-white/60">Health Insights</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-purple-400">5</div>
-                    <div className="text-sm text-white/60">DNA Reports</div>
-                  </div>
+                <div className="text-center py-4 text-white/50 text-sm">
+                  Usage tracking coming soon.
                 </div>
               </div>
             </div>

@@ -1,20 +1,24 @@
 import React from 'react';
 import { User } from 'firebase/auth';
 import { useAuth } from '../../contexts/AuthContext';
-import { HelpCircle, Settings, TestTube, Zap } from 'lucide-react';
+import { HelpCircle, Settings, TestTube, Zap, Menu, X } from 'lucide-react';
 
 interface BrandHeaderProps {
   user?: User | any;
   currentScreen?: string;
   onScreenChange?: (screen: string) => void;
   showNavigation?: boolean;
+  mobileMenuOpen?: boolean;
+  onMobileMenuToggle?: () => void;
 }
 
-const BrandHeader: React.FC<BrandHeaderProps> = ({ 
-  user, 
-  currentScreen = 'home', 
+const BrandHeader: React.FC<BrandHeaderProps> = ({
+  user,
+  currentScreen = 'home',
   onScreenChange,
-  showNavigation = true 
+  showNavigation = true,
+  mobileMenuOpen = false,
+  onMobileMenuToggle
 }) => {
   const { logout } = useAuth();
 
@@ -79,6 +83,17 @@ const BrandHeader: React.FC<BrandHeaderProps> = ({
                 </button>
               ))}
             </nav>
+          )}
+
+          {/* Mobile Menu Toggle */}
+          {showNavigation && onMobileMenuToggle && (
+            <button
+              onClick={onMobileMenuToggle}
+              className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           )}
 
           {/* User Section */}
