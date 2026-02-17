@@ -69,9 +69,9 @@ const DNAScreen: React.FC<DNAScreenProps> = ({ user }) => {
       try {
         const userId = (user as any).sub || user.uid;
 
-        // Get Auth0 token
+        // Get auth token
         const token = await getAccessToken().catch((error) => {
-          console.warn('⚠️ Could not get Auth0 token for genetic data:', error);
+          console.warn('⚠️ Could not get auth token for genetic data:', error);
           return null;
         });
 

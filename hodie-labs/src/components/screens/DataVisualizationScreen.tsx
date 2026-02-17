@@ -82,9 +82,9 @@ const DataVisualizationScreen: React.FC<DataVisualizationScreenProps> = ({ user 
 
         console.log('📊 Fetching lab results from:', apiUrl);
 
-        // Get Auth0 token for API authentication
+        // Get auth token for API authentication
         const token = await getAccessToken().catch((error) => {
-          console.warn('⚠️ Could not get Auth0 token for data visualization:', error);
+          console.warn('⚠️ Could not get auth token for data visualization:', error);
           return null;
         });
 

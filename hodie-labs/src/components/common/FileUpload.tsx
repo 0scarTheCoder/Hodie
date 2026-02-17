@@ -46,7 +46,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
     setMessage('');
 
     try {
-      // Get Auth0 token
+      // Get auth token
       const token = await getAccessToken();
 
       // Create FormData

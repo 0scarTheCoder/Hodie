@@ -147,7 +147,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
   useEffect(() => {
     const initialiseUserMetrics = async () => {
       try {
-        // Get user ID (works for both Auth0 'sub' and Firebase 'uid')
+        // Get user ID from Firebase user object
         const userId = (user as any).sub || (user as any).uid;
         console.log('📊 Initializing user metrics for:', userId);
 

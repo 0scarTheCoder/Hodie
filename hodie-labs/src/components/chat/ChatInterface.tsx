@@ -50,12 +50,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user, initialQuery, onQue
   const lastProcessedMessageRef = useRef<string | null>(null);
   const initialQueryProcessedRef = useRef<boolean>(false);
 
-  // Get Auth0 token function for authenticated API calls
+  // Get token function for authenticated API calls
   const { getAccessToken } = useAuth();
 
-  // Helper: Get user ID that works with both Firebase (uid) and Auth0 (sub)
+  // Helper: Get user ID from Firebase user object
   const getUserId = (): string => {
-    // Auth0 user object has 'sub' property
+    // Firebase user object has 'uid' property, legacy has 'sub'
     if ((user as any).sub) {
       return (user as any).sub;
     }
@@ -71,7 +71,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user, initialQuery, onQue
   useEffect(() => {
     const userId = (user as any).sub || (user as any).uid;
     if (userId) {
-      console.log('🔑 Using Auth0 user ID:', userId);
+      console.log('🔑 Using user ID:', userId);
     }
   }, [(user as any).sub || (user as any).uid]);
 
@@ -465,7 +465,7 @@ What would you like to know about your health today?`,
 
       // Get JWT token for authenticated API calls
       const token = await getAccessToken().catch((error) => {
-        console.warn('⚠️ Could not get Auth0 token:', error);
+        console.warn('⚠️ Could not get auth token:', error);
         return null;
       });
 

@@ -79,9 +79,9 @@ const ReportsScreen: React.FC<ReportsScreenProps> = ({ user }) => {
       try {
         const userId = (user as any).sub || user.uid;
 
-        // Get Auth0 token
+        // Get auth token
         const token = await getAccessToken().catch((error) => {
-          console.warn('⚠️ Could not get Auth0 token for reports:', error);
+          console.warn('⚠️ Could not get auth token for reports:', error);
           return null;
         });
 

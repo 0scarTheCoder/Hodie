@@ -244,9 +244,9 @@ Return ONLY the JSON array, no other text.`;
     try {
       const userId = (user as any).sub || user.uid;
 
-      // Get Auth0 token
+      // Get auth token
       const token = await getAccessToken().catch((error) => {
-        console.warn('⚠️ Could not get Auth0 token for saving recommendations:', error);
+        console.warn('⚠️ Could not get auth token for saving recommendations:', error);
         return null;
       });
 
@@ -287,7 +287,7 @@ Return ONLY the JSON array, no other text.`;
       const userId = (user as any).sub || user.uid;
 
       const token = await getAccessToken().catch((error) => {
-        console.warn('⚠️ Could not get Auth0 token for updating recommendation:', error);
+        console.warn('⚠️ Could not get auth token for updating recommendation:', error);
         return null;
       });
 
