@@ -128,7 +128,7 @@ class LabIntegrationService {
   ]);
 
   async processLabResults(rawResults: LabResult[]): Promise<ComprehensiveLabPanel> {
-    console.log('🔬 Processing comprehensive lab results...');
+    // Processing comprehensive lab results
 
     // Normalize and validate results
     const processedResults = this.normalizeLabResults(rawResults);

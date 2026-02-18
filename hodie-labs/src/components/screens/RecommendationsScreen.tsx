@@ -71,7 +71,6 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
         }
 
         const savedRecommendations = await response.json();
-        console.log('💡 Fetched saved recommendations:', savedRecommendations);
 
         // Use saved recommendations if available
         if (savedRecommendations && savedRecommendations.length > 0) {
@@ -110,13 +109,13 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
         );
 
         if (!labResponse.ok) {
-          console.log('💡 No lab data available for recommendations');
+          // No lab data available
           return;
         }
 
         const labResults = await labResponse.json();
         if (!labResults || labResults.length === 0) {
-          console.log('💡 No lab results found, cannot generate recommendations');
+          // No lab results found
           return;
         }
 
@@ -140,11 +139,11 @@ const RecommendationsScreen: React.FC<RecommendationsScreenProps> = ({ user, hea
         });
 
         if (allBiomarkers.length === 0) {
-          console.log('💡 No biomarkers found in lab results');
+          // No biomarkers found
           return;
         }
 
-        console.log(`💡 Generating AI recommendations from ${allBiomarkers.length} biomarkers`);
+        // Generating AI recommendations from biomarkers
 
         // Build a summary of the biomarkers for the AI prompt
         const biomarkerSummary = allBiomarkers.map(bm =>
@@ -176,6 +175,7 @@ Return ONLY the JSON array, no other text.`;
             method: 'POST',
             headers,
             body: JSON.stringify({
+              userId,
               message: prompt,
               conversationHistory: [],
               healthContext: { userId }
@@ -222,7 +222,7 @@ Return ONLY the JSON array, no other text.`;
           completed: false
         }));
 
-        console.log(`💡 Generated ${aiRecommendations.length} AI recommendations`);
+        // AI recommendations generated
         setRecommendations(aiRecommendations);
 
         // Save to MongoDB for future visits

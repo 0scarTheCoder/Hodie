@@ -81,7 +81,7 @@ const LabsScreen: React.FC<LabsScreenProps> = ({ user }) => {
         }
 
         const labResults = await response.json();
-        console.log('📊 Fetched lab results:', labResults);
+        // Lab results fetched
 
         // Process lab results into biomarkers
         if (labResults && labResults.length > 0) {

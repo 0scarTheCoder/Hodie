@@ -46,7 +46,7 @@ class ClaudeService {
         apiKey: this.apiKey,
         dangerouslyAllowBrowser: true // Required for client-side usage
       });
-      console.log('✅ Claude AI Service initialized');
+      // Claude AI Service initialized
     } else {
       console.warn('⚠️ Claude API key not found. Set REACT_APP_CLAUDE_API_KEY in .env');
     }

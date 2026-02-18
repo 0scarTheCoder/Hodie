@@ -149,7 +149,7 @@ const ComprehensiveDashboard: React.FC<DashboardProps> = ({ user }) => {
       try {
         // Get user ID from Firebase user object
         const userId = (user as any).sub || (user as any).uid;
-        console.log('📊 Initializing user metrics for:', userId);
+        // Initialise user metrics
 
         if (!userId) {
           console.warn('⚠️ No user ID available, skipping metrics initialization');

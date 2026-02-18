@@ -67,20 +67,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ user, initialQuery, onQue
     throw new Error('User ID not found in user object');
   };
 
-  // Log user ID once when available (prevents spam)
-  useEffect(() => {
-    const userId = (user as any).sub || (user as any).uid;
-    if (userId) {
-      console.log('🔑 Using user ID:', userId);
-    }
-  }, [(user as any).sub || (user as any).uid]);
+  // Track user ID once when available
+  useEffect(() => {}, [(user as any).sub || (user as any).uid]);
 
   // Initialize AI status and load chat history
   useEffect(() => {
     const initialiseChat = async () => {
       // Force AI to always be enabled
       setAiEnabled(true);
-      console.log('✅ AI: ENABLED');
       
       try {
         // Load recent conversations for context
@@ -184,7 +178,7 @@ What would you like to know about your health today?`,
   // Process initial query if provided
   useEffect(() => {
     if (initialQuery && !initialQueryProcessedRef.current && !isLoading && messages.length > 0) {
-      console.log('📨 Processing initial query:', initialQuery);
+      // Processing initial query
       initialQueryProcessedRef.current = true;
       processQuery(initialQuery);
       if (onQueryProcessed) {
@@ -239,8 +233,6 @@ What would you like to know about your health today?`,
       let genericVizTitle: string | undefined;
 
       if (isVizRequest) {
-        console.log('📊 Visualization request detected');
-
         try {
           const token = await getAccessToken().catch((error) => {
             console.warn('⚠️ Could not get token for visualization:', error);
@@ -271,7 +263,7 @@ What would you like to know about your health today?`,
             });
 
             if (bloodDataset && bloodDataset.results && bloodDataset.results.length > 0) {
-              console.log(`📊 Found blood dataset with ${bloodDataset.results.length} records`);
+              // Found blood dataset
               bloodData = bloodDataset.results.map((record: any) => ({
                 recency: parseFloat(record.recency || record.Recency) || 0,
                 frequency: parseFloat(record.frequency || record.Frequency) || 0,
@@ -279,7 +271,7 @@ What would you like to know about your health today?`,
                 time: parseFloat(record.time || record.Time) || 0,
                 class: parseInt(record.class || record.Class) || 0
               }));
-              console.log(`✅ Ready to display blood data visualizations`);
+              // Ready to display blood data visualizations
             } else {
               // No blood data — use any available lab results for generic visualization
               const anyDataset = labResults.find((result: any) =>
@@ -288,7 +280,7 @@ What would you like to know about your health today?`,
               if (anyDataset && anyDataset.results) {
                 genericVizData = anyDataset.results.slice(0, 2000);
                 genericVizTitle = anyDataset.testType || 'Lab Results';
-                console.log(`📊 Using generic visualization for ${genericVizTitle}: ${genericVizData!.length} records`);
+                // Using generic visualization
               } else {
                 console.warn('⚠️ No visualizable data found in lab results');
               }
@@ -306,7 +298,7 @@ What would you like to know about your health today?`,
 
       // Try client-side Claude first if configured
       if (claudeService.isAvailable()) {
-        console.log('🤖 Using client-side Claude AI for response');
+        // Using client-side Claude AI
 
         let enhancedQuery = query;
         if (healthContext.availableDataSummary) {
@@ -328,7 +320,7 @@ What would you like to know about your health today?`,
         );
       } else {
         // Use backend API (routes to Groq/Claude based on user tier)
-        console.log('🤖 Using backend API for response...');
+        // Using backend API for response
         try {
           const token = await getAccessToken().catch(() => null);
           const chatHeaders: HeadersInit = {
@@ -406,7 +398,7 @@ What would you like to know about your health today?`,
           if (chatRes.ok) {
             const chatData = await chatRes.json();
             responseText = chatData.response;
-            console.log('✅ Backend AI response received');
+            // Backend AI response received
           } else {
             responseText = 'Sorry, I was unable to process your request. Please try again in a moment.';
           }
@@ -461,7 +453,7 @@ What would you like to know about your health today?`,
 
   const getUserHealthContext = async (userId: string) => {
     try {
-      console.log('📊 Fetching comprehensive health context for user:', userId);
+      // Fetch comprehensive health context
 
       // Get JWT token for authenticated API calls
       const token = await getAccessToken().catch((error) => {
@@ -522,7 +514,6 @@ What would you like to know about your health today?`,
             results: result.results || [],
             biomarkers: result.biomarkers || []
           }));
-          console.log(`✅ Found ${labResults.length} lab result datasets with ${context.labResults.reduce((sum: number, r: any) => sum + r.recordCount, 0)} total records`);
         }
       }
 
@@ -536,7 +527,6 @@ What would you like to know about your health today?`,
             uploadDate: data.createdAt,
             variantsCount: data.variants?.length || 0
           }));
-          console.log(`✅ Found ${geneticData.length} genetic datasets`);
         }
       }
 
@@ -548,7 +538,6 @@ What would you like to know about your health today?`,
             recentDays: wearableData.length,
             lastSync: wearableData[0]?.date
           };
-          console.log(`✅ Found ${wearableData.length} days of wearable data`);
         }
       }
 
@@ -561,7 +550,6 @@ What would you like to know about your health today?`,
             reportType: report.reportType,
             uploadDate: report.createdAt
           }));
-          console.log(`✅ Found ${medicalReports.length} medical reports`);
         }
       }
 
@@ -574,7 +562,6 @@ What would you like to know about your health today?`,
             fileName: item.fileName,
             uploadDate: item.createdAt
           }));
-          console.log(`✅ Found ${miscData.length} miscellaneous uploads`);
         }
       }
 
@@ -591,7 +578,6 @@ What would you like to know about your health today?`,
 
       if (availableDataTypes.length > 0) {
         context.availableDataSummary = `You have access to: ${availableDataTypes.join(', ')}`;
-        console.log('📊 Context summary:', context.availableDataSummary);
       }
 
       return context;
@@ -644,7 +630,7 @@ What would you like to know about your health today?`,
   };
 
   const handleFilesUploaded = async (files: UploadedFile[]) => {
-    console.log('📁 Files uploaded:', files.length);
+    // Processing file uploads
     setUploadedFiles(prev => [...prev, ...files]);
 
     // Show processing message
@@ -658,23 +644,20 @@ What would you like to know about your health today?`,
 
     // Process each uploaded file
     for (const file of files) {
-      console.log('📄 Processing file:', file.name, 'Category:', file.category);
       try {
         // Step 1: Parse the file
-        console.log('🔍 Step 1: Parsing file...');
         const parsedData = await healthDataParsingService.parseHealthFile(file.file, file.category);
-        console.log('✅ File parsed successfully:', parsedData);
 
         // Step 2: Use AI to interpret the file and determine database mappings
         // Try: 1) Client-side Claude, 2) Backend Claude API, 3) Basic fallback
-        console.log('🤖 Step 2: AI interpreting file...');
+        // Step 2: AI interpreting file
 
         let aiInterpretation;
         let usedBackendFallback = false;
 
         try {
           if (claudeService.isAvailable()) {
-            console.log('Using client-side Claude AI for file interpretation');
+            // Using client-side Claude AI for file interpretation
             aiInterpretation = await claudeService.interpretHealthFile(
               parsedData.data,
               file.name,
@@ -692,7 +675,7 @@ What would you like to know about your health today?`,
 
         // If frontend AI failed or returned generic fallback, try backend Claude
         if (!aiInterpretation || isGenericFallback) {
-          console.log('🔄 Trying backend Claude API for file interpretation...');
+          // Trying backend Claude API for file interpretation
           try {
             const token = await getAccessToken().catch(() => null);
             const backendHeaders: HeadersInit = { 'Content-Type': 'application/json' };
@@ -722,7 +705,7 @@ What would you like to know about your health today?`,
             if (backendRes.ok) {
               aiInterpretation = await backendRes.json();
               usedBackendFallback = true;
-              console.log('✅ Backend Claude interpretation succeeded');
+              // Backend Claude interpretation succeeded
             } else {
               console.warn('Backend interpretation failed:', backendRes.status);
             }
@@ -742,12 +725,12 @@ What would you like to know about your health today?`,
           };
         }
 
-        console.log('✅ AI interpretation complete:', aiInterpretation, usedBackendFallback ? '(via backend Claude)' : '');
+        // AI interpretation complete
 
         // Step 3: Save to database based on AI recommendations
-        console.log('💾 Step 3: Saving to database...');
+        // Step 3: Saving to database
         await saveToDatabaseWithAI(aiInterpretation.databaseMappings, getUserId());
-        console.log('✅ Saved to database successfully');
+        // Saved to database successfully
 
         // Step 4: Create comprehensive message with AI insights
         const interpretationText = formatFileInterpretation(
@@ -903,7 +886,7 @@ What would you like to know about your health today?`,
     const bytesPerRow = sampleBytes / sampleSize;
     const maxRows = Math.max(100, Math.floor(maxBytes / bytesPerRow));
     if (data.length <= maxRows) return data;
-    console.log(`📦 Truncating from ${data.length} to ${maxRows} rows (est. ${(bytesPerRow * data.length / 1_000_000).toFixed(1)}MB → ${(bytesPerRow * maxRows / 1_000_000).toFixed(1)}MB)`);
+    // Truncating large dataset to fit payload limits
     return data.slice(0, maxRows);
   };
 
@@ -914,15 +897,15 @@ What would you like to know about your health today?`,
       throw new Error('AI did not provide any database mappings. The file may not have been interpreted correctly.');
     }
 
-    console.log(`💾 Attempting to save ${mappings.length} mapping(s) to database...`);
+    // Saving mappings to database
 
     let successCount = 0;
     let failCount = 0;
 
     try {
       for (const mapping of mappings) {
-        console.log(`📤 Saving to collection: ${mapping.collection}`);
-        console.log(`📊 Fields to save:`, Object.keys(mapping.fields));
+        // Saving to collection
+        // Fields mapped for save
 
         // Truncate large data arrays to avoid 413 payload errors
         const fields = { ...mapping.fields };
@@ -960,7 +943,7 @@ What would you like to know about your health today?`,
         const endpoint = getApiEndpoint(mapping.collection);
         const apiUrl = `${process.env.REACT_APP_API_BASE_URL}/${endpoint}`;
 
-        console.log(`🔗 POST to: ${apiUrl}`);
+        // POST to API
 
         const token = await getAccessToken().catch(() => null);
         const headers: HeadersInit = { 'Content-Type': 'application/json' };
@@ -980,12 +963,12 @@ What would you like to know about your health today?`,
           failCount++;
         } else {
           const savedData = await response.json();
-          console.log(`✅ Successfully saved to ${mapping.collection}:`, savedData._id);
+          // Successfully saved to collection
           successCount++;
         }
       }
 
-      console.log(`📊 Save summary: ${successCount} succeeded, ${failCount} failed`);
+      // Save complete
 
       if (successCount === 0) {
         throw new Error(`Failed to save any data to database. Check console for details.`);

@@ -65,7 +65,6 @@ class QueryLogger {
     this.logs.push(queryLog);
     this.saveLogsToStorage();
     
-    console.log(`[Query Logger] Logged query: ${logId}`, queryLog);
     return logId;
   }
 
@@ -74,7 +73,6 @@ class QueryLogger {
     if (log) {
       log.response = response;
       this.saveLogsToStorage();
-      console.log(`[Query Logger] Logged response for: ${logId}`);
     }
   }
 
