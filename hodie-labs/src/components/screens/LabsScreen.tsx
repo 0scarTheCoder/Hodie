@@ -185,7 +185,7 @@ const LabsScreen: React.FC<LabsScreenProps> = ({ user }) => {
     return 'good';
   };
 
-  // Clinical reference ranges for common biomarkers
+  // HODIE Clinical Library v2 — Australia-Optimised, Longevity-Focused reference ranges
   interface ClinicalReference {
     unit: string;
     range: string;
@@ -194,64 +194,92 @@ const LabsScreen: React.FC<LabsScreenProps> = ({ user }) => {
     optimalHigh: number;
     borderlineLow: number;
     borderlineHigh: number;
+    highThreshold?: number;      // Above this = "high"
+    veryHighThreshold?: number;  // Above this = "very high"
+    longevityWeight?: number;    // 0–1 weighting for longevity score
   }
 
   const getClinicalReference = (name: string): ClinicalReference | null => {
     const key = name.toLowerCase().replace(/[_\s-]+/g, '');
     const refs: Record<string, ClinicalReference> = {
-      // Cardiovascular
-      'totalcholesterol': { unit: 'mmol/L', range: '< 5.5', category: 'Cardiovascular', optimalLow: 0, optimalHigh: 5.0, borderlineLow: 0, borderlineHigh: 5.5 },
-      'cholesterol': { unit: 'mmol/L', range: '< 5.5', category: 'Cardiovascular', optimalLow: 0, optimalHigh: 5.0, borderlineLow: 0, borderlineHigh: 5.5 },
-      'hdl': { unit: 'mmol/L', range: '> 1.0', category: 'Cardiovascular', optimalLow: 1.2, optimalHigh: 3.0, borderlineLow: 1.0, borderlineHigh: 4.0 },
-      'hdlcholesterol': { unit: 'mmol/L', range: '> 1.0', category: 'Cardiovascular', optimalLow: 1.2, optimalHigh: 3.0, borderlineLow: 1.0, borderlineHigh: 4.0 },
-      'ldl': { unit: 'mmol/L', range: '< 3.4', category: 'Cardiovascular', optimalLow: 0, optimalHigh: 2.6, borderlineLow: 0, borderlineHigh: 3.4 },
-      'ldlcholesterol': { unit: 'mmol/L', range: '< 3.4', category: 'Cardiovascular', optimalLow: 0, optimalHigh: 2.6, borderlineLow: 0, borderlineHigh: 3.4 },
-      'triglycerides': { unit: 'mmol/L', range: '< 1.7', category: 'Cardiovascular', optimalLow: 0, optimalHigh: 1.5, borderlineLow: 0, borderlineHigh: 2.0 },
-      // Metabolic
-      'glucose': { unit: 'mmol/L', range: '3.9 - 5.5', category: 'Metabolic', optimalLow: 3.9, optimalHigh: 5.5, borderlineLow: 3.5, borderlineHigh: 6.1 },
-      'fastingglucose': { unit: 'mmol/L', range: '3.9 - 5.5', category: 'Metabolic', optimalLow: 3.9, optimalHigh: 5.5, borderlineLow: 3.5, borderlineHigh: 6.1 },
-      'hba1c': { unit: '%', range: '< 5.7', category: 'Metabolic', optimalLow: 4.0, optimalHigh: 5.6, borderlineLow: 3.5, borderlineHigh: 6.4 },
-      'insulin': { unit: 'mU/L', range: '2.6 - 24.9', category: 'Metabolic', optimalLow: 2.6, optimalHigh: 15.0, borderlineLow: 1.0, borderlineHigh: 24.9 },
-      // Blood
+      // ── Cardiovascular Risk (HODIE CORE Section 3) ──
+      'apob': { unit: 'g/L', range: '< 0.8', category: 'Cardiovascular', optimalLow: 0, optimalHigh: 0.8, borderlineLow: 0, borderlineHigh: 1.0, highThreshold: 1.0, veryHighThreshold: 1.3, longevityWeight: 0.15 },
+      'apolipoproteinb': { unit: 'g/L', range: '< 0.8', category: 'Cardiovascular', optimalLow: 0, optimalHigh: 0.8, borderlineLow: 0, borderlineHigh: 1.0, highThreshold: 1.0, veryHighThreshold: 1.3, longevityWeight: 0.15 },
+      'lpa': { unit: 'nmol/L', range: '< 75', category: 'Cardiovascular', optimalLow: 0, optimalHigh: 75, borderlineLow: 0, borderlineHigh: 125, highThreshold: 125, veryHighThreshold: 250, longevityWeight: 0.10 },
+      'lipoproteina': { unit: 'nmol/L', range: '< 75', category: 'Cardiovascular', optimalLow: 0, optimalHigh: 75, borderlineLow: 0, borderlineHigh: 125, highThreshold: 125, veryHighThreshold: 250, longevityWeight: 0.10 },
+      'hscrp': { unit: 'mg/L', range: '< 1.0', category: 'Cardiovascular', optimalLow: 0, optimalHigh: 1.0, borderlineLow: 0, borderlineHigh: 3.0, highThreshold: 3.0, veryHighThreshold: 10, longevityWeight: 0.08 },
+      'crp': { unit: 'mg/L', range: '< 1.0', category: 'Cardiovascular', optimalLow: 0, optimalHigh: 1.0, borderlineLow: 0, borderlineHigh: 3.0, highThreshold: 3.0, veryHighThreshold: 10, longevityWeight: 0.08 },
+      'creactiveprotein': { unit: 'mg/L', range: '< 1.0', category: 'Cardiovascular', optimalLow: 0, optimalHigh: 1.0, borderlineLow: 0, borderlineHigh: 3.0, highThreshold: 3.0, veryHighThreshold: 10, longevityWeight: 0.08 },
+      'fastinginsulin': { unit: 'mIU/L', range: '< 6', category: 'Cardiovascular', optimalLow: 0, optimalHigh: 6, borderlineLow: 0, borderlineHigh: 10, highThreshold: 10, veryHighThreshold: 15, longevityWeight: 0.10 },
+      'insulin': { unit: 'mIU/L', range: '< 6', category: 'Cardiovascular', optimalLow: 0, optimalHigh: 6, borderlineLow: 0, borderlineHigh: 10, highThreshold: 10, veryHighThreshold: 15, longevityWeight: 0.10 },
+      'hba1c': { unit: '%', range: '< 5.4', category: 'Cardiovascular', optimalLow: 0, optimalHigh: 5.4, borderlineLow: 0, borderlineHigh: 5.6, highThreshold: 5.6, veryHighThreshold: 6.5, longevityWeight: 0.10 },
+      // Lipid Panel
+      'totalcholesterol': { unit: 'mmol/L', range: '< 4.5', category: 'Cardiovascular', optimalLow: 0, optimalHigh: 4.5, borderlineLow: 0, borderlineHigh: 5.5, highThreshold: 5.5 },
+      'cholesterol': { unit: 'mmol/L', range: '< 4.5', category: 'Cardiovascular', optimalLow: 0, optimalHigh: 4.5, borderlineLow: 0, borderlineHigh: 5.5, highThreshold: 5.5 },
+      'ldl': { unit: 'mmol/L', range: '< 2.0', category: 'Cardiovascular', optimalLow: 0, optimalHigh: 2.0, borderlineLow: 0, borderlineHigh: 2.6, highThreshold: 2.6, veryHighThreshold: 4.5 },
+      'ldlc': { unit: 'mmol/L', range: '< 2.0', category: 'Cardiovascular', optimalLow: 0, optimalHigh: 2.0, borderlineLow: 0, borderlineHigh: 2.6, highThreshold: 2.6, veryHighThreshold: 4.5 },
+      'ldlcholesterol': { unit: 'mmol/L', range: '< 2.0', category: 'Cardiovascular', optimalLow: 0, optimalHigh: 2.0, borderlineLow: 0, borderlineHigh: 2.6, highThreshold: 2.6, veryHighThreshold: 4.5 },
+      'hdl': { unit: 'mmol/L', range: '> 1.3', category: 'Cardiovascular', optimalLow: 1.3, optimalHigh: 3.0, borderlineLow: 1.0, borderlineHigh: 3.0 },
+      'hdlc': { unit: 'mmol/L', range: '> 1.3', category: 'Cardiovascular', optimalLow: 1.3, optimalHigh: 3.0, borderlineLow: 1.0, borderlineHigh: 3.0 },
+      'hdlcholesterol': { unit: 'mmol/L', range: '> 1.3', category: 'Cardiovascular', optimalLow: 1.3, optimalHigh: 3.0, borderlineLow: 1.0, borderlineHigh: 3.0 },
+      'triglycerides': { unit: 'mmol/L', range: '< 1.0', category: 'Cardiovascular', optimalLow: 0, optimalHigh: 1.0, borderlineLow: 0, borderlineHigh: 1.7, highThreshold: 1.7 },
+
+      // ── Metabolic Health (HODIE CORE Section 4) ──
+      'glucose': { unit: 'mmol/L', range: '4.5 - 5.2', category: 'Metabolic', optimalLow: 4.5, optimalHigh: 5.2, borderlineLow: 4.5, borderlineHigh: 5.5, highThreshold: 5.5, veryHighThreshold: 7.0, longevityWeight: 0.06 },
+      'fastingglucose': { unit: 'mmol/L', range: '4.5 - 5.2', category: 'Metabolic', optimalLow: 4.5, optimalHigh: 5.2, borderlineLow: 4.5, borderlineHigh: 5.5, highThreshold: 5.5, veryHighThreshold: 7.0, longevityWeight: 0.06 },
+      'uricacid': { unit: 'µmol/L', range: '< 360', category: 'Metabolic', optimalLow: 0, optimalHigh: 360, borderlineLow: 0, borderlineHigh: 420, highThreshold: 420, longevityWeight: 0.05 },
+      'alt': { unit: 'U/L', range: '< 25', category: 'Metabolic', optimalLow: 0, optimalHigh: 25, borderlineLow: 0, borderlineHigh: 40, highThreshold: 40, veryHighThreshold: 100 },
+      'ast': { unit: 'U/L', range: '< 25', category: 'Metabolic', optimalLow: 0, optimalHigh: 25, borderlineLow: 0, borderlineHigh: 40, highThreshold: 40 },
+      'ggt': { unit: 'U/L', range: '< 25', category: 'Metabolic', optimalLow: 0, optimalHigh: 25, borderlineLow: 0, borderlineHigh: 45, highThreshold: 45 },
+
+      // ── Organ Health (HODIE CORE Section 5) ──
+      'egfr': { unit: 'mL/min/1.73m²', range: '> 90', category: 'Organ Health', optimalLow: 90, optimalHigh: 200, borderlineLow: 60, borderlineHigh: 200, longevityWeight: 0.08 },
+      'creatinine': { unit: 'µmol/L', range: '60 - 110', category: 'Organ Health', optimalLow: 60, optimalHigh: 110, borderlineLow: 50, borderlineHigh: 130 },
+      'urea': { unit: 'mmol/L', range: '2.5 - 7.1', category: 'Organ Health', optimalLow: 2.5, optimalHigh: 7.1, borderlineLow: 2.0, borderlineHigh: 8.0 },
+      // Iron Studies Panel
+      'ferritin': { unit: 'µg/L', range: '50 - 150 (M) / 30 - 120 (F)', category: 'Organ Health', optimalLow: 50, optimalHigh: 150, borderlineLow: 30, borderlineHigh: 300, highThreshold: 300, veryHighThreshold: 600 },
+      'serumiron': { unit: 'µmol/L', range: '10 - 30', category: 'Organ Health', optimalLow: 10, optimalHigh: 30, borderlineLow: 7, borderlineHigh: 35 },
+      'iron': { unit: 'µmol/L', range: '10 - 30', category: 'Organ Health', optimalLow: 10, optimalHigh: 30, borderlineLow: 7, borderlineHigh: 35 },
+      'transferrin': { unit: 'g/L', range: '2.0 - 3.6', category: 'Organ Health', optimalLow: 2.0, optimalHigh: 3.6, borderlineLow: 1.7, borderlineHigh: 4.0 },
+      'transferrinsaturation': { unit: '%', range: '20 - 50', category: 'Organ Health', optimalLow: 20, optimalHigh: 50, borderlineLow: 15, borderlineHigh: 55 },
+
+      // ── Hormone Snapshot (HODIE CORE Section 6) ──
+      'testosterone': { unit: 'nmol/L', range: '18 - 30 (M)', category: 'Hormones', optimalLow: 18, optimalHigh: 30, borderlineLow: 12, borderlineHigh: 30, longevityWeight: 0.05 },
+      'estradiol': { unit: 'pmol/L', range: 'Cycle-dependent (F)', category: 'Hormones', optimalLow: 50, optimalHigh: 500, borderlineLow: 30, borderlineHigh: 600 },
+      'shbg': { unit: 'nmol/L', range: '20 - 40', category: 'Hormones', optimalLow: 20, optimalHigh: 40, borderlineLow: 15, borderlineHigh: 60 },
+      'tsh': { unit: 'mIU/L', range: '0.5 - 2.5', category: 'Hormones', optimalLow: 0.5, optimalHigh: 2.5, borderlineLow: 0.5, borderlineHigh: 4.0, highThreshold: 4.0 },
+      'freet4': { unit: 'pmol/L', range: '12 - 18', category: 'Hormones', optimalLow: 12, optimalHigh: 18, borderlineLow: 10, borderlineHigh: 22 },
+      'freet3': { unit: 'pmol/L', range: '3.5 - 6.5', category: 'Hormones', optimalLow: 3.5, optimalHigh: 6.5, borderlineLow: 3.0, borderlineHigh: 7.0 },
+      'cortisol': { unit: 'nmol/L', range: '140 - 690', category: 'Hormones', optimalLow: 140, optimalHigh: 500, borderlineLow: 100, borderlineHigh: 690 },
+
+      // ── Blood Health (standard pathology) ──
       'haemoglobin': { unit: 'g/L', range: '130 - 170', category: 'Blood Health', optimalLow: 130, optimalHigh: 170, borderlineLow: 120, borderlineHigh: 180 },
       'hemoglobin': { unit: 'g/L', range: '130 - 170', category: 'Blood Health', optimalLow: 130, optimalHigh: 170, borderlineLow: 120, borderlineHigh: 180 },
       'rbc': { unit: '×10¹²/L', range: '4.5 - 5.5', category: 'Blood Health', optimalLow: 4.5, optimalHigh: 5.5, borderlineLow: 4.0, borderlineHigh: 6.0 },
       'wbc': { unit: '×10⁹/L', range: '4.0 - 11.0', category: 'Blood Health', optimalLow: 4.0, optimalHigh: 11.0, borderlineLow: 3.5, borderlineHigh: 12.0 },
       'platelets': { unit: '×10⁹/L', range: '150 - 400', category: 'Blood Health', optimalLow: 150, optimalHigh: 400, borderlineLow: 130, borderlineHigh: 450 },
-      // Inflammation
-      'crp': { unit: 'mg/L', range: '< 3.0', category: 'Inflammation', optimalLow: 0, optimalHigh: 1.0, borderlineLow: 0, borderlineHigh: 3.0 },
-      'creactiveprotein': { unit: 'mg/L', range: '< 3.0', category: 'Inflammation', optimalLow: 0, optimalHigh: 1.0, borderlineLow: 0, borderlineHigh: 3.0 },
-      'esr': { unit: 'mm/hr', range: '0 - 20', category: 'Inflammation', optimalLow: 0, optimalHigh: 15, borderlineLow: 0, borderlineHigh: 20 },
-      // Vitamins
+
+      // ── Vitamins ──
       'vitamind': { unit: 'nmol/L', range: '> 75', category: 'Vitamins', optimalLow: 75, optimalHigh: 200, borderlineLow: 50, borderlineHigh: 250 },
       'vitaminb12': { unit: 'pmol/L', range: '150 - 600', category: 'Vitamins', optimalLow: 200, optimalHigh: 600, borderlineLow: 150, borderlineHigh: 700 },
       'folate': { unit: 'nmol/L', range: '> 10', category: 'Vitamins', optimalLow: 10, optimalHigh: 45, borderlineLow: 7, borderlineHigh: 50 },
-      'iron': { unit: 'µmol/L', range: '10 - 30', category: 'Vitamins', optimalLow: 10, optimalHigh: 30, borderlineLow: 7, borderlineHigh: 35 },
-      'ferritin': { unit: 'µg/L', range: '30 - 300', category: 'Vitamins', optimalLow: 30, optimalHigh: 200, borderlineLow: 15, borderlineHigh: 300 },
-      // Liver
-      'alt': { unit: 'U/L', range: '< 40', category: 'Liver', optimalLow: 0, optimalHigh: 35, borderlineLow: 0, borderlineHigh: 45 },
-      'ast': { unit: 'U/L', range: '< 40', category: 'Liver', optimalLow: 0, optimalHigh: 35, borderlineLow: 0, borderlineHigh: 45 },
-      'ggt': { unit: 'U/L', range: '< 60', category: 'Liver', optimalLow: 0, optimalHigh: 45, borderlineLow: 0, borderlineHigh: 60 },
-      'bilirubin': { unit: 'µmol/L', range: '< 20', category: 'Liver', optimalLow: 0, optimalHigh: 17, borderlineLow: 0, borderlineHigh: 20 },
-      // Kidney
-      'creatinine': { unit: 'µmol/L', range: '60 - 110', category: 'Kidney', optimalLow: 60, optimalHigh: 110, borderlineLow: 50, borderlineHigh: 130 },
-      'egfr': { unit: 'mL/min', range: '> 90', category: 'Kidney', optimalLow: 90, optimalHigh: 200, borderlineLow: 60, borderlineHigh: 200 },
-      'urea': { unit: 'mmol/L', range: '2.5 - 7.1', category: 'Kidney', optimalLow: 2.5, optimalHigh: 7.1, borderlineLow: 2.0, borderlineHigh: 8.0 },
-      // Thyroid
-      'tsh': { unit: 'mU/L', range: '0.4 - 4.0', category: 'Hormones', optimalLow: 0.4, optimalHigh: 4.0, borderlineLow: 0.3, borderlineHigh: 5.0 },
-      'freet4': { unit: 'pmol/L', range: '10 - 20', category: 'Hormones', optimalLow: 10, optimalHigh: 20, borderlineLow: 8, borderlineHigh: 22 },
-      'freet3': { unit: 'pmol/L', range: '3.5 - 6.5', category: 'Hormones', optimalLow: 3.5, optimalHigh: 6.5, borderlineLow: 3.0, borderlineHigh: 7.0 },
-      // Hormones
-      'testosterone': { unit: 'nmol/L', range: '8 - 30', category: 'Hormones', optimalLow: 10, optimalHigh: 30, borderlineLow: 8, borderlineHigh: 35 },
-      'cortisol': { unit: 'nmol/L', range: '140 - 690', category: 'Hormones', optimalLow: 140, optimalHigh: 500, borderlineLow: 100, borderlineHigh: 690 },
-      // Cancer Markers
+      'omega3index': { unit: '%', range: '> 8', category: 'Vitamins', optimalLow: 8, optimalHigh: 12, borderlineLow: 4, borderlineHigh: 12 },
+
+      // ── Inflammation ──
+      'esr': { unit: 'mm/hr', range: '0 - 20', category: 'Inflammation', optimalLow: 0, optimalHigh: 15, borderlineLow: 0, borderlineHigh: 20 },
+      'bilirubin': { unit: 'µmol/L', range: '< 20', category: 'Organ Health', optimalLow: 0, optimalHigh: 17, borderlineLow: 0, borderlineHigh: 20 },
+
+      // ── Cancer Markers (HODIE ELITE Section 9) ──
       'psa': { unit: 'µg/L', range: '< 4.0', category: 'Cancer Markers', optimalLow: 0, optimalHigh: 2.5, borderlineLow: 0, borderlineHigh: 4.0 },
+      'ca125': { unit: 'U/mL', range: '< 35', category: 'Cancer Markers', optimalLow: 0, optimalHigh: 35, borderlineLow: 0, borderlineHigh: 65 },
     };
     return refs[key] || null;
   };
 
-  // Classify a value against clinical reference ranges
+  // Classify a value against HODIE Clinical Library v2 thresholds
   const classifyValue = (value: number, ref: ClinicalReference): string => {
+    if (ref.veryHighThreshold && value > ref.veryHighThreshold) return 'out of range';
+    if (ref.highThreshold && value > ref.highThreshold) return 'out of range';
     if (value >= ref.optimalLow && value <= ref.optimalHigh) return 'optimal';
     if (value >= ref.borderlineLow && value <= ref.borderlineHigh) return 'borderline';
     return 'out of range';
@@ -301,12 +329,11 @@ const LabsScreen: React.FC<LabsScreenProps> = ({ user }) => {
     'All',
     'Cardiovascular',
     'Metabolic',
-    'Blood Health',
-    'Inflammation',
-    'Vitamins',
-    'Liver',
-    'Kidney',
+    'Organ Health',
     'Hormones',
+    'Blood Health',
+    'Vitamins',
+    'Inflammation',
     'Cancer Markers',
     'Lab Results'
   ];

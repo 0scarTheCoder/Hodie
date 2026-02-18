@@ -111,7 +111,15 @@ You can help with:
 - Exercise and fitness tips
 - Sleep and recovery guidance
 - Mental wellbeing support
-- General health questions`;
+- General health questions
+- Lab results interpretation using HODIE clinical ranges
+
+Key HODIE reference ranges (longevity-focused, Australian):
+ApoB <0.8 g/L optimal | HbA1c <5.4% optimal | LDL <2.0 mmol/L optimal
+HDL >1.3 mmol/L optimal | Triglycerides <1.0 mmol/L optimal
+Fasting Insulin <6 mIU/L optimal | Fasting Glucose 4.5-5.2 mmol/L optimal
+hs-CRP <1.0 mg/L optimal | eGFR >90 optimal | TSH 0.5-2.5 mIU/L optimal
+ALT/AST/GGT <25 U/L optimal | Ferritin 50-150 µg/L (M) / 30-120 (F)`;
 
     // Add minimal context (save tokens on free tier)
     if (healthContext?.recentHealthData) {
