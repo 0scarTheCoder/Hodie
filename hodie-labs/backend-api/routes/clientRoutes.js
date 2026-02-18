@@ -6,7 +6,7 @@
 const express = require('express');
 const router = express.Router();
 const Client = require('../models/Client');
-const { authenticateUser, requireAdmin } = require('../middleware/authMiddleware');
+const { authenticateUser, ensureClient, requireAdmin } = require('../middleware/authMiddleware');
 
 /**
  * POST /api/clients
@@ -84,7 +84,7 @@ router.post('/', authenticateUser, async (req, res) => {
  * GET /api/clients/me
  * Get current user's client profile
  */
-router.get('/me', authenticateUser, async (req, res) => {
+router.get('/me', authenticateUser, ensureClient, async (req, res) => {
   try {
     const client = await Client.findByAuthProviderUserId(
       req.app.locals.db,
