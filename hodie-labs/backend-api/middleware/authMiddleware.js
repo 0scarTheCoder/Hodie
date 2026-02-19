@@ -162,12 +162,14 @@ async function authenticateUser(req, res, next) {
 async function ensureClient(req, res, next) {
   try {
     if (!req.auth || !req.auth.userId) {
-      return next(); // No auth - skip
+      console.error('❌ ensureClient: No auth or userId on request');
+      return next();
     }
 
     const db = req.app.locals.db;
     if (!db) {
-      return next(); // No DB connection - skip
+      console.error('❌ ensureClient: No database connection available');
+      return next();
     }
 
     const Client = require('../models/Client');
@@ -193,8 +195,21 @@ async function ensureClient(req, res, next) {
 
     next();
   } catch (error) {
-    // Non-blocking: log error but don't fail the request
-    console.error('⚠️ ensureClient error (non-blocking):', error.message);
+    console.error('❌ ensureClient FAILED:', error.message);
+    // Still try to find the client one more time (in case create failed but client exists)
+    try {
+      const db = req.app.locals.db;
+      if (db) {
+        const Client = require('../models/Client');
+        const client = await Client.findByAuthProviderUserId(db, req.auth.userId);
+        if (client) {
+          req.auth.clientID = client.clientID;
+          req.auth.client = client;
+        }
+      }
+    } catch (retryError) {
+      console.error('❌ ensureClient retry also failed:', retryError.message);
+    }
     next();
   }
 }

@@ -52,7 +52,7 @@ class Client {
   }
 
   /**
-   * Create new client in database
+   * Create new client in database (or return existing)
    */
   static async create(db, clientData) {
     const clientsCollection = db.collection('clients');
@@ -63,7 +63,7 @@ class Client {
     });
 
     if (existing) {
-      throw new Error('Client already exists with this authentication ID');
+      return existing; // Return existing client instead of throwing
     }
 
     // Generate clientID
@@ -73,10 +73,20 @@ class Client {
     // Create client object
     const client = new Client(clientData);
 
-    // Insert into database
-    const result = await clientsCollection.insertOne(client);
-
-    return { ...client, _id: result.insertedId };
+    try {
+      // Insert into database
+      const result = await clientsCollection.insertOne(client);
+      return { ...client, _id: result.insertedId };
+    } catch (insertError) {
+      // Handle race condition: another request may have created the client
+      if (insertError.code === 11000) { // Duplicate key error
+        const raceWinner = await clientsCollection.findOne({
+          authProviderUserId: clientData.authProviderUserId
+        });
+        if (raceWinner) return raceWinner;
+      }
+      throw insertError;
+    }
   }
 
   /**

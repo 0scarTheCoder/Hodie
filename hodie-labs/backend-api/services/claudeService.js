@@ -4,6 +4,7 @@
  */
 
 const Anthropic = require('@anthropic-ai/sdk');
+const { buildClinicalRangesPrompt } = require('../utils/clinicalRangesPrompt');
 
 class ClaudeService {
   constructor(modelType = 'haiku') {
@@ -157,36 +158,7 @@ RESPONSE FORMAT:
 
 CRITICAL: When the user's message contains lab data or biomarker values, you MUST analyse the actual data provided. Look at the specific values, identify any that are outside normal reference ranges, and provide personalised health insights. NEVER give generic responses like "upload your data" or "connect with lab providers" when actual data is present in the message. The data will be included in [brackets] within the user message.
 
-HODIE CLINICAL REFERENCE RANGES (Australia-Optimised, Longevity-Focused):
-Use these thresholds when classifying biomarkers:
-
-Cardiovascular Risk:
-- ApoB (g/L): Optimal <0.8 | Borderline 0.8–1.0 | High >1.0 | Very High >1.3
-- Lp(a) (nmol/L): Optimal <75 | Borderline 75–125 | High >125 | Very High >250
-- hs-CRP (mg/L): Optimal <1.0 | Borderline 1.0–3.0 | High >3.0 | Very High >10
-- Fasting Insulin (mIU/L): Optimal <6 | Borderline 6–10 | High >10 | Very High >15
-- HbA1c (%): Optimal <5.4 | Borderline 5.4–5.6 | High >5.6 | Very High >6.5
-- Total Cholesterol (mmol/L): Optimal <4.5 | Borderline 4.5–5.5 | High >5.5
-- LDL-C (mmol/L): Optimal <2.0 | Borderline 2.0–2.6 | High >2.6 | Very High >4.5
-- HDL-C (mmol/L): Optimal >1.3 | Low <1.0
-- Triglycerides (mmol/L): Optimal <1.0 | Borderline 1.0–1.7 | High >1.7
-
-Metabolic Health:
-- Fasting Glucose (mmol/L): Optimal 4.5–5.2 | Borderline 5.3–5.5 | High >5.5 | Very High >7.0
-- Uric Acid (µmol/L): Optimal <360 | Borderline 360–420 | High >420
-- ALT (U/L): Optimal <25 | Borderline 25–40 | High >40 | Very High >100
-- AST (U/L): Optimal <25 | Borderline 25–40 | High >40
-- GGT (U/L): Optimal <25 | Borderline 25–45 | High >45
-
-Organ Health:
-- eGFR (mL/min/1.73m²): Optimal >90 | Borderline 60–89 | High Risk <60 | Very High <45
-- Ferritin (µg/L): Optimal 50–150 (M) / 30–120 (F) | Low <30 | High >300 | Very High >600
-
-Hormones:
-- Testosterone (nmol/L, M): Optimal 18–30 | Borderline 12–18 | Low <12
-- TSH (mIU/L): Optimal 0.5–2.5 | Borderline 2.5–4.0 | High >4.0
-- Free T4 (pmol/L): Optimal 12–18 | Low <10
-- SHBG (nmol/L): Optimal 20–40 | Low <15 | High >60`;
+${buildClinicalRangesPrompt()}`;
 
     // Add health context if available
     if (healthContext) {

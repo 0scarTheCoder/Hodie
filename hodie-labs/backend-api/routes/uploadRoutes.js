@@ -8,7 +8,7 @@ const router = express.Router();
 const multer = require('multer');
 const Client = require('../models/Client');
 const Upload = require('../models/Upload');
-const { authenticateUser } = require('../middleware/authMiddleware');
+const { authenticateUser, ensureClient } = require('../middleware/authMiddleware');
 const PDFParsingService = require('../services/pdfParsingService');
 
 // Configure multer for file uploads (store in memory)
@@ -37,7 +37,7 @@ const upload = multer({
  * POST /api/upload
  * Upload health data file with restrictions
  */
-router.post('/', authenticateUser, upload.single('file'), async (req, res) => {
+router.post('/', authenticateUser, ensureClient, upload.single('file'), async (req, res) => {
   try {
     const { category } = req.body; // lab_results, genetic_data, wearable_data, etc.
 
@@ -55,24 +55,20 @@ router.post('/', authenticateUser, upload.single('file'), async (req, res) => {
       });
     }
 
-    // Get or create client
-    let client = await Client.findByAuthProviderUserId(
+    // Client is guaranteed by ensureClient middleware
+    const clientID = req.auth.clientID;
+    if (!clientID) {
+      return res.status(500).json({
+        error: 'Client record missing',
+        message: 'Could not find or create your client record. Please try again.'
+      });
+    }
+
+    // Get full client for downstream use
+    const client = req.auth.client || await Client.findByAuthProviderUserId(
       req.app.locals.db,
       req.auth.userId
     );
-
-    if (!client) {
-      // Auto-create client on first upload
-      const clientData = {
-        email: req.auth.email,
-        authProvider: req.auth.provider,
-        authProviderUserId: req.auth.userId,
-        subscriptionLevel: 'Free'
-      };
-
-      client = await Client.create(req.app.locals.db, clientData);
-      console.log(`✅ Auto-created client: ${client.clientID} on first upload`);
-    }
 
     // Check upload restrictions
     const uploadCheck = await Upload.canUploadToday(req.app.locals.db, client.clientID);
