@@ -43,6 +43,7 @@ const { authenticateUser, ensureClient } = require('./middleware/authMiddleware'
 const Client = require('./models/Client');
 
 const app = express();
+app.set('trust proxy', 1); // Render runs behind a reverse proxy
 const PORT = process.env.PORT || 3001;
 
 // MongoDB Connection
@@ -77,7 +78,7 @@ app.get('/health', (req, res) => {
     status: 'healthy',
     timestamp: new Date().toISOString(),
     service: 'Hodie Labs Backend API',
-    version: '2.3.0'
+    version: '2.3.1'
   });
 });
 

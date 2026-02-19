@@ -12,7 +12,7 @@ const { authenticateUser, ensureClient } = require('../middleware/authMiddleware
  * GET /api/lab-results/:userId
  * Get lab results for a specific user (must be owner)
  */
-router.get('/lab-results/:userId', authenticateUser, async (req, res) => {
+router.get('/lab-results/:userId', authenticateUser, ensureClient, async (req, res) => {
   try {
     const { userId } = req.params;
 
@@ -99,7 +99,7 @@ router.post('/lab-results', authenticateUser, ensureClient, async (req, res) => 
  * GET /api/genetic-data/:userId
  * Get genetic data for a specific user
  */
-router.get('/genetic-data/:userId', authenticateUser, async (req, res) => {
+router.get('/genetic-data/:userId', authenticateUser, ensureClient, async (req, res) => {
   try {
     const { userId } = req.params;
 
@@ -181,7 +181,7 @@ router.post('/genetic-data', authenticateUser, ensureClient, async (req, res) =>
  * GET /api/wearable-data/:userId
  * Get wearable data for a specific user
  */
-router.get('/wearable-data/:userId', authenticateUser, async (req, res) => {
+router.get('/wearable-data/:userId', authenticateUser, ensureClient, async (req, res) => {
   try {
     const { userId } = req.params;
 
@@ -266,7 +266,7 @@ router.post('/wearable-data', authenticateUser, ensureClient, async (req, res) =
  * GET /api/health-metrics/:userId
  * Get health metrics for a specific user
  */
-router.get('/health-metrics/:userId', authenticateUser, async (req, res) => {
+router.get('/health-metrics/:userId', authenticateUser, ensureClient, async (req, res) => {
   try {
     const { userId } = req.params;
 
@@ -352,7 +352,7 @@ router.post('/health-metrics', authenticateUser, ensureClient, async (req, res) 
  * GET /api/medical-reports/:userId
  * Get medical reports for a specific user
  */
-router.get('/medical-reports/:userId', authenticateUser, async (req, res) => {
+router.get('/medical-reports/:userId', authenticateUser, ensureClient, async (req, res) => {
   try {
     const { userId } = req.params;
 
@@ -434,7 +434,7 @@ router.post('/medical-reports', authenticateUser, ensureClient, async (req, res)
  * GET /api/miscellaneous/:userId
  * Get miscellaneous uploads for a specific user
  */
-router.get('/miscellaneous/:userId', authenticateUser, async (req, res) => {
+router.get('/miscellaneous/:userId', authenticateUser, ensureClient, async (req, res) => {
   try {
     const { userId } = req.params;
 
