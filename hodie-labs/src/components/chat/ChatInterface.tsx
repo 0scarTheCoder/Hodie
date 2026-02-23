@@ -274,13 +274,27 @@ What would you like to know about your health today?`,
               // Ready to display blood data visualizations
             } else {
               // No blood data — use any available lab results for generic visualization
+              // Check for both result.results (CSV/JSON uploads) and result.biomarkers (PDF-parsed lab results)
               const anyDataset = labResults.find((result: any) =>
-                result.results && result.results.length > 0
+                (result.results && Array.isArray(result.results) && result.results.length > 0) ||
+                (result.biomarkers && Array.isArray(result.biomarkers) && result.biomarkers.length > 0)
               );
-              if (anyDataset && anyDataset.results) {
-                genericVizData = anyDataset.results.slice(0, 2000);
-                genericVizTitle = anyDataset.testType || 'Lab Results';
-                // Using generic visualization
+              if (anyDataset) {
+                if (anyDataset.biomarkers && Array.isArray(anyDataset.biomarkers) && anyDataset.biomarkers.length > 0) {
+                  // PDF-parsed biomarker data — convert to visualization-friendly format
+                  genericVizData = anyDataset.biomarkers.map((bm: any) => ({
+                    name: bm.name,
+                    value: bm.value,
+                    unit: bm.unit,
+                    referenceRange: bm.referenceRange,
+                    flagged: bm.flagged,
+                    category: bm.category
+                  }));
+                  genericVizTitle = anyDataset.testType || anyDataset.labProvider || 'Lab Results';
+                } else if (anyDataset.results && Array.isArray(anyDataset.results)) {
+                  genericVizData = anyDataset.results.slice(0, 2000);
+                  genericVizTitle = anyDataset.testType || 'Lab Results';
+                }
               } else {
                 console.warn('⚠️ No visualizable data found in lab results');
               }

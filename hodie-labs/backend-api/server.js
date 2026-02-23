@@ -78,7 +78,7 @@ app.get('/health', (req, res) => {
     status: 'healthy',
     timestamp: new Date().toISOString(),
     service: 'Hodie Labs Backend API',
-    version: '2.3.1'
+    version: '2.3.2'
   });
 });
 

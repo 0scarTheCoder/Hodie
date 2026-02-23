@@ -32,10 +32,19 @@ class PDFParsingService {
       const pdfText = pdfData.text;
 
       if (!pdfText || pdfText.trim().length === 0) {
-        throw new Error('No text content found in PDF');
+        throw new Error('No text content found in PDF. This may be a scanned/image-based PDF that requires OCR.');
       }
 
-      console.log(`📄 Extracted ${pdfText.length} characters from PDF`);
+      // Check if extracted text has enough meaningful content
+      // Scanned PDFs often return minimal text (headers, form labels) without actual data
+      const meaningfulText = pdfText.replace(/\s+/g, ' ').trim();
+      const hasNumbers = /\d+\.?\d*/.test(meaningfulText);
+
+      console.log(`📄 Extracted ${pdfText.length} characters from PDF (meaningful: ${meaningfulText.length} chars, has numbers: ${hasNumbers})`);
+
+      if (meaningfulText.length < 50) {
+        throw new Error('PDF appears to be scanned/image-based with insufficient text content. OCR is required to extract data from this file.');
+      }
 
       // Route to appropriate parser based on category
       switch (category) {
@@ -91,11 +100,14 @@ Return ONLY a valid JSON object with this structure:
 }
 
 Important:
-- Extract ALL biomarkers found in the report
+- Extract ONLY biomarkers that are explicitly present in the text with actual numeric values
+- Do NOT fabricate, estimate, or invent any values - only extract what is clearly stated in the text
+- If the text is garbled, incomplete, or does not contain clear biomarker values, return: {"testDate": null, "labProvider": null, "biomarkers": []}
 - Use consistent naming (e.g., "Vitamin D" not "Vit D" or "25-OH Vitamin D")
 - Convert values to numbers where possible
 - If multiple tests are present, use the most recent date
-- Do not include any markdown formatting, just raw JSON`;
+- Do not include any markdown formatting, just raw JSON
+- If you cannot confidently extract data from the text, return an empty biomarkers array rather than guessing`;
 
     const response = await this.claudeService.generateResponse(prompt, [], {});
     const responseText = response.text || response;

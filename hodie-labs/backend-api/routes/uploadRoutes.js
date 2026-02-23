@@ -121,6 +121,14 @@ router.post('/', authenticateUser, ensureClient, upload.single('file'), async (r
         }
 
         console.log(`✅ PDF parsed: extracted ${recordsCount} records`);
+
+        // Reject if AI couldn't extract any meaningful data
+        if (recordsCount === 0) {
+          return res.status(400).json({
+            error: 'No data extracted',
+            message: 'Could not extract any structured data from this PDF. The file may be scanned/image-based. Please try uploading a text-based PDF or enter your results manually.'
+          });
+        }
       } else if (req.file.originalname.endsWith('.csv')) {
         // Parse CSV
         const fileContent = req.file.buffer.toString('utf-8');
@@ -193,7 +201,7 @@ router.post('/', authenticateUser, ensureClient, upload.single('file'), async (r
         testDate: parsedData.testDate,
         labProvider: parsedData.labProvider,
         biomarkers: parsedData.biomarkers,
-        results: parsedData // Also keep original parsed structure
+        results: parsedData.biomarkers // Store biomarkers as results array for visualization compatibility
       };
     } else if (category === 'genetic_data' && (parsedData.traits || parsedData.healthRisks)) {
       // For genetic data, merge traits and healthRisks at top level
