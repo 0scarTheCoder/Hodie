@@ -38,9 +38,9 @@ const BrandHeader: React.FC<BrandHeaderProps> = ({
           
           {/* Logo Section - Clickable to return to overview */}
           <div className="flex items-center space-x-4">
-            <button 
+            <button
               onClick={() => onScreenChange && onScreenChange('home')}
-              className="flex items-center space-x-3 hover:opacity-80 transition-opacity cursor-pointer"
+              className="flex items-center space-x-2 hover:opacity-80 transition-opacity cursor-pointer"
             >
               <img
                 src="/hodie_transparent_logo.png"
@@ -48,11 +48,12 @@ const BrandHeader: React.FC<BrandHeaderProps> = ({
                 className="h-8 w-auto"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
+                  const textEl = e.currentTarget.nextElementSibling as HTMLElement;
+                  if (textEl) textEl.style.display = 'flex';
                 }}
               />
-              <div className="flex flex-col">
+              <div className="flex-col hidden">
                 <div className="text-xl font-bold text-white">HodieLabs</div>
-                <div className="text-xs text-white/90 -mt-1 hidden sm:block">Health Dashboard</div>
               </div>
             </button>
           </div>

@@ -1,241 +1,1032 @@
 {
   "_meta": {
-    "version": "2.0",
-    "name": "HODIE Clinical Library v2",
-    "description": "Australia-Optimised, Longevity-Focused biomarker reference ranges",
+    "version": "4.2",
+    "name": "HODIE Clinical Library v4.2",
+    "description": "Australia-Optimised, Longevity-Focused biomarker reference ranges — converted from YAML v4.1 spec",
     "population": "Adults 35-65",
     "units": "Australian pathology standards",
-    "lastUpdated": "2026-02-18"
+    "locale": "Australia",
+    "lastUpdated": "2026-02-24",
+    "biomarkerCount": 98,
+    "coreCount": 55,
+    "eliteCount": 43
   },
-
   "biomarkers": {
     "apob": {
       "name": "ApoB",
-      "aliases": ["apolipoproteinb", "apolipoprotein_b"],
+      "aliases": [
+        "apolipoproteinb"
+      ],
       "unit": "g/L",
       "displayRange": "< 0.8",
       "category": "Cardiovascular",
       "section": "CORE",
-      "optimal": { "low": 0, "high": 0.8 },
-      "borderline": { "low": 0, "high": 1.0 },
-      "high": 1.0,
+      "optimal": {
+        "low": 0,
+        "high": 0.8
+      },
+      "borderline": {
+        "low": 0.8,
+        "high": 1
+      },
+      "high": 1.01,
       "veryHigh": 1.3,
-      "longevityWeight": 0.15,
-      "associatedRisks": ["Atherosclerosis", "Cardiovascular disease", "Plaque progression"],
       "evidenceStrength": "Strong",
-      "actionDomains": ["Saturated fat reduction", "Soluble fibre increase", "Omega-3 optimisation", "Weight reduction", "Medication discussion if persistent"]
+      "associatedRisks": [
+        "Atherosclerosis",
+        "Cardiovascular disease",
+        "Plaque progression"
+      ],
+      "actionDomains": [
+        "Reduce saturated fat",
+        "Increase soluble fibre",
+        "Exercise",
+        "Weight reduction",
+        "Discuss medication if persistent"
+      ],
+      "interpretationNotes": [
+        "Prioritise over LDL-C when discordant."
+      ],
+      "measurementFrequency": "Annual"
     },
     "lpa": {
-      "name": "Lp(a)",
-      "aliases": ["lipoproteina", "lipoprotein_a"],
+      "name": "Lipoprotein(a)",
+      "aliases": [
+        "lp(a)"
+      ],
       "unit": "nmol/L",
       "displayRange": "< 75",
       "category": "Cardiovascular",
       "section": "CORE",
-      "optimal": { "low": 0, "high": 75 },
-      "borderline": { "low": 0, "high": 125 },
-      "high": 125,
+      "optimal": {
+        "low": 0,
+        "high": 75
+      },
+      "borderline": {
+        "low": 75,
+        "high": 125
+      },
+      "high": 126,
       "veryHigh": 250,
-      "longevityWeight": 0.10,
-      "associatedRisks": ["Premature cardiovascular disease", "Calcific aortic stenosis", "Residual risk despite optimal LDL"],
       "evidenceStrength": "Strong",
-      "actionDomains": ["Aggressive ApoB optimisation", "Consider specialist referral", "Monitor CAC if elevated"],
-      "notes": "Genetically determined. Not meaningfully modified by lifestyle."
+      "associatedRisks": [
+        "Premature cardiovascular disease",
+        "Calcific aortic stenosis",
+        "Residual risk despite optimal LDL/ApoB"
+      ],
+      "actionDomains": [
+        "Aggressive ApoB lowering",
+        "Consider specialist referral if very high",
+        "Consider CAC discussion"
+      ],
+      "interpretationNotes": [
+        "Largely genetic; lifestyle has limited impact."
+      ],
+      "measurementFrequency": "Annual"
     },
     "hscrp": {
       "name": "hs-CRP",
-      "aliases": ["crp", "creactiveprotein", "highsensitivitycrp"],
+      "aliases": [
+        "highsensitivitycrp"
+      ],
       "unit": "mg/L",
-      "displayRange": "< 1.0",
-      "category": "Cardiovascular",
+      "displayRange": "< 1",
+      "category": "Inflammation",
       "section": "CORE",
-      "optimal": { "low": 0, "high": 1.0 },
-      "borderline": { "low": 0, "high": 3.0 },
-      "high": 3.0,
+      "optimal": {
+        "low": 0,
+        "high": 1
+      },
+      "borderline": {
+        "low": 1,
+        "high": 3
+      },
+      "high": 3.1,
       "veryHigh": 10,
-      "longevityWeight": 0.08,
-      "associatedRisks": ["Vascular inflammation", "Plaque instability", "Cardiometabolic risk"],
       "evidenceStrength": "Strong",
-      "actionDomains": ["Weight reduction", "Sleep optimisation", "Exercise", "Omega-3", "Investigate infection if >10"]
+      "associatedRisks": [
+        "Chronic inflammation",
+        "Cardiometabolic risk",
+        "Plaque instability"
+      ],
+      "actionDomains": [
+        "Weight reduction",
+        "Sleep optimisation",
+        "Exercise",
+        "Omega-3 optimisation",
+        "Investigate acute illness if >10"
+      ],
+      "interpretationNotes": [
+        "Interpret away from acute infection or trauma."
+      ],
+      "measurementFrequency": "Annual"
     },
-    "fastinginsulin": {
-      "name": "Fasting Insulin",
-      "aliases": ["insulin"],
-      "unit": "mIU/L",
-      "displayRange": "< 6",
-      "category": "Cardiovascular",
-      "section": "CORE",
-      "optimal": { "low": 0, "high": 6 },
-      "borderline": { "low": 0, "high": 10 },
-      "high": 10,
-      "veryHigh": 15,
-      "longevityWeight": 0.10,
-      "associatedRisks": ["Insulin resistance", "Metabolic syndrome", "Fatty liver"],
-      "evidenceStrength": "Strong",
-      "actionDomains": ["Reduce refined carbohydrates", "Resistance training", "Visceral fat reduction", "Time-restricted eating"]
-    },
-    "hba1c": {
-      "name": "HbA1c",
-      "aliases": ["glycatedhemoglobin", "glycatedhaemoglobin", "a1c"],
-      "unit": "%",
-      "displayRange": "< 5.4",
-      "category": "Cardiovascular",
-      "section": "CORE",
-      "optimal": { "low": 0, "high": 5.4 },
-      "borderline": { "low": 0, "high": 5.6 },
-      "high": 5.6,
-      "veryHigh": 6.5,
-      "longevityWeight": 0.10,
-      "associatedRisks": ["Type 2 diabetes", "Cardiovascular disease", "Cognitive decline"],
-      "evidenceStrength": "Strong",
-      "actionDomains": ["Improve insulin sensitivity", "Reduce visceral fat", "Increase physical activity"]
-    },
-    "totalcholesterol": {
+    "tc": {
       "name": "Total Cholesterol",
-      "aliases": ["cholesterol"],
+      "aliases": [],
       "unit": "mmol/L",
       "displayRange": "< 4.5",
       "category": "Cardiovascular",
       "section": "CORE",
-      "optimal": { "low": 0, "high": 4.5 },
-      "borderline": { "low": 0, "high": 5.5 },
-      "high": 5.5
+      "optimal": {
+        "low": 0,
+        "high": 4.5
+      },
+      "borderline": {
+        "low": 4.5,
+        "high": 5.5
+      },
+      "high": 5.6,
+      "veryHigh": 7.5,
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Atherosclerotic risk (context dependent)"
+      ],
+      "actionDomains": [
+        "Diet quality",
+        "Exercise",
+        "Weight optimisation"
+      ],
+      "interpretationNotes": [
+        "Interpret with ApoB/LDL-C/HDL-C/TG."
+      ],
+      "measurementFrequency": "Annual"
     },
     "ldl": {
       "name": "LDL-C",
-      "aliases": ["ldlc", "ldlcholesterol"],
+      "aliases": [],
       "unit": "mmol/L",
-      "displayRange": "< 2.0",
+      "displayRange": "< 2",
       "category": "Cardiovascular",
       "section": "CORE",
-      "optimal": { "low": 0, "high": 2.0 },
-      "borderline": { "low": 0, "high": 2.6 },
-      "high": 2.6,
+      "optimal": {
+        "low": 0,
+        "high": 2
+      },
+      "borderline": {
+        "low": 2,
+        "high": 2.6
+      },
+      "high": 2.61,
       "veryHigh": 4.5,
-      "associatedRisks": ["Atherosclerosis"],
-      "evidenceStrength": "Strong"
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Atherosclerosis"
+      ],
+      "actionDomains": [
+        "Diet quality",
+        "Soluble fibre",
+        "Discuss medication if high-risk"
+      ],
+      "interpretationNotes": [
+        "ApoB preferred when discordant; LDL-C can underestimate particle burden."
+      ],
+      "measurementFrequency": "Annual"
     },
     "hdl": {
       "name": "HDL-C",
-      "aliases": ["hdlc", "hdlcholesterol"],
+      "aliases": [],
       "unit": "mmol/L",
       "displayRange": "> 1.3",
       "category": "Cardiovascular",
       "section": "CORE",
-      "optimal": { "low": 1.3, "high": 3.0 },
-      "borderline": { "low": 1.0, "high": 3.0 },
-      "associatedRisks": ["Cardiovascular risk when low"]
+      "optimal": {
+        "low": 1.3,
+        "high": 999
+      },
+      "borderline": {
+        "low": 1,
+        "high": 1.3
+      },
+      "high": null,
+      "veryHigh": null,
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Higher cardiometabolic risk when low"
+      ],
+      "actionDomains": [
+        "Increase physical activity",
+        "Improve insulin sensitivity",
+        "Weight optimisation"
+      ],
+      "interpretationNotes": [
+        "Focus on TG/insulin/ApoB rather than trying to 'raise HDL' directly."
+      ],
+      "measurementFrequency": "Annual"
     },
-    "triglycerides": {
+    "tg": {
       "name": "Triglycerides",
       "aliases": [],
       "unit": "mmol/L",
-      "displayRange": "< 1.0",
+      "displayRange": "< 1",
       "category": "Cardiovascular",
       "section": "CORE",
-      "optimal": { "low": 0, "high": 1.0 },
-      "borderline": { "low": 0, "high": 1.7 },
-      "high": 1.7,
-      "associatedRisks": ["Insulin resistance", "Fatty liver", "Cardiometabolic disease"]
+      "optimal": {
+        "low": 0,
+        "high": 1
+      },
+      "borderline": {
+        "low": 1,
+        "high": 1.7
+      },
+      "high": 1.71,
+      "veryHigh": 5.6,
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Insulin resistance",
+        "Fatty liver",
+        "Cardiometabolic disease"
+      ],
+      "actionDomains": [
+        "Reduce refined carbohydrates",
+        "Reduce alcohol",
+        "Weight reduction",
+        "Exercise",
+        "Omega-3 if elevated"
+      ],
+      "interpretationNotes": [
+        "Best interpreted fasting; elevated TG often tracks insulin resistance."
+      ],
+      "measurementFrequency": "Annual"
     },
-
-    "fastingglucose": {
-      "name": "Fasting Glucose",
-      "aliases": ["glucose"],
+    "apoa1": {
+      "name": "ApoA1",
+      "aliases": [
+        "apolipoproteina1"
+      ],
+      "unit": "g/L",
+      "displayRange": "> 1.2",
+      "category": "Cardiovascular",
+      "section": "CORE",
+      "optimal": {
+        "low": 1.2,
+        "high": 999
+      },
+      "borderline": {
+        "low": 1.05,
+        "high": 1.2
+      },
+      "high": null,
+      "veryHigh": null,
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Reduced protective lipoprotein capacity (context)"
+      ],
+      "actionDomains": [
+        "Exercise",
+        "Diet quality",
+        "Weight optimisation"
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "apobapoa1": {
+      "name": "ApoB/ApoA1 ratio",
+      "aliases": [],
+      "unit": "ratio",
+      "displayRange": "< 0.6",
+      "category": "Cardiovascular",
+      "section": "CORE",
+      "optimal": {
+        "low": 0,
+        "high": 0.6
+      },
+      "borderline": {
+        "low": 0.6,
+        "high": 0.8
+      },
+      "high": 0.81,
+      "veryHigh": 1,
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Atherogenic dominance"
+      ],
+      "actionDomains": [
+        "Lower ApoB via lifestyle and/or medication"
+      ],
+      "interpretationNotes": [
+        "Derived from ApoB + ApoA1; no extra lab cost."
+      ],
+      "measurementFrequency": "Annual",
+      "derived": true
+    },
+    "fibrinogen": {
+      "name": "Fibrinogen",
+      "aliases": [],
+      "unit": "g/L",
+      "displayRange": "2.0 - 3.5",
+      "category": "Cardiovascular",
+      "section": "CORE",
+      "optimal": {
+        "low": 2,
+        "high": 3.5
+      },
+      "borderline": {
+        "low": 3.6,
+        "high": 4
+      },
+      "high": 4.1,
+      "veryHigh": 5,
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Thrombotic risk",
+        "Inflammation"
+      ],
+      "actionDomains": [
+        "Weight reduction",
+        "Exercise",
+        "Stop smoking",
+        "Address inflammation drivers"
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "hcy": {
+      "name": "Homocysteine",
+      "aliases": [],
+      "unit": "µmol/L",
+      "displayRange": "< 8",
+      "category": "Cardiovascular",
+      "section": "CORE",
+      "optimal": {
+        "low": 0,
+        "high": 8
+      },
+      "borderline": {
+        "low": 8,
+        "high": 12
+      },
+      "high": 12.1,
+      "veryHigh": 20,
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Vascular risk",
+        "Cognitive decline risk proxy"
+      ],
+      "actionDomains": [
+        "Optimise B12/folate",
+        "Improve diet quality",
+        "Assess thyroid/renal context"
+      ],
+      "interpretationNotes": [
+        "Interpret alongside B12/folate and renal function."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "glu": {
+      "name": "Fasting glucose",
+      "aliases": [],
       "unit": "mmol/L",
       "displayRange": "4.5 - 5.2",
       "category": "Metabolic",
       "section": "CORE",
-      "optimal": { "low": 4.5, "high": 5.2 },
-      "borderline": { "low": 4.5, "high": 5.5 },
-      "high": 5.5,
-      "veryHigh": 7.0,
-      "longevityWeight": 0.06,
-      "associatedRisks": ["Insulin resistance", "Diabetes", "Vascular damage"],
+      "optimal": {
+        "low": 4.5,
+        "high": 5.2
+      },
+      "borderline": {
+        "low": 5.3,
+        "high": 5.5
+      },
+      "high": 5.6,
+      "veryHigh": 7,
       "evidenceStrength": "Strong",
-      "actionDomains": ["Reduce glycaemic load", "Exercise", "Improve sleep"]
+      "associatedRisks": [
+        "Insulin resistance",
+        "Diabetes",
+        "Vascular damage"
+      ],
+      "actionDomains": [
+        "Reduce glycaemic load",
+        "Exercise",
+        "Improve sleep",
+        "Reduce visceral fat"
+      ],
+      "measurementFrequency": "Annual"
     },
-    "uricacid": {
-      "name": "Uric Acid",
-      "aliases": ["urate"],
+    "hba1c": {
+      "name": "HbA1c",
+      "aliases": [],
+      "unit": "%",
+      "displayRange": "< 5.4",
+      "category": "Metabolic",
+      "section": "CORE",
+      "optimal": {
+        "low": 0,
+        "high": 5.4
+      },
+      "borderline": {
+        "low": 5.4,
+        "high": 5.6
+      },
+      "high": 5.7,
+      "veryHigh": 6.5,
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Diabetes risk",
+        "Cardiovascular disease",
+        "Cognitive decline risk"
+      ],
+      "actionDomains": [
+        "Improve insulin sensitivity",
+        "Weight reduction",
+        "Exercise",
+        "Reduce refined carbs"
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "ins": {
+      "name": "Fasting insulin",
+      "aliases": [],
+      "unit": "mIU/L",
+      "displayRange": "< 6",
+      "category": "Metabolic",
+      "section": "CORE",
+      "optimal": {
+        "low": 0,
+        "high": 6
+      },
+      "borderline": {
+        "low": 6,
+        "high": 10
+      },
+      "high": 10.1,
+      "veryHigh": 15,
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Insulin resistance",
+        "Metabolic syndrome",
+        "Fatty liver"
+      ],
+      "actionDomains": [
+        "Reduce refined carbs",
+        "Resistance training",
+        "Time-restricted eating",
+        "Visceral fat reduction"
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "cpep": {
+      "name": "C-peptide",
+      "aliases": [],
+      "unit": "nmol/L (lab dependent)",
+      "displayRange": "Lab reference",
+      "category": "Metabolic",
+      "section": "CORE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference (contextual)",
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Hyperinsulinaemia confirmation",
+        "Beta-cell stress (contextual)"
+      ],
+      "actionDomains": [
+        "Same as insulin resistance interventions"
+      ],
+      "interpretationNotes": [
+        "Useful adjunct when fasting insulin is equivocal; interpret with glucose/insulin.",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "ua": {
+      "name": "Uric acid",
+      "aliases": [],
       "unit": "µmol/L",
       "displayRange": "< 360",
       "category": "Metabolic",
       "section": "CORE",
-      "optimal": { "low": 0, "high": 360 },
-      "borderline": { "low": 0, "high": 420 },
-      "high": 420,
-      "longevityWeight": 0.05,
-      "associatedRisks": ["Metabolic syndrome", "Hypertension", "Cardiovascular disease"],
+      "optimal": {
+        "low": 0,
+        "high": 360
+      },
+      "borderline": {
+        "low": 360,
+        "high": 420
+      },
+      "high": 421,
+      "veryHigh": 500,
       "evidenceStrength": "Moderate",
-      "actionDomains": ["Reduce fructose intake", "Weight reduction", "Reduce alcohol"]
+      "associatedRisks": [
+        "Metabolic syndrome",
+        "Hypertension",
+        "Cardiovascular risk",
+        "Gout risk (when high)"
+      ],
+      "actionDomains": [
+        "Reduce fructose",
+        "Reduce alcohol",
+        "Weight reduction",
+        "Hydration"
+      ],
+      "measurementFrequency": "Annual"
     },
     "alt": {
       "name": "ALT",
-      "aliases": ["alanineaminotransferase"],
+      "aliases": [],
       "unit": "U/L",
       "displayRange": "< 25",
       "category": "Metabolic",
       "section": "CORE",
-      "optimal": { "low": 0, "high": 25 },
-      "borderline": { "low": 0, "high": 40 },
-      "high": 40,
+      "optimal": {
+        "low": 0,
+        "high": 25
+      },
+      "borderline": {
+        "low": 25,
+        "high": 40
+      },
+      "high": 41,
       "veryHigh": 100,
-      "associatedRisks": ["Fatty liver", "Metabolic dysfunction"],
       "evidenceStrength": "Strong",
-      "actionDomains": ["Reduce visceral fat", "Reduce alcohol", "Improve insulin sensitivity"]
+      "associatedRisks": [
+        "Fatty liver",
+        "Metabolic dysfunction"
+      ],
+      "actionDomains": [
+        "Reduce visceral fat",
+        "Reduce alcohol",
+        "Improve insulin sensitivity"
+      ],
+      "measurementFrequency": "Annual"
     },
     "ast": {
       "name": "AST",
-      "aliases": ["aspartateaminotransferase"],
+      "aliases": [],
       "unit": "U/L",
       "displayRange": "< 25",
       "category": "Metabolic",
       "section": "CORE",
-      "optimal": { "low": 0, "high": 25 },
-      "borderline": { "low": 0, "high": 40 },
+      "optimal": {
+        "low": 0,
+        "high": 25
+      },
+      "borderline": {
+        "low": 25,
+        "high": 40
+      },
       "high": 40,
-      "associatedRisks": ["Liver injury"]
+      "veryHigh": 100,
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Liver injury (contextual)"
+      ],
+      "actionDomains": [
+        "Address alcohol/medication contributors",
+        "Improve metabolic health"
+      ],
+      "interpretationNotes": [
+        "Interpret with ALT/GGT and clinical context."
+      ],
+      "measurementFrequency": "Annual"
     },
     "ggt": {
       "name": "GGT",
-      "aliases": ["gammaglutamyltransferase"],
+      "aliases": [],
       "unit": "U/L",
       "displayRange": "< 25",
       "category": "Metabolic",
       "section": "CORE",
-      "optimal": { "low": 0, "high": 25 },
-      "borderline": { "low": 0, "high": 45 },
+      "optimal": {
+        "low": 0,
+        "high": 25
+      },
+      "borderline": {
+        "low": 25,
+        "high": 45
+      },
       "high": 45,
-      "associatedRisks": ["Oxidative stress", "Alcohol-related liver strain"]
+      "veryHigh": 120,
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Oxidative stress",
+        "Alcohol-related liver strain",
+        "Metabolic risk"
+      ],
+      "actionDomains": [
+        "Reduce alcohol",
+        "Improve insulin sensitivity",
+        "Weight reduction"
+      ],
+      "measurementFrequency": "Annual"
     },
-
+    "alp": {
+      "name": "ALP",
+      "aliases": [],
+      "unit": "U/L",
+      "displayRange": "Lab reference",
+      "category": "Metabolic",
+      "section": "CORE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Cholestasis/biliary disease (contextual)",
+        "Bone turnover (contextual)"
+      ],
+      "actionDomains": [
+        "Clinical review if persistently abnormal"
+      ],
+      "interpretationNotes": [
+        "Interpret with bilirubin, GGT and calcium/phosphate if bone suspected.",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "bili": {
+      "name": "Bilirubin (total)",
+      "aliases": [],
+      "unit": "µmol/L",
+      "displayRange": "5 - 17",
+      "category": "Metabolic",
+      "section": "CORE",
+      "optimal": {
+        "low": 5,
+        "high": 17
+      },
+      "borderline": {
+        "low": 18,
+        "high": 25
+      },
+      "high": 26,
+      "veryHigh": 50,
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Liver/biliary issues when elevated",
+        "Haemolysis/Gilbert’s (contextual)"
+      ],
+      "actionDomains": [
+        "Clinical review if persistent elevation"
+      ],
+      "interpretationNotes": [
+        "Mild isolated elevation may reflect Gilbert’s; interpret with ALT/ALP/GGT."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "alb": {
+      "name": "Albumin",
+      "aliases": [],
+      "unit": "g/L",
+      "displayRange": "40 - 50",
+      "category": "Organ Health",
+      "section": "CORE",
+      "optimal": {
+        "low": 40,
+        "high": 50
+      },
+      "borderline": {
+        "low": 35,
+        "high": 39
+      },
+      "high": null,
+      "veryHigh": null,
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Frailty risk proxy (low)",
+        "Inflammation/nutrition issues (low)",
+        "Liver/kidney disease (contextual)"
+      ],
+      "actionDomains": [
+        "Improve protein intake if appropriate",
+        "Address inflammation drivers",
+        "Clinical review if low"
+      ],
+      "interpretationNotes": [
+        "Low albumin is a strong general risk signal; interpret contextually."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "tp": {
+      "name": "Total protein",
+      "aliases": [],
+      "unit": "g/L",
+      "displayRange": "65 - 80",
+      "category": "Organ Health",
+      "section": "CORE",
+      "optimal": {
+        "low": 65,
+        "high": 80
+      },
+      "borderline": {
+        "low": 60,
+        "high": 64
+      },
+      "high": 85,
+      "veryHigh": null,
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Nutrition/immune/liver context issues"
+      ],
+      "actionDomains": [
+        "Clinical review if persistently abnormal"
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "creat": {
+      "name": "Creatinine",
+      "aliases": [],
+      "unit": "µmol/L",
+      "displayRange": "Lab reference",
+      "category": "Organ Health",
+      "section": "CORE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Kidney dysfunction (contextual)"
+      ],
+      "actionDomains": [
+        "Hydration optimisation",
+        "Manage BP/glucose",
+        "Clinical review if abnormal"
+      ],
+      "interpretationNotes": [
+        "Interpret with eGFR and muscle mass.",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
     "egfr": {
       "name": "eGFR",
-      "aliases": ["estimatedglomerularfiltrationrate"],
+      "aliases": [],
       "unit": "mL/min/1.73m²",
       "displayRange": "> 90",
       "category": "Organ Health",
       "section": "CORE",
-      "optimal": { "low": 90, "high": 200 },
-      "borderline": { "low": 60, "high": 200 },
-      "longevityWeight": 0.08,
-      "associatedRisks": ["Chronic kidney disease", "Cardiovascular mortality"],
+      "optimal": {
+        "low": 90,
+        "high": 999
+      },
+      "borderline": {
+        "low": 60,
+        "high": 89
+      },
+      "high": 45,
+      "veryHigh": 45,
       "evidenceStrength": "Strong",
-      "actionDomains": ["Blood pressure control", "Glycaemic control", "Reduce nephrotoxic exposure"],
-      "notes": "Lower values indicate worse kidney function. <60 = high risk, <45 = very high risk."
+      "associatedRisks": [
+        "Chronic kidney disease",
+        "Cardiovascular mortality risk"
+      ],
+      "actionDomains": [
+        "BP control",
+        "Glycaemic control",
+        "Avoid nephrotoxins",
+        "Clinical review if <60"
+      ],
+      "measurementFrequency": "Annual"
     },
-    "creatinine": {
-      "name": "Creatinine",
+    "urea": {
+      "name": "Urea",
       "aliases": [],
-      "unit": "µmol/L",
-      "displayRange": "60 - 110",
+      "unit": "mmol/L",
+      "displayRange": "3 - 7",
       "category": "Organ Health",
       "section": "CORE",
-      "optimal": { "low": 60, "high": 110 },
-      "borderline": { "low": 50, "high": 130 },
-      "associatedRisks": ["Kidney dysfunction"],
-      "notes": "Contextual with eGFR."
+      "optimal": {
+        "low": 3,
+        "high": 7
+      },
+      "borderline": {
+        "low": 7.1,
+        "high": 9
+      },
+      "high": 9,
+      "veryHigh": null,
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Dehydration/protein load (high)",
+        "Kidney dysfunction (contextual)"
+      ],
+      "actionDomains": [
+        "Hydration optimisation",
+        "Review protein intake if very high",
+        "Clinical review with creatinine/eGFR"
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "na": {
+      "name": "Sodium",
+      "aliases": [],
+      "unit": "mmol/L",
+      "displayRange": "Lab reference",
+      "category": "Organ Health",
+      "section": "CORE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Electrolyte imbalance",
+        "Cardiac/neuromuscular effects when abnormal (contextual)"
+      ],
+      "actionDomains": [
+        "Hydration/electrolyte management",
+        "Clinical review if abnormal"
+      ],
+      "interpretationNotes": [
+        "Interpret in clinical context and with medications (e.g., diuretics).",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "k": {
+      "name": "Potassium",
+      "aliases": [],
+      "unit": "mmol/L",
+      "displayRange": "Lab reference",
+      "category": "Organ Health",
+      "section": "CORE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Electrolyte imbalance",
+        "Cardiac/neuromuscular effects when abnormal (contextual)"
+      ],
+      "actionDomains": [
+        "Hydration/electrolyte management",
+        "Clinical review if abnormal"
+      ],
+      "interpretationNotes": [
+        "Interpret in clinical context and with medications (e.g., diuretics).",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "cl": {
+      "name": "Chloride",
+      "aliases": [],
+      "unit": "mmol/L",
+      "displayRange": "Lab reference",
+      "category": "Organ Health",
+      "section": "CORE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Electrolyte imbalance",
+        "Cardiac/neuromuscular effects when abnormal (contextual)"
+      ],
+      "actionDomains": [
+        "Hydration/electrolyte management",
+        "Clinical review if abnormal"
+      ],
+      "interpretationNotes": [
+        "Interpret in clinical context and with medications (e.g., diuretics).",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "hco3": {
+      "name": "Bicarbonate",
+      "aliases": [],
+      "unit": "mmol/L",
+      "displayRange": "Lab reference",
+      "category": "Organ Health",
+      "section": "CORE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Electrolyte imbalance",
+        "Cardiac/neuromuscular effects when abnormal (contextual)"
+      ],
+      "actionDomains": [
+        "Hydration/electrolyte management",
+        "Clinical review if abnormal"
+      ],
+      "interpretationNotes": [
+        "Interpret in clinical context and with medications (e.g., diuretics).",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "ca": {
+      "name": "Calcium",
+      "aliases": [],
+      "unit": "mmol/L",
+      "displayRange": "Lab reference",
+      "category": "Organ Health",
+      "section": "CORE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Electrolyte imbalance",
+        "Cardiac/neuromuscular effects when abnormal (contextual)"
+      ],
+      "actionDomains": [
+        "Hydration/electrolyte management",
+        "Clinical review if abnormal"
+      ],
+      "interpretationNotes": [
+        "Interpret in clinical context and with medications (e.g., diuretics).",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "po4": {
+      "name": "Phosphate",
+      "aliases": [],
+      "unit": "mmol/L",
+      "displayRange": "Lab reference",
+      "category": "Organ Health",
+      "section": "CORE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Electrolyte imbalance",
+        "Cardiac/neuromuscular effects when abnormal (contextual)"
+      ],
+      "actionDomains": [
+        "Hydration/electrolyte management",
+        "Clinical review if abnormal"
+      ],
+      "interpretationNotes": [
+        "Interpret in clinical context and with medications (e.g., diuretics).",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
     },
     "ferritin": {
       "name": "Ferritin",
@@ -244,288 +1035,2110 @@
       "displayRange": "50 - 150 (M) / 30 - 120 (F)",
       "category": "Organ Health",
       "section": "CORE",
-      "optimal": { "low": 50, "high": 150 },
-      "borderline": { "low": 30, "high": 300 },
+      "optimal": {
+        "low": 50,
+        "high": 150
+      },
+      "sexSpecific": "Male: 50-150; Female: 30-120",
+      "borderline": {
+        "low": 150,
+        "high": 300
+      },
       "high": 300,
       "veryHigh": 600,
-      "associatedRisks": ["Iron deficiency", "Iron overload", "Oxidative stress"],
       "evidenceStrength": "Strong",
-      "notes": "Optimal range differs by sex: Male 50-150, Female 30-120."
+      "associatedRisks": [
+        "Iron deficiency (low)",
+        "Iron overload/inflammation (high)",
+        "Fatigue/poor performance (low)"
+      ],
+      "actionDomains": [
+        "Iron optimisation guided by full iron studies",
+        "Investigate inflammation if high"
+      ],
+      "interpretationNotes": [
+        "Interpret with transferrin saturation and CRP."
+      ],
+      "measurementFrequency": "Annual"
     },
-    "serumiron": {
-      "name": "Serum Iron",
-      "aliases": ["iron"],
+    "iron": {
+      "name": "Serum iron",
+      "aliases": [],
       "unit": "µmol/L",
-      "displayRange": "10 - 30",
+      "displayRange": "Lab reference",
       "category": "Organ Health",
       "section": "CORE",
-      "optimal": { "low": 10, "high": 30 },
-      "borderline": { "low": 7, "high": 35 }
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Iron deficiency or overload (contextual)"
+      ],
+      "actionDomains": [
+        "Interpret with ferritin, transferrin, TSAT"
+      ],
+      "interpretationNotes": [
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
     },
     "transferrin": {
       "name": "Transferrin",
       "aliases": [],
       "unit": "g/L",
-      "displayRange": "2.0 - 3.6",
+      "displayRange": "Lab reference",
       "category": "Organ Health",
       "section": "CORE",
-      "optimal": { "low": 2.0, "high": 3.6 },
-      "borderline": { "low": 1.7, "high": 4.0 },
-      "notes": "Used to interpret ferritin contextually."
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Iron transport abnormalities (contextual)"
+      ],
+      "actionDomains": [
+        "Interpret with iron and TSAT"
+      ],
+      "interpretationNotes": [
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
     },
-    "transferrinsaturation": {
-      "name": "Transferrin Saturation",
+    "tsat": {
+      "name": "Transferrin saturation",
       "aliases": [],
       "unit": "%",
-      "displayRange": "20 - 50",
+      "displayRange": "20 - 45",
       "category": "Organ Health",
       "section": "CORE",
-      "optimal": { "low": 20, "high": 50 },
-      "borderline": { "low": 15, "high": 55 },
-      "notes": "Used to interpret ferritin contextually."
-    },
-
-    "testosterone": {
-      "name": "Testosterone",
-      "aliases": [],
-      "unit": "nmol/L",
-      "displayRange": "18 - 30 (M)",
-      "category": "Hormones",
-      "section": "CORE",
-      "optimal": { "low": 18, "high": 30 },
-      "borderline": { "low": 12, "high": 30 },
-      "longevityWeight": 0.05,
-      "associatedRisks": ["Sarcopenia", "Metabolic dysfunction", "Reduced vitality"],
+      "optimal": {
+        "low": 20,
+        "high": 45
+      },
+      "borderline": {
+        "low": 15,
+        "high": 19
+      },
+      "high": 0,
+      "veryHigh": 70,
       "evidenceStrength": "Moderate",
-      "actionDomains": ["Resistance training", "Sleep optimisation", "Body fat reduction"],
-      "notes": "Male reference. <12 = low."
+      "associatedRisks": [
+        "Iron deficiency (low)",
+        "Iron overload risk (high)"
+      ],
+      "actionDomains": [
+        "Iron optimisation; clinical review if persistently abnormal"
+      ],
+      "measurementFrequency": "Annual"
     },
-    "estradiol": {
-      "name": "Estradiol",
-      "aliases": ["oestradiol"],
-      "unit": "pmol/L",
-      "displayRange": "Cycle-dependent (F)",
+    "hb": {
+      "name": "Haemoglobin",
+      "aliases": [],
+      "unit": "g/L",
+      "displayRange": "135 - 175 (M) / 120 - 155 (F)",
+      "category": "Organ Health",
+      "section": "CORE",
+      "optimal": {
+        "low": 135,
+        "high": 175
+      },
+      "sexSpecific": "Male: 135-175; Female: 120-155",
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "referenceNote": "Slightly low/high (lab ref)",
+      "high": null,
+      "veryHigh": null,
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Anaemia (low)",
+        "Polycythaemia/dehydration (high)"
+      ],
+      "actionDomains": [
+        "Investigate iron/B12/folate if low",
+        "Clinical review if persistently abnormal"
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "rbc": {
+      "name": "Red blood cell count",
+      "aliases": [],
+      "unit": "x10^12/L",
+      "displayRange": "Lab reference",
+      "category": "Organ Health",
+      "section": "CORE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Anaemia/polycythaemia context"
+      ],
+      "actionDomains": [
+        "Interpret with Hb, Hct, MCV"
+      ],
+      "interpretationNotes": [
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "wbc": {
+      "name": "White blood cell count",
+      "aliases": [],
+      "unit": "x10^9/L",
+      "displayRange": "Lab reference",
+      "category": "Organ Health",
+      "section": "CORE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Infection/inflammation/haematologic issues (contextual)"
+      ],
+      "actionDomains": [
+        "Clinical review if abnormal; interpret with differential"
+      ],
+      "interpretationNotes": [
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "plt": {
+      "name": "Platelets",
+      "aliases": [],
+      "unit": "x10^9/L",
+      "displayRange": "Lab reference",
+      "category": "Organ Health",
+      "section": "CORE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Bleeding/clotting risk signals when abnormal (contextual)"
+      ],
+      "actionDomains": [
+        "Clinical review if persistently abnormal"
+      ],
+      "interpretationNotes": [
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "hct": {
+      "name": "Haematocrit",
+      "aliases": [],
+      "unit": "%",
+      "displayRange": "0.40 - 0.52 (M) / 0.36 - 0.46 (F)",
+      "category": "Organ Health",
+      "section": "CORE",
+      "optimal": {
+        "low": 0.4,
+        "high": 0.52
+      },
+      "sexSpecific": "Male: 0.40-0.52; Female: 0.36-0.46",
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Anaemia/dehydration context"
+      ],
+      "actionDomains": [
+        "Interpret with Hb/RBC and hydration status"
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "mcv": {
+      "name": "MCV",
+      "aliases": [],
+      "unit": "fL",
+      "displayRange": "80 - 100",
+      "category": "Organ Health",
+      "section": "CORE",
+      "optimal": {
+        "low": 80,
+        "high": 100
+      },
+      "borderline": {
+        "low": 75,
+        "high": 79
+      },
+      "high": 105,
+      "veryHigh": null,
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "B12/folate deficiency (high)",
+        "Iron deficiency (low)"
+      ],
+      "actionDomains": [
+        "Assess B12/folate/iron depending on direction"
+      ],
+      "interpretationNotes": [
+        "Macrocytosis strongly suggests B12/folate issues or alcohol/thyroid context."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "mch": {
+      "name": "MCH",
+      "aliases": [],
+      "unit": "pg",
+      "displayRange": "Lab reference",
+      "category": "Organ Health",
+      "section": "CORE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Anaemia typing context"
+      ],
+      "actionDomains": [
+        "Interpret with MCV and Hb"
+      ],
+      "interpretationNotes": [
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "rdw": {
+      "name": "RDW",
+      "aliases": [],
+      "unit": "%",
+      "displayRange": "< 13.5",
+      "category": "Organ Health",
+      "section": "CORE",
+      "optimal": {
+        "low": 0,
+        "high": 13.5
+      },
+      "borderline": {
+        "low": 13.5,
+        "high": 14.5
+      },
+      "high": 14.6,
+      "veryHigh": 16,
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "All-cause mortality proxy (elevated)",
+        "Nutrient deficiency/inflammation (contextual)"
+      ],
+      "actionDomains": [
+        "Assess iron/B12/folate and inflammation drivers"
+      ],
+      "interpretationNotes": [
+        "RDW is a strong general risk marker; interpret alongside CBC and nutrition markers."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "testosteronem": {
+      "name": "Testosterone (total)",
+      "aliases": [
+        "totaltestosterone"
+      ],
+      "unit": "nmol/L",
+      "displayRange": "18 - 30",
       "category": "Hormones",
       "section": "CORE",
-      "optimal": { "low": 50, "high": 500 },
-      "borderline": { "low": 30, "high": 600 },
-      "associatedRisks": ["Bone loss", "Cardiovascular risk"],
-      "notes": "Cycle-dependent. Low postmenopause: <50."
+      "optimal": {
+        "low": 18,
+        "high": 30
+      },
+      "borderline": {
+        "low": 12,
+        "high": 17
+      },
+      "high": 30,
+      "veryHigh": 35,
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Sarcopenia (low)",
+        "Insulin resistance (low)",
+        "Fatigue/low libido (low)"
+      ],
+      "actionDomains": [
+        "Resistance training",
+        "Sleep optimisation",
+        "Reduce visceral fat",
+        "Clinical review if persistently low"
+      ],
+      "interpretationNotes": [
+        "Morning test preferred; interpret with SHBG.  Free testosterone can be calculated."
+      ],
+      "measurementFrequency": "Annual",
+      "sexSpecificFor": "Male"
+    },
+    "estradiolf": {
+      "name": "Estradiol (E2)",
+      "aliases": [
+        "oestradiol",
+        "e2"
+      ],
+      "unit": "pmol/L",
+      "displayRange": "Cycle/context dependent",
+      "category": "Hormones",
+      "section": "CORE",
+      "optimalDetailed": {
+        "premenopausal_follicular": "100–300",
+        "premenopausal_midcycle": "300–1200",
+        "premenopausal_luteal": "150–600",
+        "postmenopausal_no_HRT": "50–150",
+        "postmenopausal_on_HRT": "150–400"
+      },
+      "optimal": {
+        "low": 100,
+        "high": 300
+      },
+      "borderlineDetailed": {
+        "premenopausal": "50–99",
+        "postmenopausal": "30–49"
+      },
+      "borderline": {
+        "low": 50,
+        "high": 99
+      },
+      "highDetailed": {
+        "premenopausal": ">1200",
+        "postmenopausal": ">400"
+      },
+      "high": 1200,
+      "veryHigh": 2000,
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Bone loss risk (low)",
+        "Cardiovascular risk (low)",
+        "Hormonal imbalance (high)"
+      ],
+      "actionDomains": [
+        "Resistance training",
+        "Body composition optimisation",
+        "Medical review (cycle/HRT context)"
+      ],
+      "interpretationNotes": [
+        "Interpret with cycle phase and menopausal status; interpret alongside SHBG where relevant."
+      ],
+      "measurementFrequency": "Annual",
+      "sexSpecificFor": "Female"
     },
     "shbg": {
       "name": "SHBG",
-      "aliases": ["sexhormonebindingglobulin"],
+      "aliases": [],
       "unit": "nmol/L",
       "displayRange": "20 - 40",
       "category": "Hormones",
       "section": "CORE",
-      "optimal": { "low": 20, "high": 40 },
-      "borderline": { "low": 15, "high": 60 },
-      "associatedRisks": ["Insulin resistance (low SHBG)"]
+      "optimal": {
+        "low": 20,
+        "high": 40
+      },
+      "borderline": {
+        "low": 15,
+        "high": 19
+      },
+      "high": 60,
+      "veryHigh": null,
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Insulin resistance proxy when low",
+        "Hormone binding alterations (context)"
+      ],
+      "actionDomains": [
+        "Improve insulin sensitivity",
+        "Body fat reduction",
+        "Clinical review if very high"
+      ],
+      "interpretationNotes": [
+        "Required to interpret testosterone accurately."
+      ],
+      "measurementFrequency": "Annual"
     },
     "tsh": {
       "name": "TSH",
-      "aliases": ["thyroidstimulatinghormone"],
+      "aliases": [],
       "unit": "mIU/L",
       "displayRange": "0.5 - 2.5",
       "category": "Hormones",
       "section": "CORE",
-      "optimal": { "low": 0.5, "high": 2.5 },
-      "borderline": { "low": 0.5, "high": 4.0 },
-      "high": 4.0,
-      "associatedRisks": ["Hypothyroidism", "Hyperthyroidism"],
-      "notes": "Very low (<0.1) may indicate hyperthyroidism."
+      "optimal": {
+        "low": 0.5,
+        "high": 2.5
+      },
+      "borderline": {
+        "low": 2.6,
+        "high": 4
+      },
+      "high": 4,
+      "veryHigh": 10,
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Hypothyroidism (high)",
+        "Hyperthyroidism (low/very low)"
+      ],
+      "actionDomains": [
+        "Medical review if abnormal"
+      ],
+      "interpretationNotes": [
+        "Interpret with Free T4/Free T3 and symptoms."
+      ],
+      "measurementFrequency": "Annual"
     },
-    "freet4": {
+    "ft4": {
       "name": "Free T4",
-      "aliases": ["ft4", "freethyroxine"],
+      "aliases": [],
       "unit": "pmol/L",
       "displayRange": "12 - 18",
       "category": "Hormones",
       "section": "CORE",
-      "optimal": { "low": 12, "high": 18 },
-      "borderline": { "low": 10, "high": 22 },
-      "notes": "Low <10."
+      "optimal": {
+        "low": 12,
+        "high": 18
+      },
+      "borderline": {
+        "low": 10,
+        "high": 11
+      },
+      "high": 21,
+      "veryHigh": 25,
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Thyroid dysfunction (contextual)"
+      ],
+      "actionDomains": [
+        "Medical review if abnormal"
+      ],
+      "interpretationNotes": [
+        "Interpret with TSH and Free T3."
+      ],
+      "measurementFrequency": "Annual"
     },
-    "freet3": {
+    "ft3": {
       "name": "Free T3",
-      "aliases": ["ft3", "freetriiodothyronine"],
-      "unit": "pmol/L",
-      "displayRange": "3.5 - 6.5",
-      "category": "Hormones",
-      "section": "CORE",
-      "optimal": { "low": 3.5, "high": 6.5 },
-      "borderline": { "low": 3.0, "high": 7.0 }
-    },
-    "cortisol": {
-      "name": "Cortisol",
       "aliases": [],
-      "unit": "nmol/L",
-      "displayRange": "140 - 690",
+      "unit": "pmol/L",
+      "displayRange": "4.0 - 6.5",
       "category": "Hormones",
       "section": "CORE",
-      "optimal": { "low": 140, "high": 500 },
-      "borderline": { "low": 100, "high": 690 }
+      "optimal": {
+        "low": 4,
+        "high": 6.5
+      },
+      "borderline": {
+        "low": 3.5,
+        "high": 3.9
+      },
+      "high": 7,
+      "veryHigh": null,
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Thyroid dysfunction",
+        "Metabolic symptoms (contextual)"
+      ],
+      "actionDomains": [
+        "Medical review if abnormal"
+      ],
+      "interpretationNotes": [
+        "Interpret with TSH and Free T4."
+      ],
+      "measurementFrequency": "Annual"
     },
-
-    "haemoglobin": {
-      "name": "Haemoglobin",
-      "aliases": ["hemoglobin", "hb", "hgb"],
-      "unit": "g/L",
-      "displayRange": "130 - 170",
-      "category": "Blood Health",
-      "section": "CORE",
-      "optimal": { "low": 130, "high": 170 },
-      "borderline": { "low": 120, "high": 180 }
-    },
-    "rbc": {
-      "name": "RBC",
-      "aliases": ["redbloodcells", "redcellcount"],
-      "unit": "×10¹²/L",
-      "displayRange": "4.5 - 5.5",
-      "category": "Blood Health",
-      "section": "CORE",
-      "optimal": { "low": 4.5, "high": 5.5 },
-      "borderline": { "low": 4.0, "high": 6.0 }
-    },
-    "wbc": {
-      "name": "WBC",
-      "aliases": ["whitebloodcells", "whitecellcount", "leucocytes"],
-      "unit": "×10⁹/L",
-      "displayRange": "4.0 - 11.0",
-      "category": "Blood Health",
-      "section": "CORE",
-      "optimal": { "low": 4.0, "high": 11.0 },
-      "borderline": { "low": 3.5, "high": 12.0 }
-    },
-    "platelets": {
-      "name": "Platelets",
-      "aliases": ["plateletcount"],
-      "unit": "×10⁹/L",
-      "displayRange": "150 - 400",
-      "category": "Blood Health",
-      "section": "CORE",
-      "optimal": { "low": 150, "high": 400 },
-      "borderline": { "low": 130, "high": 450 }
-    },
-
-    "vitamind": {
-      "name": "Vitamin D",
-      "aliases": ["25ohd", "25hydroxyvitamind"],
+    "vitd": {
+      "name": "Vitamin D (25-OH)",
+      "aliases": [
+        "25hydroxyvitamind"
+      ],
       "unit": "nmol/L",
-      "displayRange": "> 75",
+      "displayRange": "75 - 125",
       "category": "Vitamins",
       "section": "CORE",
-      "optimal": { "low": 75, "high": 200 },
-      "borderline": { "low": 50, "high": 250 }
+      "optimal": {
+        "low": 75,
+        "high": 125
+      },
+      "borderline": {
+        "low": 50,
+        "high": 74
+      },
+      "high": 125,
+      "veryHigh": 150,
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Immune dysfunction (low)",
+        "Bone loss risk (low)",
+        "Higher all-cause risk (low)"
+      ],
+      "actionDomains": [
+        "Sunlight exposure optimisation",
+        "Supplementation if low",
+        "Recheck if correcting deficiency"
+      ],
+      "interpretationNotes": [
+        "Longevity optimal range is typically higher than minimum deficiency threshold."
+      ],
+      "measurementFrequency": "Annual"
     },
-    "vitaminb12": {
+    "b12": {
       "name": "Vitamin B12",
-      "aliases": ["b12", "cobalamin"],
+      "aliases": [],
       "unit": "pmol/L",
-      "displayRange": "150 - 600",
+      "displayRange": "> 400",
       "category": "Vitamins",
       "section": "CORE",
-      "optimal": { "low": 200, "high": 600 },
-      "borderline": { "low": 150, "high": 700 }
+      "optimal": {
+        "low": 400,
+        "high": 999
+      },
+      "borderline": {
+        "low": 250,
+        "high": 400
+      },
+      "high": null,
+      "veryHigh": null,
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Neuropathy/cognitive symptoms (low)",
+        "Anaemia (low)",
+        "Elevated homocysteine (low)"
+      ],
+      "actionDomains": [
+        "Dietary optimisation",
+        "Supplementation if low",
+        "Investigate malabsorption if persistent"
+      ],
+      "interpretationNotes": [
+        "Interpret with folate, MCV and homocysteine."
+      ],
+      "measurementFrequency": "Annual"
     },
     "folate": {
       "name": "Folate",
-      "aliases": ["folicacid"],
-      "unit": "nmol/L",
-      "displayRange": "> 10",
+      "aliases": [],
+      "unit": "nmol/L (lab dependent)",
+      "displayRange": "> 15",
       "category": "Vitamins",
       "section": "CORE",
-      "optimal": { "low": 10, "high": 45 },
-      "borderline": { "low": 7, "high": 50 }
+      "optimal": {
+        "low": 15,
+        "high": 999
+      },
+      "borderline": {
+        "low": 10,
+        "high": 15
+      },
+      "high": null,
+      "veryHigh": null,
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Anaemia (low)",
+        "Elevated homocysteine (low)"
+      ],
+      "actionDomains": [
+        "Dietary optimisation",
+        "Supplementation if low"
+      ],
+      "interpretationNotes": [
+        "Interpret with B12 (do not treat folate alone if B12 deficient)."
+      ],
+      "measurementFrequency": "Annual"
     },
-    "omega3index": {
-      "name": "Omega-3 Index",
-      "aliases": ["omega3"],
-      "unit": "%",
-      "displayRange": "> 8",
+    "mg": {
+      "name": "Magnesium",
+      "aliases": [],
+      "unit": "mmol/L",
+      "displayRange": "0.80 - 0.95",
       "category": "Vitamins",
-      "section": "ELITE",
-      "optimal": { "low": 8, "high": 12 },
-      "borderline": { "low": 4, "high": 12 }
+      "section": "CORE",
+      "optimal": {
+        "low": 0.8,
+        "high": 0.95
+      },
+      "borderline": {
+        "low": 0.75,
+        "high": 0.79
+      },
+      "high": 1.05,
+      "veryHigh": 1.2,
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Arrhythmia/muscle symptoms when low (contextual)",
+        "Metabolic risk proxy (low-normal)"
+      ],
+      "actionDomains": [
+        "Dietary optimisation",
+        "Supplementation if low",
+        "Review renal function if high"
+      ],
+      "interpretationNotes": [
+        "Serum Mg is imperfect; still useful screening marker."
+      ],
+      "measurementFrequency": "Annual"
     },
-
+    "zn": {
+      "name": "Zinc",
+      "aliases": [],
+      "unit": "µmol/L",
+      "displayRange": "12 - 18",
+      "category": "Vitamins",
+      "section": "CORE",
+      "optimal": {
+        "low": 12,
+        "high": 18
+      },
+      "borderline": {
+        "low": 10,
+        "high": 11
+      },
+      "high": 20,
+      "veryHigh": null,
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Immune dysfunction (low)",
+        "Imbalance with copper (contextual)"
+      ],
+      "actionDomains": [
+        "Dietary optimisation",
+        "Supplementation if low (avoid excess)"
+      ],
+      "interpretationNotes": [
+        "Interpret alongside copper; aim for balance rather than extremes."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "lppla2": {
+      "name": "Lp-PLA2",
+      "aliases": [],
+      "unit": "U/L or ng/mL (lab dependent)",
+      "displayRange": "Lab reference",
+      "category": "Cardiovascular",
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference (lower is better)",
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Vascular inflammation",
+        "Plaque activity"
+      ],
+      "actionDomains": [
+        "ApoB optimisation",
+        "Anti-inflammatory lifestyle",
+        "Specialist discussion if elevated"
+      ],
+      "interpretationNotes": [
+        "Interpret with ApoB, hs-CRP and overall risk profile.",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "oxldl": {
+      "name": "Oxidised LDL (OxLDL)",
+      "aliases": [],
+      "unit": "U/L (lab dependent)",
+      "displayRange": "Lab reference",
+      "category": "Cardiovascular",
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference (lower is better)",
+      "evidenceStrength": "Emerging",
+      "associatedRisks": [
+        "Oxidative stress",
+        "Atherogenesis (contextual)"
+      ],
+      "actionDomains": [
+        "Improve insulin sensitivity",
+        "Increase exercise",
+        "Diet quality",
+        "Stop smoking"
+      ],
+      "interpretationNotes": [
+        "Use as an adjunct marker; interpret trend over time.",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "apoc3": {
+      "name": "Apolipoprotein C-III (ApoC-III)",
+      "aliases": [],
+      "unit": "mg/dL (lab dependent)",
+      "displayRange": "Lab reference",
+      "category": "Cardiovascular",
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference (lower is better)",
+      "evidenceStrength": "Emerging",
+      "associatedRisks": [
+        "Triglyceride-rich lipoprotein risk"
+      ],
+      "actionDomains": [
+        "Lower TG drivers (carbs/alcohol/visceral fat)",
+        "Consider specialist if persistently high"
+      ],
+      "interpretationNotes": [
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "il6": {
+      "name": "Interleukin-6 (IL-6)",
+      "aliases": [],
+      "unit": "pg/mL",
+      "displayRange": "Lab reference",
+      "category": "Inflammation",
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Low/undetectable (lab reference)",
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Inflammaging",
+        "Cardiometabolic risk"
+      ],
+      "actionDomains": [
+        "Sleep optimisation",
+        "Exercise",
+        "Weight reduction",
+        "Anti-inflammatory nutrition"
+      ],
+      "interpretationNotes": [
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "tnf": {
+      "name": "TNF-alpha",
+      "aliases": [],
+      "unit": "pg/mL",
+      "displayRange": "Lab reference",
+      "category": "Inflammation",
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Low/undetectable (lab reference)",
+      "evidenceStrength": "Emerging",
+      "associatedRisks": [
+        "Chronic inflammation"
+      ],
+      "actionDomains": [
+        "As per IL-6; investigate drivers if high"
+      ],
+      "interpretationNotes": [
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
     "esr": {
       "name": "ESR",
-      "aliases": ["erythrocytesedimentationrate"],
+      "aliases": [],
       "unit": "mm/hr",
-      "displayRange": "0 - 20",
+      "displayRange": "Lab reference",
       "category": "Inflammation",
-      "section": "CORE",
-      "optimal": { "low": 0, "high": 15 },
-      "borderline": { "low": 0, "high": 20 }
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Low (lab reference)",
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Inflammation signal (non-specific)"
+      ],
+      "actionDomains": [
+        "Interpret with hs-CRP; clinical review if persistently elevated"
+      ],
+      "interpretationNotes": [
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
     },
-    "bilirubin": {
-      "name": "Bilirubin",
-      "aliases": ["totalbilirubin"],
+    "cortisolam": {
+      "name": "Cortisol (AM)",
+      "aliases": [],
+      "unit": "nmol/L",
+      "displayRange": "Lab reference",
+      "category": "Hormones",
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference (time-dependent)",
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Stress load",
+        "Sleep disruption",
+        "Metabolic impact"
+      ],
+      "actionDomains": [
+        "Sleep optimisation",
+        "Stress reduction",
+        "Training periodisation"
+      ],
+      "interpretationNotes": [
+        "Time of day critical; interpret with symptoms and sleep data.",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "dheas": {
+      "name": "DHEA-S",
+      "aliases": [],
       "unit": "µmol/L",
-      "displayRange": "< 20",
-      "category": "Organ Health",
-      "section": "CORE",
-      "optimal": { "low": 0, "high": 17 },
-      "borderline": { "low": 0, "high": 20 }
+      "displayRange": "Lab reference",
+      "category": "Hormones",
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Age-adjusted lab reference",
+      "evidenceStrength": "Emerging",
+      "associatedRisks": [
+        "Aging axis proxy (low)",
+        "Androgen excess (high, contextual)"
+      ],
+      "actionDomains": [
+        "Sleep and recovery",
+        "Resistance training",
+        "Medical review if very low/high"
+      ],
+      "interpretationNotes": [
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
     },
-    "urea": {
-      "name": "Urea",
-      "aliases": ["bloodureanitrogen", "bun"],
-      "unit": "mmol/L",
-      "displayRange": "2.5 - 7.1",
-      "category": "Organ Health",
-      "section": "CORE",
-      "optimal": { "low": 2.5, "high": 7.1 },
-      "borderline": { "low": 2.0, "high": 8.0 }
+    "igf1": {
+      "name": "IGF-1",
+      "aliases": [],
+      "unit": "nmol/L or ng/mL (lab dependent)",
+      "displayRange": "Lab reference",
+      "category": "Hormones",
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Age-adjusted lab reference",
+      "evidenceStrength": "Emerging",
+      "associatedRisks": [
+        "Growth/aging axis (context dependent)"
+      ],
+      "actionDomains": [
+        "Protein/training optimisation",
+        "Clinical interpretation in context"
+      ],
+      "interpretationNotes": [
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
     },
-
+    "leptin": {
+      "name": "Leptin",
+      "aliases": [],
+      "unit": "ng/mL",
+      "displayRange": "Lab reference",
+      "category": "Metabolic",
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Low-normal (sex/BMI dependent)",
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Leptin resistance",
+        "Metabolic dysfunction"
+      ],
+      "actionDomains": [
+        "Visceral fat reduction",
+        "Diet quality",
+        "Exercise"
+      ],
+      "interpretationNotes": [
+        "Interpret with BMI/body fat and insulin markers."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "omega3": {
+      "name": "Omega-3 Index",
+      "aliases": [],
+      "unit": "%",
+      "displayRange": "8 - 12",
+      "category": "Vitamins",
+      "section": "ELITE",
+      "optimal": {
+        "low": 8,
+        "high": 12
+      },
+      "borderline": {
+        "low": 6,
+        "high": 7.9
+      },
+      "high": 12.1,
+      "veryHigh": 14,
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Higher cardiovascular risk when low",
+        "Inflammation balance issues"
+      ],
+      "actionDomains": [
+        "Increase EPA/DHA intake",
+        "Reduce omega-6 excess"
+      ],
+      "interpretationNotes": [
+        "Highly actionable; retest after 3–6 months if actively correcting."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "copper": {
+      "name": "Copper",
+      "aliases": [],
+      "unit": "µmol/L",
+      "displayRange": "12 - 22",
+      "category": "Vitamins",
+      "section": "ELITE",
+      "optimal": {
+        "low": 12,
+        "high": 22
+      },
+      "borderline": {
+        "low": 10,
+        "high": 11
+      },
+      "high": 25,
+      "veryHigh": null,
+      "evidenceStrength": "Emerging",
+      "associatedRisks": [
+        "Imbalance with zinc (contextual)",
+        "Oxidative stress context"
+      ],
+      "actionDomains": [
+        "Balance zinc/copper intake",
+        "Avoid excessive supplementation"
+      ],
+      "interpretationNotes": [
+        "Consider zinc:copper balance rather than single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "stfr": {
+      "name": "Soluble Transferrin Receptor (sTfR)",
+      "aliases": [],
+      "unit": "mg/L (lab dependent)",
+      "displayRange": "Lab reference",
+      "category": "Organ Health",
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Functional iron deficiency",
+        "Fatigue/performance limitation"
+      ],
+      "actionDomains": [
+        "Iron optimisation guided by full iron picture"
+      ],
+      "interpretationNotes": [
+        "Complements ferritin; useful when inflammation confounds ferritin.",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
     "psa": {
       "name": "PSA",
-      "aliases": ["prostatespecificantigen"],
-      "unit": "µg/L",
-      "displayRange": "< 4.0",
+      "aliases": [],
+      "unit": "µg/L (ng/mL)",
+      "displayRange": "Lab reference",
       "category": "Cancer Markers",
       "section": "ELITE",
-      "optimal": { "low": 0, "high": 2.5 },
-      "borderline": { "low": 0, "high": 4.0 },
-      "notes": "Men only."
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Age-adjusted; low",
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Prostate cancer screening context"
+      ],
+      "actionDomains": [
+        "Clinical discussion and shared decision-making"
+      ],
+      "interpretationNotes": [
+        "Optional; requires informed consent and appropriate follow-up pathway.",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual",
+      "sexSpecificFor": "Male",
+      "optional": true
     },
     "ca125": {
       "name": "CA-125",
-      "aliases": ["cancerantigen125"],
+      "aliases": [],
       "unit": "U/mL",
-      "displayRange": "< 35",
+      "displayRange": "Lab reference",
       "category": "Cancer Markers",
       "section": "ELITE",
-      "optimal": { "low": 0, "high": 35 },
-      "borderline": { "low": 0, "high": 65 },
-      "notes": "Women only."
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "<35 (lab reference)",
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Ovarian pathology screening context (non-specific)"
+      ],
+      "actionDomains": [
+        "Clinical discussion and follow-up if elevated"
+      ],
+      "interpretationNotes": [
+        "Optional; non-specific; interpret with symptoms and clinical pathway.",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual",
+      "sexSpecificFor": "Female",
+      "optional": true
+    },
+    "globulin": {
+      "name": "Globulin",
+      "aliases": [
+        "derived(tpalbumin)"
+      ],
+      "unit": "g/L",
+      "displayRange": "Lab reference",
+      "category": "Organ Health",
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Immune/protein status context"
+      ],
+      "actionDomains": [
+        "Clinical review if persistently abnormal"
+      ],
+      "interpretationNotes": [
+        "Often derived from total protein and albumin.",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual",
+      "derived": true
+    },
+    "agratio": {
+      "name": "Albumin/Globulin ratio",
+      "aliases": [],
+      "unit": "ratio",
+      "displayRange": "1.1 - 2.2",
+      "category": "Organ Health",
+      "section": "ELITE",
+      "optimal": {
+        "low": 1.1,
+        "high": 2.2
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Inflammation/immune context"
+      ],
+      "actionDomains": [
+        "Interpret with albumin and globulin"
+      ],
+      "interpretationNotes": [
+        "Derived metric."
+      ],
+      "measurementFrequency": "Annual",
+      "derived": true
+    },
+    "ldh": {
+      "name": "LDH",
+      "aliases": [],
+      "unit": "U/L",
+      "displayRange": "Lab reference",
+      "category": "Organ Health",
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Cell turnover/tissue injury marker (non-specific)"
+      ],
+      "actionDomains": [
+        "Clinical review if abnormal"
+      ],
+      "interpretationNotes": [
+        "Non-specific; use as context marker.",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "nonhdl": {
+      "name": "Non-HDL cholesterol",
+      "aliases": [],
+      "unit": "mmol/L",
+      "displayRange": "< 3",
+      "category": "Cardiovascular",
+      "section": "ELITE",
+      "optimal": {
+        "low": 0,
+        "high": 3
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Atherogenic cholesterol burden"
+      ],
+      "actionDomains": [
+        "Lower ApoB and TG drivers"
+      ],
+      "interpretationNotes": [
+        "Derived: TC - HDL."
+      ],
+      "measurementFrequency": "Annual",
+      "derived": true
+    },
+    "remnant": {
+      "name": "Remnant cholesterol",
+      "aliases": [],
+      "unit": "mmol/L",
+      "displayRange": "< 0.8",
+      "category": "Cardiovascular",
+      "section": "ELITE",
+      "optimal": {
+        "low": 0,
+        "high": 0.8
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "evidenceStrength": "Emerging",
+      "associatedRisks": [
+        "Residual atherogenic risk"
+      ],
+      "actionDomains": [
+        "Lower TG drivers"
+      ],
+      "interpretationNotes": [
+        "Derived; formula depends on available lipids."
+      ],
+      "measurementFrequency": "Annual",
+      "derived": true
+    },
+    "tghdl": {
+      "name": "TG/HDL ratio",
+      "aliases": [],
+      "unit": "ratio",
+      "displayRange": "< 1",
+      "category": "Metabolic",
+      "section": "ELITE",
+      "optimal": {
+        "low": 0,
+        "high": 1
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Insulin resistance proxy"
+      ],
+      "actionDomains": [
+        "Improve insulin sensitivity"
+      ],
+      "interpretationNotes": [
+        "Derived; interpret with insulin/HbA1c."
+      ],
+      "measurementFrequency": "Annual",
+      "derived": true
+    },
+    "homair": {
+      "name": "HOMA-IR",
+      "aliases": [],
+      "unit": "index",
+      "displayRange": "< 1.5",
+      "category": "Metabolic",
+      "section": "ELITE",
+      "optimal": {
+        "low": 0,
+        "high": 1.5
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Insulin resistance"
+      ],
+      "actionDomains": [
+        "Lifestyle interventions to improve sensitivity"
+      ],
+      "interpretationNotes": [
+        "Derived from fasting glucose + insulin."
+      ],
+      "measurementFrequency": "Annual",
+      "derived": true
+    },
+    "insgluratio": {
+      "name": "Insulin:Glucose ratio",
+      "aliases": [],
+      "unit": "ratio",
+      "displayRange": "Lab reference",
+      "category": "Metabolic",
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab/engine-defined",
+      "evidenceStrength": "Emerging",
+      "associatedRisks": [
+        "Insulin resistance proxy"
+      ],
+      "actionDomains": [
+        "As per insulin resistance"
+      ],
+      "interpretationNotes": [
+        "Derived metric."
+      ],
+      "measurementFrequency": "Annual",
+      "derived": true
+    },
+    "astaltratio": {
+      "name": "AST/ALT ratio",
+      "aliases": [],
+      "unit": "ratio",
+      "displayRange": "0.8 - 1.2",
+      "category": "Metabolic",
+      "section": "ELITE",
+      "optimal": {
+        "low": 0.8,
+        "high": 1.2
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Liver disease pattern context"
+      ],
+      "actionDomains": [
+        "Address alcohol/metabolic drivers"
+      ],
+      "interpretationNotes": [
+        "Derived metric; interpret clinically."
+      ],
+      "measurementFrequency": "Annual",
+      "derived": true
+    },
+    "neut": {
+      "name": "Neutrophils (abs)",
+      "aliases": [],
+      "unit": "x10^9/L",
+      "displayRange": "Lab reference",
+      "category": "Inflammation",
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Infection/inflammation context"
+      ],
+      "actionDomains": [
+        "Clinical review if abnormal"
+      ],
+      "interpretationNotes": [
+        "Part of CBC differential.",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "lymph": {
+      "name": "Lymphocytes (abs)",
+      "aliases": [],
+      "unit": "x10^9/L",
+      "displayRange": "Lab reference",
+      "category": "Inflammation",
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Immune status context"
+      ],
+      "actionDomains": [
+        "Clinical review if abnormal"
+      ],
+      "interpretationNotes": [
+        "Part of CBC differential.",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "mono": {
+      "name": "Monocytes (abs)",
+      "aliases": [],
+      "unit": "x10^9/L",
+      "displayRange": "Lab reference",
+      "category": "Inflammation",
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Inflammation/immune context"
+      ],
+      "actionDomains": [
+        "Clinical review if persistently abnormal"
+      ],
+      "interpretationNotes": [
+        "Part of CBC differential.",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "eos": {
+      "name": "Eosinophils (abs)",
+      "aliases": [],
+      "unit": "x10^9/L",
+      "displayRange": "Lab reference",
+      "category": "Inflammation",
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Allergy/parasite context"
+      ],
+      "actionDomains": [
+        "Clinical review if abnormal"
+      ],
+      "interpretationNotes": [
+        "Part of CBC differential.",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "baso": {
+      "name": "Basophils (abs)",
+      "aliases": [],
+      "unit": "x10^9/L",
+      "displayRange": "Lab reference",
+      "category": "Inflammation",
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Emerging",
+      "associatedRisks": [
+        "Allergy/immune context"
+      ],
+      "actionDomains": [
+        "Clinical review if abnormal"
+      ],
+      "interpretationNotes": [
+        "Part of CBC differential.",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "nlr": {
+      "name": "Neutrophil/Lymphocyte ratio",
+      "aliases": [],
+      "unit": "ratio",
+      "displayRange": "Lab reference",
+      "category": "Inflammation",
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lower is better (engine-defined)",
+      "evidenceStrength": "Emerging",
+      "associatedRisks": [
+        "Inflammation/mortality proxy"
+      ],
+      "actionDomains": [
+        "Address inflammation drivers"
+      ],
+      "interpretationNotes": [
+        "Derived from CBC differential."
+      ],
+      "measurementFrequency": "Annual",
+      "derived": true
+    },
+    "uacr": {
+      "name": "Urine albumin/creatinine ratio (uACR)",
+      "aliases": [
+        "microalbumin"
+      ],
+      "unit": "mg/mmol",
+      "displayRange": "< 3",
+      "category": "Organ Health",
+      "section": "ELITE",
+      "optimal": {
+        "low": 0,
+        "high": 3
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Early kidney/microvascular damage",
+        "Cardiovascular risk"
+      ],
+      "actionDomains": [
+        "BP control",
+        "Glycaemic control",
+        "Clinical review if elevated"
+      ],
+      "interpretationNotes": [
+        "High value early marker; repeat to confirm elevation."
+      ],
+      "measurementFrequency": "Annual",
+      "sampleType": "Urine"
+    },
+    "urinealb": {
+      "name": "Urine albumin",
+      "aliases": [],
+      "unit": "mg/L",
+      "displayRange": "Lab reference",
+      "category": "Organ Health",
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Kidney/microvascular context"
+      ],
+      "actionDomains": [
+        "Interpret with uACR"
+      ],
+      "interpretationNotes": [
+        "Usually used as part of uACR.",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual",
+      "sampleType": "Urine"
+    },
+    "urinecreat": {
+      "name": "Urine creatinine",
+      "aliases": [],
+      "unit": "mmol/L",
+      "displayRange": "Lab reference",
+      "category": "Organ Health",
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Kidney context"
+      ],
+      "actionDomains": [
+        "Interpret with uACR"
+      ],
+      "interpretationNotes": [
+        "Part of uACR calculation.",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual",
+      "sampleType": "Urine"
+    },
+    "vita": {
+      "name": "Vitamin A (retinol)",
+      "aliases": [],
+      "unit": "µmol/L",
+      "displayRange": "1.0 - 2.5",
+      "category": "Vitamins",
+      "section": "ELITE",
+      "optimal": {
+        "low": 1,
+        "high": 2.5
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "evidenceStrength": "Emerging",
+      "associatedRisks": [
+        "Vision/immune function issues when low/high"
+      ],
+      "actionDomains": [
+        "Dietary optimisation",
+        "Avoid excess supplementation"
+      ],
+      "interpretationNotes": [
+        "Optional supporting nutrient marker."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "vite": {
+      "name": "Vitamin E (alpha-tocopherol)",
+      "aliases": [],
+      "unit": "µmol/L",
+      "displayRange": "12 - 42",
+      "category": "Vitamins",
+      "section": "ELITE",
+      "optimal": {
+        "low": 12,
+        "high": 42
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "evidenceStrength": "Emerging",
+      "associatedRisks": [
+        "Oxidative stress context"
+      ],
+      "actionDomains": [
+        "Dietary optimisation"
+      ],
+      "interpretationNotes": [
+        "Optional supporting nutrient marker."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "selenium": {
+      "name": "Selenium",
+      "aliases": [],
+      "unit": "µmol/L",
+      "displayRange": "0.9 - 1.5",
+      "category": "Vitamins",
+      "section": "ELITE",
+      "optimal": {
+        "low": 0.9,
+        "high": 1.5
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "evidenceStrength": "Emerging",
+      "associatedRisks": [
+        "Thyroid/immune context"
+      ],
+      "actionDomains": [
+        "Dietary optimisation"
+      ],
+      "interpretationNotes": [
+        "Optional supporting nutrient marker."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "crpstd": {
+      "name": "CRP (standard)",
+      "aliases": [],
+      "unit": "mg/L",
+      "displayRange": "< 3",
+      "category": "Inflammation",
+      "section": "ELITE",
+      "optimal": {
+        "low": 0,
+        "high": 3
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "evidenceStrength": "Strong",
+      "associatedRisks": [
+        "Inflammation (non-hs)"
+      ],
+      "actionDomains": [
+        "As per inflammation"
+      ],
+      "interpretationNotes": [
+        "Included as context; hs-CRP is primary."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "ck": {
+      "name": "Creatine kinase (CK)",
+      "aliases": [],
+      "unit": "U/L",
+      "displayRange": "Lab reference",
+      "category": "Organ Health",
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Moderate",
+      "associatedRisks": [
+        "Muscle injury/overtraining context"
+      ],
+      "actionDomains": [
+        "Adjust training load",
+        "Clinical review if very high"
+      ],
+      "interpretationNotes": [
+        "Useful in performance users.",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "faratio": {
+      "name": "Fatty acid ratio (Omega-6:3)",
+      "aliases": [],
+      "unit": "ratio",
+      "displayRange": "Lab reference",
+      "category": "Vitamins",
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lower is better",
+      "evidenceStrength": "Emerging",
+      "associatedRisks": [
+        "Inflammation balance context"
+      ],
+      "actionDomains": [
+        "Diet adjustment",
+        "Omega-3 optimisation"
+      ],
+      "interpretationNotes": [
+        "Often derived when fatty acids measured."
+      ],
+      "measurementFrequency": "Annual",
+      "derived": true
+    },
+    "b12active": {
+      "name": "Active B12 (holotranscobalamin)",
+      "aliases": [],
+      "unit": "pmol/L",
+      "displayRange": "Lab reference",
+      "category": "Vitamins",
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Emerging",
+      "associatedRisks": [
+        "Functional B12 deficiency"
+      ],
+      "actionDomains": [
+        "Supplementation/diet"
+      ],
+      "interpretationNotes": [
+        "Optional refinement; include only if available/cost-effective.",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "hcycontext": {
+      "name": "Methylmalonic acid (MMA)",
+      "aliases": [],
+      "unit": "µmol/L",
+      "displayRange": "Lab reference",
+      "category": "Vitamins",
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Emerging",
+      "associatedRisks": [
+        "Functional B12 deficiency"
+      ],
+      "actionDomains": [
+        "Treat B12 deficiency appropriately"
+      ],
+      "interpretationNotes": [
+        "Optional; improves specificity for B12 deficiency.",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "lipase": {
+      "name": "Lipase",
+      "aliases": [],
+      "unit": "U/L",
+      "displayRange": "Lab reference",
+      "category": "Organ Health",
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Lab reference",
+      "evidenceStrength": "Emerging",
+      "associatedRisks": [
+        "Pancreatic context (non-specific)"
+      ],
+      "actionDomains": [
+        "Clinical review if abnormal"
+      ],
+      "interpretationNotes": [
+        "Optional.",
+        "Interpret using the reporting lab’s reference interval and clinical context; trend over time is often more informative than a single value."
+      ],
+      "measurementFrequency": "Annual"
+    },
+    "ferritinindex": {
+      "name": "Ferritin index (sTfR/log ferritin)",
+      "aliases": [],
+      "unit": "index",
+      "displayRange": "Lab reference",
+      "category": "Organ Health",
+      "section": "ELITE",
+      "optimal": {
+        "low": null,
+        "high": null
+      },
+      "borderline": {
+        "low": null,
+        "high": null
+      },
+      "high": null,
+      "veryHigh": null,
+      "referenceNote": "Engine-defined",
+      "evidenceStrength": "Emerging",
+      "associatedRisks": [
+        "Functional iron status"
+      ],
+      "actionDomains": [
+        "Iron optimisation"
+      ],
+      "interpretationNotes": [
+        "Derived from sTfR and ferritin."
+      ],
+      "measurementFrequency": "Annual",
+      "derived": true
     }
   },
-
   "categories": [
     "All",
     "Cardiovascular",
     "Metabolic",
     "Organ Health",
     "Hormones",
-    "Blood Health",
     "Vitamins",
     "Inflammation",
     "Cancer Markers"
   ],
-
   "scoring": {
     "core": {
       "description": "Weighted composite of cardiovascular risk, metabolic health, inflammation, hormonal balance, organ resilience, and body composition",
       "maxScore": 100,
-      "components": ["Cardiovascular", "Metabolic", "Inflammation", "Hormones", "Organ Health"]
+      "components": [
+        "Cardiovascular",
+        "Metabolic",
+        "Inflammation",
+        "Hormones",
+        "Organ Health"
+      ]
     },
     "elite": {
       "description": "Blind spot detection + aging precision overlay on top of CORE score",
-      "components": ["Cancer Markers", "Biological Aging", "Cognitive Resilience"]
+      "components": [
+        "Cancer Markers",
+        "Biological Aging",
+        "Cognitive Resilience"
+      ]
     }
   }
 }

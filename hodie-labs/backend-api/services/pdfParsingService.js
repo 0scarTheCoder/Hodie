@@ -18,6 +18,59 @@ class PDFParsingService {
   }
 
   /**
+   * Remove repeated page headers/footers from multi-page pathology reports.
+   * Melbourne Pathology (and similar) repeat the full patient header on every page.
+   */
+  deduplicateText(pdfText) {
+    const lines = pdfText.split('\n');
+    const seen = new Set();
+    const filtered = [];
+    let skipCount = 0;
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      // Skip empty lines
+      if (!trimmed) {
+        filtered.push(line);
+        continue;
+      }
+      // Skip repeated header lines (patient info, lab name, dates that appear on every page)
+      if (seen.has(trimmed) && (
+        trimmed.startsWith('MELBOURNE PATHOLOGY') ||
+        trimmed.startsWith('Patient:') ||
+        trimmed.startsWith('DOB:') ||
+        trimmed.startsWith('Address:') ||
+        trimmed.startsWith('Ordered by:') ||
+        trimmed.startsWith('Copy to:') ||
+        trimmed.startsWith('Collected:') ||
+        trimmed.startsWith('Reported:') ||
+        trimmed.startsWith('Tests Completed:') ||
+        trimmed.startsWith('Tests Pending') ||
+        trimmed.startsWith('Sample Pending') ||
+        trimmed.startsWith('Melbourne Pathology NATA') ||
+        trimmed.startsWith('Dept Supervising') ||
+        trimmed.includes('midstream cardiovascular') ||
+        trimmed.startsWith('EVEDA') ||
+        trimmed.startsWith('Patient Name:') ||
+        trimmed.startsWith('MRN:') ||
+        trimmed.startsWith('Email:') ||
+        trimmed.startsWith('Lab Reference ID')
+      )) {
+        skipCount++;
+        continue;
+      }
+      seen.add(trimmed);
+      filtered.push(line);
+    }
+
+    if (skipCount > 0) {
+      console.log(`📄 Removed ${skipCount} duplicate header/footer lines`);
+    }
+
+    return filtered.join('\n');
+  }
+
+  /**
    * Parse a PDF buffer and extract structured health data
    * @param {Buffer} pdfBuffer - The PDF file buffer
    * @param {string} category - Data category (lab_results, genetic_data, etc.)
@@ -29,14 +82,13 @@ class PDFParsingService {
 
       // Extract text from PDF
       const pdfData = await pdf(pdfBuffer);
-      const pdfText = pdfData.text;
+      let pdfText = pdfData.text;
 
       if (!pdfText || pdfText.trim().length === 0) {
         throw new Error('No text content found in PDF. This may be a scanned/image-based PDF that requires OCR.');
       }
 
       // Check if extracted text has enough meaningful content
-      // Scanned PDFs often return minimal text (headers, form labels) without actual data
       const meaningfulText = pdfText.replace(/\s+/g, ' ').trim();
       const hasNumbers = /\d+\.?\d*/.test(meaningfulText);
 
@@ -45,6 +97,10 @@ class PDFParsingService {
       if (meaningfulText.length < 50) {
         throw new Error('PDF appears to be scanned/image-based with insufficient text content. OCR is required to extract data from this file.');
       }
+
+      // Deduplicate repeated headers from multi-page reports
+      pdfText = this.deduplicateText(pdfText);
+      console.log(`📄 After deduplication: ${pdfText.length} characters`);
 
       // Route to appropriate parser based on category
       switch (category) {
@@ -66,9 +122,62 @@ class PDFParsingService {
   }
 
   /**
+   * Try to repair truncated JSON from AI response
+   */
+  repairTruncatedJson(jsonText) {
+    // If JSON ends mid-array, try to close it
+    let repaired = jsonText.trim();
+
+    // Remove trailing comma if present
+    repaired = repaired.replace(/,\s*$/, '');
+
+    // Count open/close braces and brackets
+    const openBraces = (repaired.match(/{/g) || []).length;
+    const closeBraces = (repaired.match(/}/g) || []).length;
+    const openBrackets = (repaired.match(/\[/g) || []).length;
+    const closeBrackets = (repaired.match(/]/g) || []).length;
+
+    // Try to close unclosed structures
+    // First close any open strings (look for odd number of unescaped quotes)
+    // Then close brackets and braces
+    const bracketDiff = openBrackets - closeBrackets;
+    const braceDiff = openBraces - closeBraces;
+
+    if (bracketDiff > 0 || braceDiff > 0) {
+      console.log(`📄 Attempting JSON repair: ${bracketDiff} unclosed brackets, ${braceDiff} unclosed braces`);
+
+      // If we're in the middle of a biomarker object, try to find a good cut point
+      const lastCompleteObject = repaired.lastIndexOf('},');
+      const lastCompleteObjectEnd = repaired.lastIndexOf('}');
+
+      if (lastCompleteObject > 0 && bracketDiff > 0) {
+        // Cut at the last complete object in the array
+        repaired = repaired.substring(0, lastCompleteObject + 1);
+      }
+
+      // Close remaining structures
+      for (let i = 0; i < openBrackets - (repaired.match(/]/g) || []).length; i++) {
+        repaired += ']';
+      }
+      for (let i = 0; i < openBraces - (repaired.match(/}/g) || []).length; i++) {
+        repaired += '}';
+      }
+    }
+
+    return repaired;
+  }
+
+  /**
    * Parse lab results PDF into structured biomarker data
    */
   async parseLabResults(pdfText) {
+    // Truncate very long texts to avoid exceeding input limits
+    const maxInputChars = 15000;
+    if (pdfText.length > maxInputChars) {
+      console.log(`📄 Truncating PDF text from ${pdfText.length} to ${maxInputChars} chars`);
+      pdfText = pdfText.substring(0, maxInputChars);
+    }
+
     const prompt = `You are a medical data extraction specialist. Extract structured biomarker data from this lab report.
 
 Lab Report Text:
@@ -79,9 +188,11 @@ Extract ALL biomarkers found in the report. For each biomarker, extract:
 - value: The numeric value
 - unit: The unit of measurement (e.g., "mmol/L", "mg/dL", "ng/mL")
 - referenceRange: The normal reference range as a string (e.g., "< 5.0", "40-60", "> 75")
-- flagged: true if out of range or flagged, false if normal
+- flagged: true if out of range or flagged (marked with H or L), false if normal
 - testDate: The date of the test (ISO format if possible, or the original format)
-- category: The category (e.g., "Cardiovascular", "Metabolic", "Vitamins", "Hormones", "General")
+- category: The category (e.g., "Cardiovascular", "Metabolic", "Vitamins", "Hormones", "Haematology", "Organ", "General")
+
+When there are multiple dates/results for the same biomarker, use the MOST RECENT value only (the "Latest Results" column).
 
 Return ONLY a valid JSON object with this structure:
 {
@@ -105,11 +216,12 @@ Important:
 - If the text is garbled, incomplete, or does not contain clear biomarker values, return: {"testDate": null, "labProvider": null, "biomarkers": []}
 - Use consistent naming (e.g., "Vitamin D" not "Vit D" or "25-OH Vitamin D")
 - Convert values to numbers where possible
-- If multiple tests are present, use the most recent date
+- Use the most recent date and most recent values when multiple dates exist
 - Do not include any markdown formatting, just raw JSON
 - If you cannot confidently extract data from the text, return an empty biomarkers array rather than guessing`;
 
-    const response = await this.claudeService.generateResponse(prompt, [], {});
+    // Use higher max_tokens for large reports (50+ biomarkers need ~8k tokens of JSON)
+    const response = await this.claudeService.generateResponse(prompt, [], {}, { maxTokens: 8192 });
     const responseText = response.text || response;
 
     // Clean up response (remove markdown code blocks if present)
@@ -120,18 +232,35 @@ Important:
       jsonText = jsonText.replace(/```\n?/g, '');
     }
 
+    // First try parsing as-is
     try {
       const parsedData = JSON.parse(jsonText);
       console.log(`✅ Extracted ${parsedData.biomarkers?.length || 0} biomarkers`);
 
-      // Validate parsed data
       const validatedData = validateLabResults(parsedData);
       console.log(`✅ Validated ${validatedData.biomarkers.length} biomarkers`);
 
       return validatedData;
     } catch (parseError) {
-      console.error('Failed to parse AI response as JSON:', jsonText.substring(0, 200));
-      throw new Error('AI returned invalid JSON format');
+      console.warn('⚠️ Initial JSON parse failed, attempting repair...');
+      console.warn('First 300 chars:', jsonText.substring(0, 300));
+      console.warn('Last 200 chars:', jsonText.substring(jsonText.length - 200));
+
+      // Try to repair truncated JSON
+      try {
+        const repairedJson = this.repairTruncatedJson(jsonText);
+        const parsedData = JSON.parse(repairedJson);
+        console.log(`✅ Repaired JSON: extracted ${parsedData.biomarkers?.length || 0} biomarkers`);
+
+        const validatedData = validateLabResults(parsedData);
+        console.log(`✅ Validated ${validatedData.biomarkers.length} biomarkers (from repaired JSON)`);
+
+        return validatedData;
+      } catch (repairError) {
+        console.error('Failed to repair JSON:', repairError.message);
+        console.error('Original response (first 500 chars):', jsonText.substring(0, 500));
+        throw new Error('AI returned invalid JSON format. The report may be too large or complex for automated parsing.');
+      }
     }
   }
 
@@ -139,6 +268,10 @@ Important:
    * Parse genetic data PDF (23andMe, AncestryDNA, etc.)
    */
   async parseGeneticData(pdfText) {
+    if (pdfText.length > 15000) {
+      pdfText = pdfText.substring(0, 15000);
+    }
+
     const prompt = `Extract genetic health information from this genetic test report.
 
 Report Text:
@@ -170,7 +303,7 @@ Return ONLY valid JSON:
   ]
 }`;
 
-    const response = await this.claudeService.generateResponse(prompt, [], {});
+    const response = await this.claudeService.generateResponse(prompt, [], {}, { maxTokens: 8192 });
     const responseText = response.text || response;
 
     let jsonText = responseText.trim().replace(/```json\n?/g, '').replace(/```\n?/g, '');
@@ -192,6 +325,10 @@ Return ONLY valid JSON:
    * Parse general medical report
    */
   async parseMedicalReport(pdfText) {
+    if (pdfText.length > 15000) {
+      pdfText = pdfText.substring(0, 15000);
+    }
+
     const prompt = `Extract key information from this medical report.
 
 Report Text:
@@ -207,7 +344,7 @@ Extract summary information. Return ONLY valid JSON:
   "recommendations": ["List of recommendations if any"]
 }`;
 
-    const response = await this.claudeService.generateResponse(prompt, [], {});
+    const response = await this.claudeService.generateResponse(prompt, [], {}, { maxTokens: 8192 });
     const responseText = response.text || response;
 
     let jsonText = responseText.trim().replace(/```json\n?/g, '').replace(/```\n?/g, '');
@@ -235,24 +372,6 @@ Extract summary information. Return ONLY valid JSON:
       parsedDate: new Date().toISOString(),
       note: 'Generic extraction - structured parsing not available for this category'
     };
-  }
-
-  /**
-   * Validate parsed lab results data
-   */
-  validateLabResults(data) {
-    if (!data || !data.biomarkers || !Array.isArray(data.biomarkers)) {
-      throw new Error('Invalid lab results structure');
-    }
-
-    // Validate each biomarker has required fields
-    for (const biomarker of data.biomarkers) {
-      if (!biomarker.name || biomarker.value === undefined) {
-        throw new Error(`Invalid biomarker: missing name or value`);
-      }
-    }
-
-    return true;
   }
 }
 

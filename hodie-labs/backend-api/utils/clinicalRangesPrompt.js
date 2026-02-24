@@ -25,20 +25,28 @@ function buildClinicalRangesPrompt() {
   for (const [category, markers] of Object.entries(grouped)) {
     prompt += `\n${category}:\n`;
     for (const bm of markers) {
-      let line = `- ${bm.name} (${bm.unit}): Optimal ${bm.displayRange}`;
-      if (bm.borderline && bm.optimal) {
-        // Show borderline as the range between optimal and high
-        const bLow = bm.optimal.high;
-        const bHigh = bm.borderline.high;
-        if (bLow !== bHigh) {
-          line += ` | Borderline ${bLow}–${bHigh}`;
+      let line = `- ${bm.name} (${bm.unit}): `;
+      if (bm.referenceNote) {
+        // Lab-reference-only marker (no numeric thresholds)
+        line += `Reference: ${bm.referenceNote}`;
+      } else {
+        line += `Optimal ${bm.displayRange}`;
+        if (bm.borderline && bm.optimal && bm.optimal.high !== null && bm.borderline.high !== null) {
+          const brdLow = bm.borderline.low;
+          const brdHigh = bm.borderline.high;
+          if (brdLow !== null && brdHigh !== null && brdLow !== brdHigh) {
+            line += ` | Borderline ${brdLow}–${brdHigh}`;
+          }
+        }
+        if (bm.high !== undefined && bm.high !== null) {
+          line += ` | High >${bm.high}`;
+        }
+        if (bm.veryHigh !== undefined && bm.veryHigh !== null) {
+          line += ` | Very High >${bm.veryHigh}`;
         }
       }
-      if (bm.high !== undefined) {
-        line += ` | High >${bm.high}`;
-      }
-      if (bm.veryHigh !== undefined) {
-        line += ` | Very High >${bm.veryHigh}`;
+      if (bm.interpretationNotes && bm.interpretationNotes.length > 0) {
+        line += ` [${bm.interpretationNotes[0]}]`;
       }
       prompt += line + '\n';
     }
@@ -60,8 +68,11 @@ function buildCondensedRangesPrompt() {
   );
 
   const lines = keyMarkers.map((bm) => {
+    if (bm.referenceNote) {
+      return `${bm.name} (${bm.unit}) ref: ${bm.referenceNote}`;
+    }
     let line = `${bm.name} ${bm.displayRange} ${bm.unit} optimal`;
-    if (bm.borderline) {
+    if (bm.borderline && bm.borderline.high !== null) {
       line += ` | ${bm.borderline.high} borderline`;
     }
     return line;

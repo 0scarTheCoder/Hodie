@@ -33,7 +33,7 @@ class ClaudeService {
   /**
    * Generate health response using Claude
    */
-  async generateResponse(message, conversationHistory = [], healthContext = null) {
+  async generateResponse(message, conversationHistory = [], healthContext = null, options = {}) {
     try {
       // Build system prompt
       const systemPrompt = this.buildSystemPrompt(healthContext);
@@ -62,7 +62,7 @@ class ClaudeService {
       // Call Claude API
       const response = await this.client.messages.create({
         model: this.model,
-        max_tokens: this.maxTokens,
+        max_tokens: options.maxTokens || this.maxTokens,
         system: systemPrompt,
         messages: messages
       });
