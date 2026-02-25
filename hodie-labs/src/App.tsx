@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import ExactHodieLogin from './components/auth/ExactHodieLogin';
 import ComprehensiveDashboard from './components/dashboard/ComprehensiveDashboard';
@@ -7,6 +7,25 @@ import OnboardingFlow from './components/onboarding/OnboardingFlow';
 import FirebasePasswordReset from './components/auth/FirebasePasswordReset';
 import { queryLogger } from './utils/queryLogger';
 import { Loader2 } from 'lucide-react';
+
+// Login route wrapper - redirects to dashboard if already authenticated
+const LoginRoute: React.FC = () => {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-[#2a1e5c] via-[#1a0f3a] to-[#0f0622] flex items-center justify-center">
+        <Loader2 className="w-16 h-16 text-white animate-spin" />
+      </div>
+    );
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <ExactHodieLogin />;
+};
 
 // Firebase App Content Component
 const FirebaseAppContent: React.FC = () => {
@@ -115,7 +134,7 @@ function App() {
       <AuthProvider>
         <Routes>
           <Route path="/reset-password" element={<FirebasePasswordReset />} />
-          <Route path="/login" element={<ExactHodieLogin />} />
+          <Route path="/login" element={<LoginRoute />} />
           <Route path="/*" element={<FirebaseAppContent />} />
         </Routes>
       </AuthProvider>

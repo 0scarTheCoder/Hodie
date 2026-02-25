@@ -25,7 +25,7 @@ const BrandHeader: React.FC<BrandHeaderProps> = ({
   const handleLogout = async () => {
     try {
       await logout();
-      window.location.href = '/login';
+      window.location.href = '/';
     } catch (error) {
       console.error('Logout error:', error);
     }
@@ -45,7 +45,7 @@ const BrandHeader: React.FC<BrandHeaderProps> = ({
               <img
                 src="/hodie_transparent_logo.png"
                 alt="HodieLabs"
-                className="h-8 w-auto"
+                className="h-10 w-auto brightness-0 invert"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
                   const textEl = e.currentTarget.nextElementSibling as HTMLElement;
