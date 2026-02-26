@@ -19,8 +19,10 @@ class ClaudeService {
     });
 
     // Set model based on type
+    // Note: claude-3-haiku only supports 4096 max output tokens
+    // claude-3-5-haiku supports 8192 max output tokens (needed for large PDF parsing)
     this.models = {
-      haiku: 'claude-3-haiku-20240307',
+      haiku: 'claude-3-5-haiku-20241022',
       sonnet: 'claude-3-5-sonnet-20241022'
     };
 

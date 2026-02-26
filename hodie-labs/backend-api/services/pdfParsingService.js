@@ -54,7 +54,13 @@ class PDFParsingService {
         trimmed.startsWith('Patient Name:') ||
         trimmed.startsWith('MRN:') ||
         trimmed.startsWith('Email:') ||
-        trimmed.startsWith('Lab Reference ID')
+        trimmed.startsWith('Lab Reference ID') ||
+        // Dante Labs headers
+        trimmed.startsWith('www.dantelabs.com') ||
+        trimmed.startsWith('DANTE LABS') ||
+        trimmed.startsWith('KIT ID:') ||
+        trimmed.includes('Wellness and Lifestyle Report') ||
+        trimmed.includes('Kit ID:')
       )) {
         skipCount++;
         continue;

@@ -71,11 +71,15 @@ const LabsScreen: React.FC<LabsScreenProps> = ({ user }) => {
           headers['Authorization'] = `Bearer ${token}`;
         }
 
-        // Fetch lab results from backend
+        // Fetch lab results from backend (with 15s timeout)
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
+
         const response = await fetch(
           `${process.env.REACT_APP_API_BASE_URL}/lab-results/${userId}`,
-          { headers }
+          { headers, signal: controller.signal }
         );
+        clearTimeout(timeoutId);
 
         if (!response.ok) {
           throw new Error(`Failed to fetch lab results: ${response.status}`);
